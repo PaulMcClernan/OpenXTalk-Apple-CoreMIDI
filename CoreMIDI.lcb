@@ -32,8 +32,10 @@ metadata svgicon is "M66.43,52.07c-0.71,0.32-1.48,0.56-2.31,0.78c-2.35,0.65-5.44
 
 -- OSStatus MIDIEntityGetDevice(MIDIEntityRef inEntity, MIDIDeviceRef *outDevice);
 -- OSStatus MIDIClientCreate(CFStringRef name, MIDINotifyProc notifyProc, void *notifyRefCon, MIDIClientRef *outClient);
-private foreign handler c_MIDIClientCreate(in pClientNameCFStrngRef as ObjCId, in pMIDINotifyProc as optional any , in pNotifyRefConstant as optional any, out rMIDIClientRef as ObjCId) returns CInt binds to "c:CoreMIDI.framework>MIDIClientCreate"
+private foreign handler c_MIDIClientCreate(in pClientNameCFStrngRef as ObjCId, in pMIDINotifyProc as optional any , in pNotifyRefConst as optional any, out rMIDIClientRef as ObjCId) returns CInt binds to "c:CoreMIDI.framework>MIDIClientCreate"
 private foreign handler c_MIDIOutputPortCreate(in pMIDIClientRef as ObjCId, in pOutPortNameCFStrngRef as ObjCId, out rMIDIOutPortRef as ObjCId) returns CInt binds to "c:CoreMIDI.framework>MIDIOutputPortCreate"
+private foreign handler c_MIDISourceCreate(in pMIDIClientRef as ObjCId, in pSourceNameStrRef as ObjCId, out rMIDISourceEndPointRef as ObjCId) returns CInt binds to "c:CoreMIDI.framework>MIDISourceCreate"
+private foreign handler c_MIDIDestinationCreate(in pMIDIClientRef as ObjCId, in pMIDIDestinationNameStrRef as ObjCId, in pMIDIReadProc as optional any, in pRefConst as optional any, out rMIDIDestEndpointRef as ObjCId) returns CInt binds to "c:CoreMIDI.framework>MIDIDestinationCreate"
 
 private foreign handler c_MIDIGetNumberOfDestinations() returns CInt binds to "c:CoreMIDI.framework>MIDIGetNumberOfDestinations"
 private foreign handler c_MIDIGetNumberOfDevices() returns CInt binds to "c:CoreMIDI.framework>MIDIGetNumberOfDevices"
@@ -49,6 +51,8 @@ private foreign handler objC_NSErrorAlloc() returns ObjcRetainedId binds to "obj
 -- private variable sMIDIClientRef as ObjcObject
 private variable sMIDIClientRef as ObjCId
 private variable sMIDIOutPortRef as ObjCId
+private variable sMIDIDestEndpointRef as ObjCId
+private variable sMIDISourceEndpointRef as ObjCId
 
 public handler CoreMIDIClientCreate(in clientName as String) returns nothing
    variable tClientNameStrRef as ObjcObject
@@ -69,8 +73,30 @@ public handler CoreMIDIOutputPortCreate(in portName as String) returns nothing
    variable tNotifyRefCon as optional any
 		unsafe
 			put StringToNSString(portName) into tOutPortStrRef
-         -- put c_MIDIClientCreate(tClientNameStrRef,nothing,nothing,sMIDIClientRef) into tOSStatus
          put c_MIDIOutputPortCreate(sMIDIClientRef,tOutPortStrRef,sMIDIOutPortRef) into tOSStatus
+   end unsafe
+end handler
+
+public handler CoreMIDISourceCreate(in sourceName as String) returns nothing
+   -- OSStatus MIDISourceCreate(MIDIClientRef client, CFStringRef name, MIDIEndpointRef *outSrc);
+   variable tSourceNameStrRef as ObjcObject
+   variable tOSStatus as optional CInt
+		unsafe
+			put StringToNSString(sourceName) into tSourceNameStrRef
+         put c_MIDISourceCreate(sMIDIClientRef,tSourceNameStrRef,sMIDISourceEndpointRef) into tOSStatus
+   end unsafe
+end handler
+
+public handler CoreMIDIDestinationCreate(in destName as String) returns nothing
+   -- OSStatus MIDIDestinationCreate(MIDIClientRef client, CFStringRef name, MIDIReadProc readProc, void *refCon, MIDIEndpointRef *outDest);
+   variable tDestNameStrRef as ObjcObject
+   variable tOSStatus as optional CInt
+   variable tMIDIReadProc as optional any
+   variable tRefCon as optional any
+		unsafe
+			put StringToNSString(destName) into tDestNameStrRef
+         -- put c_MIDIClientCreate(tClientNameStrRef,nothing,nothing,sMIDIClientRef) into tOSStatus
+         put c_MIDIDestinationCreate(sMIDIClientRef,tDestNameStrRef,tMIDIReadProc,tRefCon,sMIDIDestEndpointRef) into tOSStatus
    end unsafe
 end handler
 
