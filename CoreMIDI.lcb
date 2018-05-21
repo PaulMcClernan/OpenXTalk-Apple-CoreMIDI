@@ -3,6 +3,7 @@ library community.coremidi.paulmcclernan
 use com.livecode.foreign
 use com.livecode.objc
 use com.livecode.engine
+use com.livecode.byte
 
 metadata version is "0.0.1"
 metadata author is "Paul McClernan"
@@ -19,6 +20,8 @@ metadata svgicon is "M66.43,52.07c-0.71,0.32-1.48,0.56-2.31,0.78c-2.35,0.65-5.44
 -- OSStatus MIDIDestinationCreate(MIDIClientRef client, CFStringRef name, MIDIReadProc readProc, void *refCon, MIDIEndpointRef *outDest);
 -- OSStatus MIDIClientCreate(CFStringRef name, MIDINotifyProc notifyProc, void *notifyRefCon, MIDIClientRef *outClient);
 -- OSStatus MIDIObjectGetStringProperty(MIDIObjectRef obj, CFStringRef propertyID, CFStringRef  _Nullable *str);
+
+-- OSStatus MIDISend(MIDIPortRef port, MIDIEndpointRef dest, const MIDIPacketList *pktlist);
 
 
 -- ItemCount MIDIEntityGetNumberOfDestinations(MIDIEntityRef entity);
@@ -37,6 +40,9 @@ private foreign handler c_MIDIOutputPortCreate(in pMIDIClientRef as ObjCId, in p
 private foreign handler c_MIDISourceCreate(in pMIDIClientRef as ObjCId, in pSourceNameStrRef as ObjCId, out rMIDISourceEndPointRef as ObjCId) returns CInt binds to "c:CoreMIDI.framework>MIDISourceCreate"
 private foreign handler c_MIDIDestinationCreate(in pMIDIClientRef as ObjCId, in pMIDIDestinationNameStrRef as ObjCId, in pMIDIReadProc as optional any, in pRefConst as optional any, out rMIDIDestEndpointRef as ObjCId) returns CInt binds to "c:CoreMIDI.framework>MIDIDestinationCreate"
 
+private foreign handler c_MIDISend(in pMIDIPortRef as ObjCId, in pMIDIEndpointRef as ObjCId, in pMIDIPacketList as Pointer) returns CInt binds to "c:CoreMIDI.framework>MIDISend"
+
+
 private foreign handler c_MIDIGetNumberOfDestinations() returns CInt binds to "c:CoreMIDI.framework>MIDIGetNumberOfDestinations"
 private foreign handler c_MIDIGetNumberOfDevices() returns CInt binds to "c:CoreMIDI.framework>MIDIGetNumberOfDevices"
 private foreign handler c_MIDIGetNumberOfExternalDevices() returns CInt binds to "c:CoreMIDI.framework>MIDIGetNumberOfExternalDevices"
@@ -53,6 +59,20 @@ private variable sMIDIClientRef as ObjCId
 private variable sMIDIOutPortRef as ObjCId
 private variable sMIDIDestEndpointRef as ObjCId
 private variable sMIDISourceEndpointRef as ObjCId
+
+constant kMIDINoteOnCh1 is 0x90
+
+public handler CoreMIDITestNoteOn ()
+   variable tOSStatus as optional CInt
+   variable tPacketData as Array
+    put 0x90 & 0x3F & 0x00 into tPacketData[0]
+    log tPacketData
+      unsafe
+         put c_MIDISend(sMIDIClientRef,sMIDISourceEndpointRef,tPacketData) into tOSStatus
+      end unsafe
+
+end handler
+
 
 public handler CoreMIDIClientCreate(in clientName as String) returns nothing
    variable tClientNameStrRef as ObjcObject
