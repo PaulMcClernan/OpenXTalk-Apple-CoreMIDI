@@ -1,0 +1,163 @@
+Typing
+LiveCode Builder is a typed language, although typing is completely optional in most places
+(the only exception being in foreign handler declarations). If a type annotation is not specified
+it is simply taken to be the most general type optional any (meaning any value, including nothing).
+
+The range of core types is relatively small, comprising the following:
+
+optional type means the value can be either the specified type or nothing. Variables which are of optional type are automatically initial zed to nothing.
+
+nothing: the single value nothing
+Boolean: one of true or false
+Integer: any integral numeric value (size limitations apply)
+Real: any numeric value (size and accuracy limitations apply)
+Number: any integer or real value
+String: a sequence of UTF-16 code units
+Data: a sequence of bytes
+List: a sequence of any values
+Array: a mapping from strings to values
+any: a value of any type
+
+any: any value
+Boolean: a boolean value, either the value true or false.
+Integer: any integer number value
+Real: any real number value
+Number: any number value
+String: a sequence of UTF-16 code units
+Data: a sequence of bytes
+Array: a map from string to any value (i.e. an associative array, just like in LiveCode Script)
+List: a sequence of any value
+nothing: a single value nothing (this is used to describe handlers with no return value - i.e. void)
+Pointer: a low-level pointer (this is used with foreign code interconnect and shouldn't be generally used).
+
+Note: Integer and Real are currently the same as Number.
+
+Note: In a subsequent update you will be able to specify lists and arrays of fixed types. For example, List of String.
+
+Note: In a subsequent update you will be able to define record types (named collections of values - like structs in C)
+and handler types (allowing dynamic handler calls through a variable - like function pointers in C).
+
+: <Name: Identifier>
+ | 'optional' <Target: Type>
+ | 'any'
+ | 'nothing'
+ | 'Boolean'
+ | 'Integer'
+ | 'Real'
+ | 'Number'
+ | 'String'
+ | 'Data'
+ | 'Array'
+ | 'List'
+ | 'Pointer'
+
+ Handler Types
+HandlerTypeDefinition
+  : [ 'foreign' ] 'handler' 'type' <Name: Identifier> '(' [ ParameterList ] ')' [ 'returns' <ReturnType: Type> ]
+A handler type definition defines a type which can hold a handler. Variables of such types can hold handlers (just like function pointers in C) which allows them to be called dynamically.
+
+If the handler type is defined as foreign then automatic bridging to a C function pointer will occur when the type appears as the type of a parameter in a foreign handler definition.
+
+Note: Passing an LCB handler to a foreign function requires creation of a function pointer. The lifetime of the function pointer is the same as the widget or module which created it.
+Record Types
+RecordTypeDefinition
+  : 'record' 'type' <Name: Identifier> SEPARATOR
+    { RecordTypeFieldDefinition }
+    'end' 'record'
+
+RecordTypeFieldDefinition
+  : <Name: Identifier> [ 'as' <TypeOf: Type> ]
+A record type definition defines a type that consists of 0 or more named fields, each with its own optional type.
+
+Variables
+VariableDefinition
+  : 'variable' <Name: Identifier> [ 'as' <TypeOf: Type> ]
+A variable definition defines a module-scope variable. In a widget module, such variables are per-widget (i.e. instance variables). In a library module, there is only a single instance (i.e. a private global variable).
+
+The type specification for the variable is optional, if it is not specified the type of the variable is optional any meaning that it can hold any value, including being nothing.
+
+Variables whose type has a default value are initialized to that value at the point of definition. The default values for the standard types are:
+
+optional: nothing
+Boolean: false
+Integer: 0
+Real: 0.0
+Number: 0
+String: the empty string
+Data: the empty data
+Array: the empty array
+List: the empty list
+nothing: nothing
+Variables whose type do not have a default value will remain unassigned and it is a checked runtime error to fetch from such variables until they are assigned a value.
+
+
+Foreign Aggregate Types
+C-style aggregates (e.g. structs) can now be accessed from LCB via the new aggregate parameterized type.
+This allows calling foreign functions which has arguments taking aggregates by value, or has an aggregate return value.
+
+Aggregate types are foreign types and can be used in C and Obj-C foreign handler definitions.
+They bridge to and from the List type, allowing an aggregate's contents to be viewed as a sequence of discrete values.
+
+Aggregate types are defined using a foreign type clause and binding string. e.g.
+
+public foreign type NSRect binds to "MCAggregateTypeInfo:qqqq"
+The structure of the aggregate is defined by using a sequence of type codes after the ':', each type code represents a specific foreign (C) type:
+
+Char	Type
+a	CBool
+b	CChar
+c	CUChar
+C	CSChar
+d	CUShort
+D	CSShort
+e	CUInt
+E	CSInt
+f	CULong
+F	CSLong
+g	CULongLong
+G	CSLongLong
+h	UInt8
+H	SInt8
+i	UInt16
+I	SInt16
+j	UInt32
+J	SInt32
+k	UInt64
+K	SInt64
+l	UIntPtr
+L	SIntPtr
+m	UIntSize
+M	SIntSize
+n	Float
+N	Double
+o	LCUInt
+O	LCSInt
+p	NaturalUInt
+P	NaturalSInt
+q	NaturalFloat
+r	Pointer
+
+Conversion must be explicitly specified using syntax
+(currently this is using things like ... parsed as number and ... formatted as string.
+
+The structure of tokens is similar to LiveCode Script, but again a little stricter.
+The regular expressions describing the tokens are as follows:
+
+Identifier: [A-Za-z][A-Za-z0-9.]*
+Integer: [0-9]+
+Binary Integer: 0b[01]+
+Hexadecimal Integer: 0x[0-9a-fA-F]+
+Real: [0-9]+"."[0-9]+([eE][-+]?[0-9]+)?
+String: "[^\n\r"]*"
+Separator: Any whitespace containing at least one newline
+Strings use backslash ('\') as an escape - the following are understood:
+
+\n: LF (ASCII 10)
+\r: CR (ASCII 13)
+\t: TAB (ASCII 9)
+\q: quote '"'
+**\u{X...X}: character with unicode codepoint U+X...X - any number of nibbles may be specified, but any values greater than 0x10FFFF will be replaced by U+FFFD.
+\: backslash '\'
+Note: The presence of '.' in identifiers are used as a namespace scope delimiter.
+
+Note: Source files are presumed to be in UTF-8 encoding.
