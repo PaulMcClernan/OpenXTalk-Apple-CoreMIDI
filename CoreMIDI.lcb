@@ -35,18 +35,17 @@ metadata svgicon is "M66.43,52.07c-0.71,0.32-1.48,0.56-2.31,0.78c-2.35,0.65-5.44
 
 -- OSStatus MIDIEntityGetDevice(MIDIEntityRef inEntity, MIDIDeviceRef *outDevice);
 -- OSStatus MIDIClientCreate(CFStringRef name, MIDINotifyProc notifyProc, void *notifyRefCon, MIDIClientRef *outClient);
-private foreign handler c_MIDIClientCreate(in pClientNameCFStrngRef as ObjCId, in pMIDINotifyProc as optional any , in pNotifyRefConst as optional any, out rMIDIClientRef as ObjCId) returns CInt binds to "c:CoreMIDI.framework>MIDIClientCreate"
-private foreign handler c_MIDIOutputPortCreate(in pMIDIClientRef as ObjCId, in pOutPortNameCFStrngRef as ObjCId, out rMIDIOutPortRef as ObjCId) returns CInt binds to "c:CoreMIDI.framework>MIDIOutputPortCreate"
-private foreign handler c_MIDISourceCreate(in pMIDIClientRef as ObjCId, in pSourceNameStrRef as ObjCId, out rMIDISourceEndPointRef as ObjCId) returns CInt binds to "c:CoreMIDI.framework>MIDISourceCreate"
-private foreign handler c_MIDIDestinationCreate(in pMIDIClientRef as ObjCId, in pMIDIDestinationNameStrRef as ObjCId, in pMIDIReadProc as optional any, in pRefConst as optional any, out rMIDIDestEndpointRef as ObjCId) returns CInt binds to "c:CoreMIDI.framework>MIDIDestinationCreate"
+private foreign handler c_MIDIClientCreate(in pClientNameCFStrngRef as ObjcId, in pMIDINotifyProc as optional any , in pNotifyRefConst as optional any, out rMIDIClientRef as ObjcId) returns CInt binds to "c:CoreMIDI.framework>MIDIClientCreate"
+private foreign handler c_MIDIOutputPortCreate(in pMIDIClientRef as ObjcId, in pOutPortNameCFStrngRef as ObjCId, out rMIDIOutPortRef as ObjcId) returns CInt binds to "c:CoreMIDI.framework>MIDIOutputPortCreate"
+private foreign handler c_MIDISourceCreate(in pMIDIClientRef as ObjcId, in pSourceNameStrRef as ObjCId, out rMIDISourceEndPointRef as ObjcId) returns CInt binds to "c:CoreMIDI.framework>MIDISourceCreate"
+private foreign handler c_MIDIDestinationCreate(in pMIDIClientRef as ObjcId, in pMIDIDestinationNameStrRef as ObjcId, in pMIDIReadProc as optional any, in pRefConst as optional any, out rMIDIDestEndpointRef as ObjcId) returns CInt binds to "c:CoreMIDI.framework>MIDIDestinationCreate"
 
 private foreign handler c_MIDISend(in pMIDIPortRef as ObjCId, in pMIDIEndpointRef as ObjCId, in pMIDIPacketList as Pointer) returns CInt binds to "c:CoreMIDI.framework>MIDISend"
-
+private foreign handler c_MIDIPacketListAdd(in pMIDIPacketList as optional ObjCId, in pByteCount as CInt, in pMIDIPacket as ObjcId, in pMIDITimeStamp as UInt64, pPcktByteCnt as Cint, in pPacket as optional Data) returns ObjcId binds to "c:CoreMIDI.framework>MIDIPacketListAdd"
 
 private foreign handler c_MIDIGetNumberOfDestinations() returns CInt binds to "c:CoreMIDI.framework>MIDIGetNumberOfDestinations"
 private foreign handler c_MIDIGetNumberOfDevices() returns CInt binds to "c:CoreMIDI.framework>MIDIGetNumberOfDevices"
 private foreign handler c_MIDIGetNumberOfExternalDevices() returns CInt binds to "c:CoreMIDI.framework>MIDIGetNumberOfExternalDevices"
-
 
 private foreign handler objC_NSURLURLWithString(in pURLString as ObjcId) returns ObjcId binds to "objc:NSURL.+URLWithString:"
 private foreign handler objC_NSURLfileOrDirURLWithPath(in pPathString as ObjcId, in pIsDir as CBool) returns ObjcId binds to "objc:.NSURL.+fileURLWithPath:isDirectory:"
@@ -55,20 +54,32 @@ private foreign handler objC_NSURLfileURLWithPath(in pPathString as ObjcId) retu
 private foreign handler objC_NSErrorAlloc() returns ObjcRetainedId binds to "objc:NSError.+alloc"
 
 -- private variable sMIDIClientRef as ObjcObject
-private variable sMIDIClientRef as ObjCId
-private variable sMIDIOutPortRef as ObjCId
-private variable sMIDIDestEndpointRef as ObjCId
-private variable sMIDISourceEndpointRef as ObjCId
+private variable sMIDIClientRef as ObjcId
+private variable sMIDIOutPortRef as ObjcId
+private variable sMIDIDestEndpointRef as ObjcId
+private variable sMIDISourceEndpointRef as ObjcId
+private variable sMIDITimeStamp as optional UInt64
+private variable sMIDIPacket as optional Array
+private variable sMIDIPacketList as optional Array
 
 constant kMIDINoteOnCh1 is 0x90
 
 public handler CoreMIDITestNoteOn ()
    variable tOSStatus as optional CInt
-   variable tPacketData as Array
-    put 0x90 & 0x3F & 0x00 into tPacketData[0]
-    log tPacketData
+   variable tPacketData as Data
+   put 0x90 into byte 1 of tPacketData
+   put 0x44 into byte 2 of tPacketData
+   put 0x7F into byte 3 of tPacketData
+
+   log tPacketData
       unsafe
-         put c_MIDISend(sMIDIClientRef,sMIDISourceEndpointRef,tPacketData) into tOSStatus
+      -- MIDIPacket * MIDIPacketListInit(MIDIPacketList *pktlist);
+      -- MIDIPacket * MIDIPacketListAdd(MIDIPacketList *pktlist, ByteCount listSize, MIDIPacket *curPacket, MIDITimeStamp time, ByteCount nData, const Byte *data);
+      -- curPacket = A packet pointer returned by a previous call to MIDIPacketListInit or MIDIPacketListAdd for this packet list.
+      put c_MIDIPacketListAdd(sMIDIPacketList, 1, sMIDIPacket, 0, 3, tPacketData) into sMIDIPacketList
+
+         put c_MIDISend(sMIDIOutPortRef,sMIDISourceEndpointRef,sMIDIPacketList) into tOSStatus
+
       end unsafe
 
 end handler
