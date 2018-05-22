@@ -42,8 +42,9 @@ private foreign handler c_MIDIDestinationCreate(in pMIDIClientRef as ObjcId, in 
 
 private foreign handler c_MIDISend(in pMIDIPortRef as ObjCId, in pMIDIEndpointRef as ObjCId, in pMIDIPacketList as Pointer) returns CInt binds to "c:CoreMIDI.framework>MIDISend"
 private foreign handler c_MIDIPacketListInit()returns ObjcId binds to "c:CoreMIDI.framework>MIDIPacketListInit"
-private foreign handler c_MIDIPacketNext(in pMIDIPacketList as Pointer) returns ObjcId binds to "c:CoreMIDI.framework>MIDIPacketNext"
+private foreign handler c_MIDIPacketNext(in pMIDIPacketList as ObjcId) returns ObjcId binds to "c:CoreMIDI.framework>MIDIPacketNext"
 private foreign handler c_MIDIPacketListAdd(in pMIDIPacketList as ObjcId, in pPacketsCnt as UInt16, in pMIDIPacket as ObjcId, in pMIDITimeStamp as UInt64, pPcktByteCnt as Cint, in pPacket as optional any) returns ObjcId binds to "c:CoreMIDI.framework>MIDIPacketListAdd"
+-- sMIDIPacketList,1,sMIDIPacket,sMIDITimeStamp,3,tPacketData
 
 private foreign handler c_MIDIGetNumberOfDestinations() returns CInt binds to "c:CoreMIDI.framework>MIDIGetNumberOfDestinations"
 private foreign handler c_MIDIGetNumberOfSources() returns CInt binds to "c:CoreMIDI.framework>MIDIGetNumberOfSources"
@@ -82,14 +83,20 @@ private variable sMIDIDestEndpointRef as ObjcId
 private variable sMIDISourceEndpointRef as ObjcId
 private variable sMIDITimeStamp as optional UInt64
 private variable sMIDIPacketList as optional ObjcId
-private variable sMIDIPacket as optional any
+private variable sMIDIPacket as optional ObjcId
 -- private variable sMIDITimeStamp as optional MIDITimeStamp
 
 constant kMIDINoteOnCh1 is 0x90
 
 public handler CoreMIDITestNoteOn () returns nothing
    variable tOSStatus as optional CInt
-   variable tPacketData as optional any
+   variable tPacketData as optional Data
+
+   variable tPacketListCnt as Number
+   put 1 into tPacketListCnt
+   variable tPacketByteCnt as Number
+   put 3 into tPacketByteCnt
+
    put 0x00000000 into sMIDITimeStamp
    put 0x90447F into tPacketData
 
@@ -108,10 +115,11 @@ public handler CoreMIDITestNoteOn () returns nothing
       put c_MIDIPacketListInit() into sMIDIPacketList
       log "c_MIDIPacketListInit"
       put c_MIDIPacketNext(sMIDIPacketList) into sMIDIPacket
+      -- put c_MIDIPacketNext() into sMIDIPacket
       log "c_MIDIPacketListNext"
       -- MIDIPacketListAdd(MIDIPacketList, ByteCountlistSize, MIDIPacketCurPacket, MIDITimeStampTime, ByteCountMIDIData, MIDIDATA ) returns a MIDIPacket
       -- curPacket = A packet pointer returned by a previous call to MIDIPacketListInit or MIDIPacketListAdd for this packet list.
-         put c_MIDIPacketListAdd(sMIDIPacketList,3,sMIDIPacket,sMIDITimeStamp,3,tPacketData) into sMIDIPacketList
+         put c_MIDIPacketListAdd(sMIDIPacketList,tPacketListCnt,sMIDIPacket,sMIDITimeStamp,tPacketByteCnt,tPacketData) into sMIDIPacketList
       -- put c_MIDIPacketListAdd(sMIDIPacketList, 1, sMIDIPacket,sMIDITimeStamp, 9, tPacketData) into sMIDIPacketList
       put c_MIDISend(sMIDIOutPortRef,sMIDISourceEndpointRef,sMIDIPacketList) into tOSStatus
 
