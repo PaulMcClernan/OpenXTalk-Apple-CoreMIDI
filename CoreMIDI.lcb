@@ -118,8 +118,8 @@ public handler CoreMIDITestNoteOn () returns nothing
       end unsafe
 
 end handler
-Just declaring the MIDIPacketList doesn't allocate memory or set up the structure. There's a process to adding packets to the list. Here's a quick and dirty example:
-
+-- Just declaring the MIDIPacketList doesn't allocate memory or set up the structure.
+-- There's a process to adding packets to the list. Here's a quick and dirty example:
 -- - (void)matrixCtrlSetPosX:(int)posX PosY:(int)posY {
 --    MIDITimeStamp timestamp = 0;
 --    const ByteCount MESSAGELENGTH = 6;
