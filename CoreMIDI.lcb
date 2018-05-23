@@ -4,6 +4,7 @@ use com.livecode.foreign
 use com.livecode.objc
 use com.livecode.engine
 use com.livecode.byte
+com.livecode.array
 
 metadata version is "0.0.1"
 metadata author is "Paul McClernan"
@@ -32,7 +33,7 @@ metadata svgicon is "M66.43,52.07c-0.71,0.32-1.48,0.56-2.31,0.78c-2.35,0.65-5.44
 -- MIDIEndpointRef MIDIEntityGetDestination(MIDIEntityRef entity, ItemCount destIndex0);
 -- MIDIEndpointRef MIDIGetDestination(ItemCount destIndex0);
 -- MIDIDeviceRef MIDIGetExternalDevice(ItemCount deviceIndex0);
-
+-- OSStatus MIDIObjectGetStringProperty(MIDIObjectRef obj, CFStringRef propertyID, CFStringRef  _Nullable *str);
 -- OSStatus MIDIEntityGetDevice(MIDIEntityRef inEntity, MIDIDeviceRef *outDevice);
 -- OSStatus MIDIClientCreate(CFStringRef name, MIDINotifyProc notifyProc, void *notifyRefCon, MIDIClientRef *outClient);
 private foreign handler c_MIDIClientCreate(in pClientNameCFStrngRef as ObjcId, in pMIDINotifyProc as optional any , in pNotifyRefConst as optional any, out rMIDIClientRef as ObjcId) returns CInt binds to "c:CoreMIDI.framework>MIDIClientCreate"
@@ -40,12 +41,13 @@ private foreign handler c_MIDIOutputPortCreate(in pMIDIClientRef as ObjcId, in p
 private foreign handler c_MIDISourceCreate(in pMIDIClientRef as ObjcId, in pSourceNameStrRef as ObjCId, out rMIDISourceEndPointRef as ObjcId) returns CInt binds to "c:CoreMIDI.framework>MIDISourceCreate"
 private foreign handler c_MIDIDestinationCreate(in pMIDIClientRef as ObjcId, in pMIDIDestinationNameStrRef as ObjcId, in pMIDIReadProc as optional any, in pRefConst as optional any, out rMIDIDestEndpointRef as ObjcId) returns CInt binds to "c:CoreMIDI.framework>MIDIDestinationCreate"
 
-private foreign handler c_MIDISend(in pMIDIPortRef as ObjCId, in pMIDIEndpointRef as ObjCId, in pMIDIPacketList as Pointer) returns CInt binds to "c:CoreMIDI.framework>MIDISend"
-private foreign handler c_MIDIPacketListInit()returns ObjcId binds to "c:CoreMIDI.framework>MIDIPacketListInit"
+private foreign handler c_MIDISend(in pMIDIPortRef as ObjcId, in pMIDIEndpointRef as ObjCId, in pMIDIPacketList as Pointer) returns CInt binds to "c:CoreMIDI.framework>MIDISend"
+private foreign handler c_MIDIPacketListInit(inout pMIDIPacketList as ObjcId) returns ObjcId binds to "c:CoreMIDI.framework>MIDIPacketListInit"
 private foreign handler c_MIDIPacketNext(in pMIDIPacketList as ObjcId) returns ObjcId binds to "c:CoreMIDI.framework>MIDIPacketNext"
 private foreign handler c_MIDIPacketListAdd(in pMIDIPacketList as ObjcId, in pPacketsCnt as UInt16, in pMIDIPacket as ObjcId, in pMIDITimeStamp as UInt64, pPcktByteCnt as Cint, in pPacket as optional any) returns ObjcId binds to "c:CoreMIDI.framework>MIDIPacketListAdd"
 -- sMIDIPacketList,1,sMIDIPacket,sMIDITimeStamp,3,tPacketData
 
+private foreign handler c_MIDIDeviceListGetNumberOfDevices() returns CInt binds to "c:CoreMIDI.framework>MIDIDeviceListGetNumberOfDevices"
 private foreign handler c_MIDIGetNumberOfDestinations() returns CInt binds to "c:CoreMIDI.framework>MIDIGetNumberOfDestinations"
 private foreign handler c_MIDIGetNumberOfSources() returns CInt binds to "c:CoreMIDI.framework>MIDIGetNumberOfSources"
 private foreign handler c_MIDIGetNumberOfDevices() returns CInt binds to "c:CoreMIDI.framework>MIDIGetNumberOfDevices"
@@ -70,12 +72,12 @@ private foreign handler objC_NSErrorAlloc() returns ObjcRetainedId binds to "obj
 -- data MIDINotification
 -- type MIDINotifyProc a = Ptr MIDINotification -> Ptr a -> IO ()
 
--- MIDIPacket:
--- MIDITimeStamp = UInt64
+-- MIDIPacket:  public foreign type MIDIPkt binds to "MCAggregateTypeInfo:kihhh" -- i=UInt16
+-- MIDITimeStamp = public foreign type MIDITimeStamp binds to "MCAggregateTypeInfo:k" -- k=UInt64
 -- Length = UInt16
 -- Data = MIDI Byte Data[256]
--- public foreign type MIDITimeStamp as UInt64
--- public foreign type MIDIPacket binds to "MCAggregateTypeInfo:kihhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh"
+-- public variable MIDITimeStamp as UInt64
+-- public foreign type MIDIPacket binds to "MCAggregateTypeInfo:kihhh"
 
 private variable sMIDIClientRef as ObjcId
 private variable sMIDIOutPortRef as ObjcId
@@ -85,48 +87,51 @@ private variable sMIDITimeStamp as optional UInt64
 private variable sMIDIPacketList as optional ObjcId
 private variable sMIDIPacket as optional ObjcId
 -- private variable sMIDITimeStamp as optional MIDITimeStamp
+public foreign type CMNotePckt binds to "MCAggregateTypeInfo:"
 
 constant kMIDINoteOnCh1 is 0x90
 
 public handler CoreMIDITestNoteOn () returns nothing
    variable tOSStatus as optional CInt
-   variable tPacketData as optional Data
 
-   variable tPacketListCnt as Number
-   put 1 into tPacketListCnt
-   variable tPacketByteCnt as Number
-   put 3 into tPacketByteCnt
-
-   put 0x00000000 into sMIDITimeStamp
-   put 0x90447F into tPacketData
-
-   -- put 0x00 into byte 1 of tPacketData
-   -- put 0x00 into byte 2 of tPacketData
-   -- put 0x00 into byte 3 of tPacketData
-   -- put 0x00 into byte 4 of tPacketData
-   -- put 0x0003 into byte 5 to 6 of tPacketData
-   -- put 0x90 into byte 7 of tPacketData
-   -- put 0x44 into byte 8 of tPacketData
-   -- put 0x7F into byte 9 of tPacketData
+   variable tPacketData as Data
+   put 0x90 into tPacketData[0]
+   put 0xCF into tPacketData[1]
+   put 0x7F into tPacketData[3]
 
    log tPacketData
+
       unsafe
       -- MIDIPacket * MIDIPacketListInit(MIDIPacketList *pktlist);
-      put c_MIDIPacketListInit() into sMIDIPacketList
+      -- put c_MIDIPacketListInit(sMIDIPacketList) into sMIDIPacket
+      put c_MIDIPacketListInit(sMIDIPacketList) into sMIDIPacketList
       log "c_MIDIPacketListInit"
+      -- put c_MIDIPacketNext(sMIDIPacketList) into sMIDIPacket
       put c_MIDIPacketNext(sMIDIPacketList) into sMIDIPacket
-      -- put c_MIDIPacketNext() into sMIDIPacket
       log "c_MIDIPacketListNext"
-      -- MIDIPacketListAdd(MIDIPacketList, ByteCountlistSize, MIDIPacketCurPacket, MIDITimeStampTime, ByteCountMIDIData, MIDIDATA ) returns a MIDIPacket
+      -- MIDIPacketListAdd(MIDIPacketList, ByteCountlistSize, MIDIPacketCurPacket, MIDITimeStampTime, ByteCountMIDIData, MIDIDATA ) returns a MIDIPacket (next pvkt ptr)
       -- curPacket = A packet pointer returned by a previous call to MIDIPacketListInit or MIDIPacketListAdd for this packet list.
-         put c_MIDIPacketListAdd(sMIDIPacketList,tPacketListCnt,sMIDIPacket,sMIDITimeStamp,tPacketByteCnt,tPacketData) into sMIDIPacketList
-      -- put c_MIDIPacketListAdd(sMIDIPacketList, 1, sMIDIPacket,sMIDITimeStamp, 9, tPacketData) into sMIDIPacketList
-      put c_MIDISend(sMIDIOutPortRef,sMIDISourceEndpointRef,sMIDIPacketList) into tOSStatus
 
+      -- put c_MIDIPacketListAdd(sMIDIPacketList,tPacketListCnt,sMIDIPacket,sMIDITimeStamp,tPacketByteCnt,DataToNSData(tPacketData)) into sMIDIPacketList
+      put c_MIDIPacketListAdd(sMIDIPacketList,1,sMIDIPacket,sMIDITimeStamp,3,tPacketData) into sMIDIPacketList
+      put c_MIDISend(sMIDIOutPortRef,sMIDISourceEndpointRef,sMIDIPacketList) into tOSStatus
       end unsafe
 
 end handler
+Just declaring the MIDIPacketList doesn't allocate memory or set up the structure. There's a process to adding packets to the list. Here's a quick and dirty example:
 
+-- - (void)matrixCtrlSetPosX:(int)posX PosY:(int)posY {
+--    MIDITimeStamp timestamp = 0;
+--    const ByteCount MESSAGELENGTH = 6;
+--    Byte buffer[1024];             // storage space for MIDI Packets
+--    MIDIPacketList *packetlist = (MIDIPacketList*)buffer;
+--    MIDIPacket *currentpacket = MIDIPacketListInit(packetlist);
+--    Byte msgs[MESSAGELENGTH] = {0xB0, 0x32, (Byte)posX, 0xB0, 0x33, (Byte)posY};
+--    currentpacket = MIDIPacketListAdd(packetlist, sizeof(buffer),
+--                                      currentpacket, timestamp, MESSAGELENGTH, msgs);
+
+--    CheckError(MIDISend(_outputPort, _destinationEndpoint, packetlist), "Couldn't send MIDI packet list");
+--  }
 
 public handler CoreMIDIClientCreate(in clientName as String) returns nothing
    variable tClientNameStrRef as ObjcObject
@@ -174,6 +179,30 @@ public handler CoreMIDIDestinationCreate(in destName as String) returns nothing
    end unsafe
 end handler
 
+-- OSStatus = MIDIObjectSetDataProperty(MIDIObjectRef obj, CFStringRef propertyID, CFDataRef data);
+-- (obj The object whose property is to be altered, propertyID Name of the property to set, data New value of the property)
+
+-- MIDIObjectGetStringProperty -- Gets an object's string-type property.
+-- OSStatus MIDIObjectGetStringProperty(MIDIObjectRef obj, CFStringRef propertyID, CFStringRef  _Nullable *str);
+-- obj The object whose property is to be returned,
+-- propertyID Name of the property to return,
+-- str On successful return, the value of the property.
+-- Return Value A result code.
+-- (See the MIDIObjectRef documentation for information about properties.)
+
+-- MIDIObjectGetDataProperty -- Gets an object's data-type property.
+
+-- CFRunLoopRef = MIDIGetDriverIORunLoop(void);
+
+-- MIDIDeviceRef = MIDIDeviceListGetDevice(MIDIDeviceListRef devList, ItemCount index0);
+
+public handler CoreMIDIDeviceListGetNumberOfDevices() returns Number
+   unsafe
+      -- MIDIDeviceListRefPointer
+      -- return c_MIDIDeviceListGetNumberOfDevices(MIDIDeviceListRefPointer)
+      -- return c_MIDIDeviceListGetNumberOfDevices()
+   end unsafe
+end handler
 
 public handler CoreMIDIMIDIGetNumberOfSources() returns Number
 		unsafe
