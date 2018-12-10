@@ -3,44 +3,70 @@ library community.coremidi.paulmcclernan
 use com.livecode.engine
 use com.livecode.foreign
 use com.livecode.objc
---use com.livecode.array
---use com.livecode.list
---use com.livecode.byte
---use com.livecode.date
---use com.livecode.binary
---use com.livecode.bitwise
---use com.livecode.string
+use com.livecode.array
+use com.livecode.list
+use com.livecode.byte
+-- use com.livecode.date
+use com.livecode.binary
+use com.livecode.bitwise
+-- use com.livecode.string
 
 metadata version is "0.0.1"
 metadata author is "Paul McClernan"
 metadata title is "CoreMIDI library"
 metadata svgicon is "M66.43,52.07c-0.71,0.32-1.48,0.56-2.31,0.78c-2.35,0.65-5.44,0.04-5.44,0.04l-8.52,9.56c0,0,11.03,11.58,13.36,13.92 s4.02,6.19,4.02,6.19l8.77-19.76C76.31,62.8,67.18,58.92,66.43,52.07z M56.35,86.86c-2.83-2.4-16.4-15.09-16.4-15.09L21.22,90.12c0,0,3.25,1.93,5.41,1.86c5.6-0.17,10.48-3.77,15.46-3.77 c4.58,0,8.99,3.52,15.56,3.77c1.55,0.06,2.88-0.35,4.41-1.24c0.7-0.41,2.02-1.54,2.02-1.54S59.18,89.26,56.35,86.86z M52.45,18.42c5.85-5.85,5.42-15.63,5.42-15.63s-8.65,0.97-13.34,6.82c-5.22,6.51-5.07,13.39-4.94,14.51 C44.49,24.13,48.71,22.16,52.45,18.42z M18.38,48.03c-3.59,0.27-3.23,4.28-3.21,4.45l0.03,0.32l-0.23,0.23l-5.54,5.89l-5.85-5.95l8.91,24.95l18.58-18.16l-8.8-9.83 C22.28,49.93,19.79,47.92,18.38,48.03z M9.98,39.65c0,0,1.4-2.6,5.19-5.27c2.15-1.51,4.69-2.88,7.45-3.52c1.75-0.41,3.72-0.62,5.86-0.62 c3.63,0,9.12,1.35,9.12,1.35l-10.85,4.24c-1.77,0.8-2.58,2.62-2.85,3.38l14.4,13.75c3.71-3.62,6.78-6.15,9.99-9.57 c-0.51-4.23,0.89-8.11,3.22-10.81c4.73-5.48,13.47-2.78,13.47-2.78l-3.55,3.05c0,0-4.13,3.16-3.01,6.79 c0.27,0.87,0.84,2.34,2.44,3.17c0.93,0.48,4.09,0.37,5.6-0.95C68.48,40.1,70.45,38,70.45,38s0.88-1.54,1.8-2.43 c1.11-1.08,3.56-2.91,3.56-2.91s-4.82-5.38-8.14-6.83c-2.91-1.27-6.15-1.89-9.71-1.91c-7.4-0.03-12.83,4.65-16.7,4.35 c-3.19-0.25-9.47-4.38-14.6-4.35c-7.22,0.05-13.04,2.44-17.47,7.33C5.44,35.37,4,45.11,4,45.11l1.89-1.93c0,0,2.98-0.11,3.34-0.41 c1.48-1.24,1.31-2.33,1.31-2.33L9.98,39.65z M18.15,46.11c1.68-0.19,4.88,2.09,4.88,2.09l9.22,10.03l4.11-3.86L21.75,39.42l0.13-0.52c0.03-0.14,0.88-3.49,3.9-4.84 l5.18-2.02c-1.95-0.07-5.6-0.11-7.97,0.42c-3.26,0.74-8.73,4.32-10.78,7.04c0.06,0.17,0.09,0.34,0.1,0.53 c0.08,1.49-1.41,3.45-2.02,3.98c-0.73,0.63-2.55,1.03-3.63,1.21l-3.94,3.94l6.59,6.6l3.85-3.86c-0.04-1.6,0.45-3.4,1.78-4.57 C15.67,46.71,16.48,46.3,18.15,46.11z M70.95,39.93c-0.62,0.44-4.18,6.07-9.58,4.98c-2.9-0.58-4.65-3.5-4.92-5.3c-0.6-4.07,1.8-6.16,3.56-7.69 c0.59-0.52,1.6-1.31,1.6-1.31s-6.16-0.73-9.16,3.5c-3.98,5.61-1.98,9.83-1.98,9.83S13.22,80.66,12.03,81.82 c-0.09,0.56-0.5,3.71,0.93,5.31c1.56,1.74,3.06,2.79,5.34,2.24c1.3-0.32,39.44-38.44,39.44-38.44s3.65,0.56,5.67,0.07 C68.3,49.8,70.71,46.32,70.95,39.93z M65.52,84.81c-0.14,0.85-0.52,1.48-1.2,1.99c-0.5,0.41-1.12,0.62-1.88,0.62c-2.8,0-6.23-3.51-6.24-3.52L41.82,70.25 l6.44-6.55c0,0,13.44,13.7,14.11,14.36C63.03,78.73,65.79,83.22,65.52,84.81z"
 
+-- This is for taking a list where each element is a list representing an aggregate and returning a pointer to a c array of the structs.
+-- Use like this:
+-- variable tCoords as Pointer
+-- variable tCount as Integer
+-- if not CreateCArray(tPolyline["coordinates"], "NN", tCoords, tCount) then
+--     throw "unable to create coordinate array"
+-- end if
+--
+--You should be able to just use the same handler to create a pointer to a single aggregate by passing it a list with just one element like this:
+-- variable tPointer as Pointer
+-- variable tCount as Integer // ignore it will always be 1
+-- if not CreateCArray([<aggregate>], “<aggregatebinding>", tPointer, tCount) then
+--     throw "unable to get pointer to aggregate
+--end if
+--
+foreign handler MCProperListConvertToForeignValues(in pList as List, in pTypeInfo as Pointer, \
+   out rCArray as Pointer, out rCount as LCUIndex) returns CBool binds to "<builtin>"
+foreign handler MCAggregateTypeInfo(in pBinding as String, out rTypeInfo as Pointer) returns CBool binds to "<builtin>"
+foreign handler MCValueRelease(in pValue as Pointer) returns nothing binds to "<builtin>"
+foreign handler MCMemoryDelete(in pBlock as Pointer) returns nothing binds to "<builtin>"
 
--- private foreign handler CGMainDisplayID() returns CInt binds to "c:CoreGraphics.framework>CGMainDisplayID”
--- https://developer.apple.com/documentation/coremidi/midi_services?language=objc
+unsafe handler CreateCArray(in pList as List, in pAggregateBinding as String, out rPointer as optional Pointer, out rCount as Integer) returns Boolean
+   variable tCArray as optional Pointer
+   variable tCount as Integer
+   variable tTypeInfo as Pointer
+   if not MCAggregateTypeInfo(pAggregateBinding, tTypeInfo) then  -- in Aggregate Binding String, out Pointer to TypeInfo returns true on success
+      return false
+   end if
+   variable tSuccess as Boolean
+   put MCProperListConvertToForeignValues(pList, tTypeInfo, tCArray, tCount) into tSuccess -- takes in List and TypeInfo Block Pointer, out CArray Pointer, out count of elements, returns true on success
+   MCValueRelease(tTypeInfo) -- frees memory used by TypeInfo pointer block
+   if not tSuccess then
+      return false
+   end if
+   put tCArray into rPointer
+   put tCount into rCount
+   return true
+end handler
+-- remember this is allocating memory so you need to call MCMemoryDelete on the pointer when you are done with it
+-- unless you are passing ownership of the memory off to something else.
 
--- OSStatus MIDISourceCreate(MIDIClientRef client, CFStringRef name, MIDIEndpointRef *outSrc);
--- OSStatus MIDIInputPortCreate(MIDIClientRef client, CFStringRef portName, MIDIReadProc readProc, void *refCon, MIDIPortRef *outPort);
--- OSStatus MIDIOutputPortCreate(MIDIClientRef client, CFStringRef portName, MIDIPortRef *outPort);
--- OSStatus MIDIDestinationCreate(MIDIClientRef client, CFStringRef name, MIDIReadProc readProc, void *refCon, MIDIEndpointRef *outDest);
--- OSStatus MIDIClientCreate(CFStringRef name, MIDINotifyProc notifyProc, void *notifyRefCon, MIDIClientRef *outClient);
--- OSStatus MIDIObjectGetStringProperty(MIDIObjectRef obj, CFStringRef propertyID, CFStringRef  _Nullable *str);
+-- MIDIPacket (timeStamp: MIDITimeStamp, length: UInt16, data: Data: ARRAY OF 256 x UInt8 )  -- UInt64,UInt16,Data(256))
+-- public foreign type MIDIPacket binds to "MCAggregateTypeInfo:kihhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh"
+public foreign type MIDIPacket binds to "MCAggregateTypeInfo:kihhh" --k=UInt64  i=UInt16 h=3 x UInt8
+ -- MIDIPacketList init(numPackets:packet:)
 
--- OSStatus MIDISend(MIDIPortRef port, MIDIEndpointRef dest, const MIDIPacketList *pktlist);
+ public foreign type MIDIMsg binds to "MCAggregateTypeInfo:hhh" -- h=3 x UInt8
 
-
--- ItemCount MIDIEntityGetNumberOfDestinations(MIDIEntityRef entity);
--- ItemCount MIDIEntityGetNumberOfSources(MIDIEntityRef entity);
--- ItemCount MIDIEntityGetNumberOfSources(MIDIEntityRef entity);
-
--- MIDIEndpointRef MIDIEntityGetSource(MIDIEntityRef entity, ItemCount sourceIndex0);
--- MIDIEndpointRef MIDIEntityGetDestination(MIDIEntityRef entity, ItemCount destIndex0);
--- MIDIEndpointRef MIDIGetDestination(ItemCount destIndex0);
--- MIDIDeviceRef MIDIGetExternalDevice(ItemCount deviceIndex0);
--- OSStatus MIDIObjectGetStringProperty(MIDIObjectRef obj, CFStringRef propertyID, CFStringRef  _Nullable *str);
--- OSStatus MIDIEntityGetDevice(MIDIEntityRef inEntity, MIDIDeviceRef *outDevice);
--- OSStatus MIDIClientCreate(CFStringRef name, MIDINotifyProc notifyProc, void *notifyRefCon, MIDIClientRef *outClient);
+public foreign type MIDIPacketList binds to "MCAggregateTypeInfo:jr"
+ -- Declaration (numPackets: UInt32, *packet(MIDIPacket)) -- j = UInt32
+public type MIDITimeStamp is UInt64
 
 private foreign handler c_MIDIClientCreate(in pClientNameCFStrngRef as ObjcId, in pMIDINotifyProc as optional any , in pNotifyRefConst as optional any, out rMIDIClientRef as ObjcId) returns CInt binds to "c:CoreMIDI.framework>MIDIClientCreate"
 private foreign handler c_MIDIOutputPortCreate(in pMIDIClientRef as ObjcId, in pOutPortNameCFStrngRef as ObjCId, out rMIDIOutPortRef as ObjcId) returns CInt binds to "c:CoreMIDI.framework>MIDIOutputPortCreate"
@@ -48,10 +74,9 @@ private foreign handler c_MIDISourceCreate(in pMIDIClientRef as ObjcId, in pSour
 private foreign handler c_MIDIDestinationCreate(in pMIDIClientRef as ObjcId, in pMIDIDestinationNameStrRef as ObjcId, in pMIDIReadProc as optional any, in pRefConst as optional any, out rMIDIDestEndpointRef as ObjcId) returns CInt binds to "c:CoreMIDI.framework>MIDIDestinationCreate"
 
 private foreign handler c_MIDISend(in pMIDIPortRef as ObjcId, in pMIDIEndpointRef as ObjCId, in pMIDIPacketList as Pointer) returns CInt binds to "c:CoreMIDI.framework>MIDISend"
-private foreign handler c_MIDIPacketListInit(inout pMIDIPacketList as optional Pointer) returns Pointer binds to "c:CoreMIDI.framework>MIDIPacketListInit"
-private foreign handler c_MIDIPacketNext(in pMIDIPacketList as Pointer) returns Pointer binds to "c:CoreMIDI.framework>MIDIPacketNext"
-private foreign handler c_MIDIPacketListAdd(in pMIDIPacketList as Pointer, in pPacketsCnt as UInt16, in pMIDIPacket as Pointer, in pMIDITimeStamp as UInt64, pPcktByteCnt as Cint, in pPacket as Data) returns Pointer binds to "c:CoreMIDI.framework>MIDIPacketListAdd"
--- sMIDIPacketList,1,sMIDIPacket,sMIDITimeStamp,3,tPacketData
+private foreign handler c_MIDIPacketListInit(in pMIDIPacketListByteBuffer as Pointer) returns Pointer binds to "c:CoreMIDI.framework>MIDIPacketListInit"
+private foreign handler c_MIDIPacketNext(in pMIDIPacketListByteBuffer as Pointer) returns Pointer binds to "c:CoreMIDI.framework>MIDIPacketNext"
+private foreign handler c_MIDIPacketListAdd(in pMIDIPacketListByteBuffer as Pointer, in pPacketsCnt as UInt32, in pMIDIPacket as Pointer, in pMIDITimeStamp as UInt64, pPcktByteCnt as UInt16, in pPacket as Pointer) returns Pointer binds to "c:CoreMIDI.framework>MIDIPacketListAdd"
 
 private foreign handler c_MIDIDeviceListGetNumberOfDevices() returns CInt binds to "c:CoreMIDI.framework>MIDIDeviceListGetNumberOfDevices"
 private foreign handler c_MIDIGetNumberOfDestinations() returns CInt binds to "c:CoreMIDI.framework>MIDIGetNumberOfDestinations"
@@ -59,106 +84,93 @@ private foreign handler c_MIDIGetNumberOfSources() returns CInt binds to "c:Core
 private foreign handler c_MIDIGetNumberOfDevices() returns CInt binds to "c:CoreMIDI.framework>MIDIGetNumberOfDevices"
 private foreign handler c_MIDIGetNumberOfExternalDevices() returns CInt binds to "c:CoreMIDI.framework>MIDIGetNumberOfExternalDevices"
 
-private foreign handler objC_NSURLURLWithString(in pURLString as ObjcId) returns ObjcId binds to "objc:NSURL.+URLWithString:"
-private foreign handler objC_NSURLfileOrDirURLWithPath(in pPathString as ObjcId, in pIsDir as CBool) returns ObjcId binds to "objc:.NSURL.+fileURLWithPath:isDirectory:"
-private foreign handler objC_NSURLfileURLWithPath(in pPathString as ObjcId) returns ObjcId binds to "objc:NSURL.+fileURLWithPath:"
-
-private foreign handler objC_NSErrorAlloc() returns ObjcRetainedId binds to "objc:NSError.+alloc"
-
--- foreign handler type ini_handler(in pContext as optional Pointer, in pSection as ZStringNative, in pName as ZStringNative, in pValue as ZStringNative) returns CInt
--- foreign handler ini_parse_string(in pString as ZStringNative, in pHandler as ini_handler, in pContext as optional Pointer) returns CInt binds to "c:inih>ini_parse_string”
--- handler ini_callback_handler(in pContext as optional Pointer, in pSection as ZStringNative, in pName as ZStringNative, in pValue as ZStringNative) returns CInt
--- end handler
---if ini_parse_string(pIniString, ini_callback_handler, t_context) < 0 then
-
-
--- type MIDIClientRef    = Ptr OpaqueMIDIClient
--- type MIDIObjectRef    = Ptr OpaqueMIDIObject
--- type MIDIDeviceRef    = Ptr OpaqueMIDIDevice
--- type MIDIEntityRef    = Ptr OpaqueMIDIEntity
--- type MIDIEndpointRef  = Ptr OpaqueMIDIEndpoint
--- type MIDIPortRef      = Ptr OpaqueMIDIPort
-
--- type MIDIUniqueID     = SInt32
--- type MIDIObjectType   = SInt32
-
--- data MIDINotification
--- type MIDINotifyProc a = Ptr MIDINotification -> Ptr a -> IO ()
-
--- public foreign type MIDIPacket binds to "MCAggregateTypeInfo:kihhh" --k=UInt64 i=UInt16 h=Uint
--- MIDITimeStamp = public foreign type MIDITimeStamp binds to "MCAggregateTypeInfo:k" -- k=UInt64
--- Length = UInt16
--- Data = MIDI Byte Data 256
-
--- public variable MIDITimeStamp as UInt64
--- public foreign type MIDIPacket binds to "MCAggregateTypeInfo:kihhh"
-
--- MIDIPacket (timeStamp: MIDITimeStamp, length: UInt16, data: Data: ARRAY OF 256 x UInt8 )  -- UInt64,UInt16,Data(256))
-public foreign type MIDIPacket binds to "MCAggregateTypeInfo:kihhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh"
--- public foreign type MIDIPacket binds to "MCAggregateTypeInfo:kihhh" --k=UInt64 i=UInt16 h=3 x UInt8
-
- -- MIDIPacketList init(numPackets:packet:)
- public foreign type MIDIPacketList binds to "MCAggregateTypeInfo:jr"
- -- Declaration (numPackets: UInt32, *packet(MIDIPacket)) -- j = UInt32
-
-public type MIDITimeStamp is UInt64
--- public foreign type TimeStruct binds to "MCAggregateTypeInfo:EEEEEEEEE"
--- public type Time is UInt64
+-- Creates and returns an mutable data object containing a given number of zeroed bytes. Toll free bridges to CFMutableDataRef for Foundation C APIs
+private foreign handler objC_NSMutableDataWithLength(in pDataLength as ObjcId) returns ObjcRetainedId binds to "objc:NSMutableData.+dataWithLength:"
+private foreign handler objC_NSMutableDataWithCapacity(in pDataLength as ObjcId) returns ObjcRetainedId binds to "objc:NSMutableData.+dataWithCapacity:"
+private foreign handler objC_NSMutableDataBytesPtr(in pMutableDataRef as ObjcId) returns Pointer binds to "objc:NSMutableData.mutableBytes"
+private foreign handler objC_NSMutableDataSetData(in pMutableDataRef as ObjcId, in pNSDataToSet as ObjcId) returns nothing binds to "objc:NSMutableData.-setData:"
+private foreign handler objC_NSDataBytesPtr(in pDataRef as ObjcId) returns Pointer binds to "objc:NSData.bytes"
 
 private variable sMIDIClientRef as ObjcId
 private variable sMIDIOutPortRef as ObjcId
 private variable sMIDIDestEndpointRef as ObjcId
 private variable sMIDISourceEndpointRef as ObjcId
-private variable sMIDITimeStamp as ObjcId
-private variable sMIDIPacketListPtr as optional Pointer
-private variable sMIDIPacketPtr as optional Pointer
 -- private variable sMIDITimeStamp as optional MIDITimeStamp
 
 constant kMIDINoteOnCh1 is 0x90
 
-public handler CoreMIDITestNoteOn(tPacketData) returns nothing
+public handler CoreMIDITestNoteOn(tMIDIMsgData as Data) returns nothing
    variable tOSStatus as optional CInt
+   variable tTimeStamp as MIDITimeStamp
+   variable tMIDIPacket as MIDIPacket
+   variable tMIDIPacketList as MIDIPacketList
+   variable numPkts as UInt32
+   variable tMIDIPacketPtr as Pointer
+   variable tMIDIPacketListPtr as Pointer
+   variable tCount as Integer -- ObjcRetainedId
+   variable tSuccess as Boolean
+   variable tBYTE
+   variable tVal as Number
+   variable tMsg as String
+   variable tMIDIMsgBytesNSDataRef as ObjcId -- tCFMutableDataRef
+   variable tMIDIMsgBytesPtr as Pointer
+   variable tMIDIPacketByteBufferNSMutableDataRef as ObjcId -- tCFMutableDataRef
+   variable tMIDIPacketByteBufferPtr as Pointer
 
-   -- variable tPacketData as optional String
+   repeat for each byte tBYTE in tMIDIMsgData
+    get the code of tBYTE
+   put the result into tVal
+   log tVal
+   end repeat
 
-   --- put 0x90 & 0x3F & 0x7F into tPacketData
-   -- put 144 into char 1 of tPacketData
-   -- put byte with code 144 into byte 1 of tPacketData
-   -- put byte tNoteOn into byte 1 of tPacketData
-   -- set byte 1 of tPacketData to 144
-   -- put (byte with code tNoteOn) into (byte 1 of tPacketData)
-   -- put 0x3F into byte 2 of tPacketData
-   -- put byte with code 60 into byte 2 of tPacketData
-   -- put byte with code 127 into byte 3 of tPacketData
-   log "tPacketData"
-   log tPacketData
-   -- variable tPacketList as List
-   -- put 0x7F into (byte 3 of tPacketData)
-   -- log "tPacketData " & the number of bytes in tPacketData
-   -- put (byte with code 144) into (byte 1 of tPacketData)
-   -- put byte with code 144 & byte with code 60 & byte with code 127 into tPacketData
-   -- put tPacketData into tPacketList[0]
+   unsafe
+      put 0 into tTimeStamp
+      put objC_NSMutableDataWithLength(NumberToNSNumber(256)) into tMIDIPacketByteBufferNSMutableDataRef
+      put objC_NSMutableDataBytesPtr(tMIDIPacketByteBufferNSMutableDataRef) into tMIDIPacketByteBufferPtr
 
-      unsafe
+       put c_MIDIPacketListInit(tMIDIPacketByteBufferPtr) into tMIDIPacketPtr
+       log "tMIDIPacketByteBufferNSMutableDataRef:"
+       log tMIDIPacketByteBufferNSMutableDataRef
+       log "tMIDIPacketByteBufferPtr:"
+       log tMIDIPacketByteBufferPtr
+       log "tMIDIPacketPtr:"
+       log tMIDIPacketPtr
 
-      -- MIDIPacket * MIDIPacketListInit(MIDIPacketList *pktlist);
-      --c_MIDIPacketListInit(sMIDIPacketList)
-      -- put c_MIDIPacketListInit(sMIDIPacketListPtr) into sMIDIPacketPtr
-      -- log "c_MIDIPacketListInit"
-
+      -- put 256 into numPkts
+      -- put [numPkts,tMIDIPacketPtr] into tMIDIPacketList
+      -- put CreateCArray([tMIDIPacketList],"jr",tMIDIPacketListPtr,tCount) into tSuccess
+      -- log tSuccess
+      -- log tMIDIPacketListPtr
+      -- put [144,60,127] into tMIDIMsgData
+       -- put [0x90,0x3A,0x7F] into tMIDIMsgData
+       -- put CreateCArray([tMIDIMsgData],"hhh", tMIDIPacketPtr, tCount) into tSuccess
+       -- put CreateCArray(tMIDIMsgData, "hhh", tMIDIPacketPtr, tCount) into tSuccess
       -- put c_MIDIPacketNext(sMIDIPacketList) into sMIDIPacket
-      -- put c_MIDIPacketNext(sMIDIPacketList) into sMIDIPacket
-      -- log "c_MIDIPacketListNext"
       -- MIDIPacketListAdd(MIDIPacketList, ByteCountlistSize, MIDIPacketCurPacket, MIDITimeStampTime, ByteCountMIDIData, MIDIDATA ) returns a MIDIPacket (next pvkt ptr)
       -- curPacket = A packet pointer returned by a previous call to MIDIPacketListInit or MIDIPacketListAdd for this packet list.
-      -- put c_MIDIPacketListAdd(sMIDIPacketList,1,sMIDIPacket,sMIDITimeStamp,3,DataToNSData(tPacketData)) into sMIDIPacketList
-      -- put c_MIDIPacketListAdd(sMIDIPacketListPtr,1,sMIDIPacketPtr,0,3,DataToNSData(tPacketData)) into sMIDIPacketListPtr
-      -- log the keys of sMIDIPacketPtr
-      -- put c_MIDISend(sMIDIOutPortRef,sMIDISourceEndpointRef,ArrayToNSDictionary(tPacketData)) into tOSStatus
+         put objC_NSMutableDataWithLength(NumberToNSNumber(3)) into tMIDIMsgBytesNSDataRef
+         objC_NSMutableDataSetData(tMIDIMsgBytesNSDataRef, DataToNSData(tMIDIMsgData))
+         put objC_NSMutableDataBytesPtr(tMIDIMsgBytesNSDataRef) into tMIDIMsgBytesPtr
+         put c_MIDIPacketListAdd(tMIDIPacketByteBufferPtr,256,tMIDIPacketPtr,tTimeStamp,3,tMIDIMsgBytesPtr) into tMIDIPacketPtr
+         log "________________________________________"
+         log "tMIDIPacketByteBufferNSMutableDataRef:"
+         log tMIDIPacketByteBufferNSMutableDataRef
+         log "tMIDIPacketByteBufferPtr:"
+         log tMIDIPacketByteBufferPtr
+         log "tMIDIPacketPtr:"
+         log tMIDIPacketPtr
+         log "________________________________________"
+         log "tMIDIMsgBytesNSDataRef:"
+         log tMIDIMsgBytesNSDataRef
+         log "tMIDIMsgBytesPtr:"
+         log tMIDIMsgBytesPtr
 
-      -- put c_MIDISend(sMIDIOutPortRef,sMIDISourceEndpointRef,ListToNSArray(tPacketData)) into tOSStatus
 
-      put c_MIDISend(sMIDIOutPortRef,sMIDISourceEndpointRef,tPacketData) into tOSStatus
+      put c_MIDISend(sMIDIOutPortRef,sMIDIDestEndpointRef,tMIDIPacketByteBufferPtr) into tOSStatus
+      -- put c_MIDISend(sMIDIOutPortRef,sMIDISourceEndpointRef,tMIDIPacketByteBufferPtr) into tOSStatus
+      -- log tOSStatus
+      -- MCMemoryDelete(tMIDIPacketPtr)
+      -- MCMemoryDelete(tMIDIPacketListPtr)
       end unsafe
 end handler
 
@@ -173,7 +185,6 @@ end handler
 --    Byte msgs[MESSAGELENGTH] = {0xB0, 0x32, (Byte)posX, 0xB0, 0x33, (Byte)posY};
 --    currentpacket = MIDIPacketListAdd(packetlist, sizeof(buffer),
 --                                      currentpacket, timestamp, MESSAGELENGTH, msgs);
-
 --    CheckError(MIDISend(_outputPort, _destinationEndpoint, packetlist), "Couldn't send MIDI packet list");
 --  }
 
@@ -273,6 +284,17 @@ public handler CoreMIDIGetNumberOfExternalDevices() returns Number
 end handler
 
 end library
+
+-- https://developer.apple.com/documentation/coremidi/midi_services?language=objc
+
+-- OSStatus MIDIObjectGetStringProperty(MIDIObjectRef obj, CFStringRef propertyID, CFStringRef  _Nullable *str);
+-- MIDIEndpointRef MIDIEntityGetSource(MIDIEntityRef entity, ItemCount sourceIndex0);
+-- MIDIEndpointRef MIDIEntityGetDestination(MIDIEntityRef entity, ItemCount destIndex0);
+-- MIDIEndpointRef MIDIGetDestination(ItemCount destIndex0);
+-- MIDIDeviceRef MIDIGetExternalDevice(ItemCount deviceIndex0);
+-- OSStatus MIDIObjectGetStringProperty(MIDIObjectRef obj, CFStringRef propertyID, CFStringRef  _Nullable *str);
+-- OSStatus MIDIEntityGetDevice(MIDIEntityRef inEntity, MIDIDeviceRef *outDevice);
+-- OSStatus MIDIClientCreate(CFStringRef name, MIDINotifyProc notifyProc, void *notifyRefCon, MIDIClientRef *outClient);
 
 --// generic error handler - if err is nonzero, prints error message and exits program.
 --static void CheckError(OSStatus error, const char *operation)
