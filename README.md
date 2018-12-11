@@ -1,3 +1,3 @@
 # lcbCoreMIDI
 
-ITS ALIVE!!!
+IT'S ALIVE!!!
