@@ -129,11 +129,23 @@ public type MIDITimeStamp is UInt64
 
 private foreign handler c_MIDIClientCreate(in pClientNameCFStrngRef as ObjcId, in pMIDINotifyProc as optional any, in pNotifyRefConst as optional any, \
                                               out rMIDIClientRef as ObjcRetainedId) returns CInt binds to "c:CoreMIDI.framework>MIDIClientCreate"
+                                              
+-- Creates an input port through which the client may receive incoming MIDI messages from any MIDI source 
+-- OSStatus MIDIInputPortCreate(MIDIClientRef client, CFStringRef portName, MIDIReadProc readProc, void *refCon, MIDIPortRef *outPort);
+private foreign handler c_MIDIInputPortCreate(in pMIDIClientRef as ObjcId, in pInputPortNameCFStrngRef as ObjCId, out rMIDIInputPortRef as ObjcId) returns CInt binds to "c:CoreMIDI.framework>MIDIInputPortCreate"
 private foreign handler c_MIDIOutputPortCreate(in pMIDIClientRef as ObjcId, in pOutPortNameCFStrngRef as ObjCId, out rMIDIOutPortRef as ObjcId) returns CInt binds to "c:CoreMIDI.framework>MIDIOutputPortCreate"
+private foreign handler c_MIDIPortDispose( in pMIDIPortRef as ObjCId) returns CInt binds to "c:CoreMIDI.framework>MIDIPortDispose"
+-- It is not usually necessary to call this function; when an application's MIDIClient's are automatically disposed at termination,
+-- or explicitly, via MIDIClientDispose, the client's ports are automatically disposed at that time.
+
 private foreign handler c_MIDIDestinationCreate(in pMIDIClientRef as ObjcId, in pMIDIDestinationNameStrRef as ObjcId, in pMIDIReadProc as optional any, in pRefConst as optional any, \
                                                    out rMIDIDestEndpointRef as ObjcId) returns CInt binds to "c:CoreMIDI.framework>MIDIDestinationCreate"
 private foreign handler c_MIDISourceCreate(in pMIDIClientRef as ObjcId, in pSourceNameStrRef as ObjCId, out rMIDISourceEndPointRef as ObjcId) returns CInt binds to "c:CoreMIDI.framework>MIDISourceCreate"
+private foreign handler c_MIDIGetSource( in pSourceIndexNum as Number) returns optional ObjCId binds to "c:CoreMIDI.framework>MIDIEGetSource" -- Returns a reference to a source, or NULL if an error occurred.
+private foreign handler c_MIDIEndpointDispose( in pEndPointRef as ObjCId) returns CInt binds to "c:CoreMIDI.framework>MIDIEndpointDispose"
 
+
+-- OSStatus MIDIPortDispose(MIDIPortRef port);
 -- OSStatus MIDIReceived(MIDIEndpointRef src, const MIDIPacketList *pktlist);ai
 private foreign handler c_MIDIReceived(in pMIDIEndpointRef as ObjCId, in pMIDIPacketListPtr as Pointer) returns CInt binds to "c:CoreMIDI.framework>MIDIReceived"
 private foreign handler c_MIDISend(in pMIDIPortRef as ObjcId, in pMIDIEndpointRef as ObjCId, in pMIDIPacketList as Pointer) returns CInt binds to "c:CoreMIDI.framework>MIDISend"
@@ -181,28 +193,30 @@ public handler CoreMIDITestNoteOn(pMIDIMsgData as Data) returns nothing
    variable tSuccess as Boolean
    variable tBYTE
    variable tVal as Number
+   variable tCnt as Number
    variable tMsg as String
    variable tMIDIMsgBytesNSDataRef as ObjCId
    variable tMIDIMsgBytesPtr as Pointer
 
-   repeat for each byte tBYTE in pMIDIMsgData
-    get the code of tBYTE
-   put the result into tVal
-   log tVal
-   end repeat
+   put the number of bytes in pMIDIMsgData into tCnt
+   log tCnt
+   -- repeat for each byte tBYTE in pMIDIMsgData
+   -- get the code of tBYTE
+   -- put the result into tVal
+   -- log tVal
+   -- end repeat
 
    unsafe
       put 0 into tTimeStamp
       put objC_NSMutableDataWithLength(NumberToNSNumber(1024)) into sMIDIPacketByteBufferNSMutableDataRef
       put objC_NSMutableDataBytesPtr(sMIDIPacketByteBufferNSMutableDataRef) into sMIDIPacketByteBufferPtr
-
        put c_MIDIPacketListInit(sMIDIPacketByteBufferPtr) into sMIDIPacketPtr
-       log "sMIDIPacketByteBufferNSMutableDataRef:"
-       log sMIDIPacketByteBufferNSMutableDataRef
-       log "sMIDIPacketByteBufferPtr:"
-       log sMIDIPacketByteBufferPtr
-       log "sMIDIPacketPtr:"
-       log sMIDIPacketPtr
+       -- log "sMIDIPacketByteBufferNSMutableDataRef:"
+       -- log sMIDIPacketByteBufferNSMutableDataRef
+      --  log "sMIDIPacketByteBufferPtr:"
+       -- log sMIDIPacketByteBufferPtr
+       -- log "sMIDIPacketPtr:"
+       -- log sMIDIPacketPtr
 
       -- put 256 into numPkts
       -- put [numPkts,tMIDIPacketPtr] into tMIDIPacketList
@@ -216,27 +230,27 @@ public handler CoreMIDITestNoteOn(pMIDIMsgData as Data) returns nothing
       -- put c_MIDIPacketNext(sMIDIPacketList) into sMIDIPacket
       -- MIDIPacketListAdd(MIDIPacketList, ByteCountlistSize, MIDIPacketCurPacket, MIDITimeStampTime, ByteCountMIDIData, MIDIDATA ) returns a MIDIPacket (next pvkt ptr)
       -- curPacket = A packet pointer returned by a previous call to MIDIPacketListInit or MIDIPacketListAdd for this packet list.
-         put objC_NSMutableDataWithLength(NumberToNSNumber(3)) into tMIDIMsgBytesNSDataRef
+         put objC_NSMutableDataWithLength(NumberToNSNumber(tCnt)) into tMIDIMsgBytesNSDataRef
          objC_NSMutableDataSetData(tMIDIMsgBytesNSDataRef, DataToNSData(pMIDIMsgData))
          put objC_NSMutableDataBytesPtr(tMIDIMsgBytesNSDataRef) into tMIDIMsgBytesPtr
-         put c_MIDIPacketListAdd(sMIDIPacketByteBufferPtr,1024,sMIDIPacketPtr,tTimeStamp,3,tMIDIMsgBytesPtr) into sMIDIPacketPtr
-         log "________________________________________"
-         log "tMIDIPacketByteBufferNSMutableDataRef:"
-         log sMIDIPacketByteBufferNSMutableDataRef
-         log "tMIDIPacketByteBufferPtr:"
-         log sMIDIPacketByteBufferPtr
-         log "sMIDIPacketPtr:"
-         log sMIDIPacketPtr
-         log "________________________________________"
-         log "tMIDIMsgBytesNSDataRef:"
-         log tMIDIMsgBytesNSDataRef
-         log "tMIDIMsgBytesPtr:"
-         log tMIDIMsgBytesPtr
+         put c_MIDIPacketListAdd(sMIDIPacketByteBufferPtr,1024,sMIDIPacketPtr,tTimeStamp,tCnt,tMIDIMsgBytesPtr) into sMIDIPacketPtr
+         -- log "________________________________________"
+         -- log "tMIDIPacketByteBufferNSMutableDataRef:"
+         -- log sMIDIPacketByteBufferNSMutableDataRef
+         -- log "tMIDIPacketByteBufferPtr:"
+         -- log sMIDIPacketByteBufferPtr
+         -- log "sMIDIPacketPtr:"
+         -- log sMIDIPacketPtr
+         -- log "________________________________________"
+         -- log "tMIDIMsgBytesNSDataRef:"
+         -- log tMIDIMsgBytesNSDataRef
+         -- log "tMIDIMsgBytesPtr:"
+         -- log tMIDIMsgBytesPtr
 
       put c_MIDIReceived(sMIDISourceEndpointRef,sMIDIPacketByteBufferPtr) into tOSStatus
       -- put c_MIDISend(sMIDIOutPortRef,sMIDIDestEndpointRef,sMIDIPacketByteBufferPtr) into tOSStatus
       -- put c_MIDISend(sMIDIOutPortRef,sMIDISourceEndpointRef,tMIDIPacketByteBufferPtr) into tOSStatus
-      log tOSStatus
+      -- log tOSStatus
       -- MCMemoryDelete(tMIDIPacketPtr)
       -- MCMemoryDelete(tMIDIPacketListPtr)
       end unsafe
@@ -304,7 +318,7 @@ public handler CoreMIDIDestinationCreate(in destName as String) returns nothing
    variable tOSStatus as optional CInt
    variable tMIDIReadProc as optional Pointer
    variable tRefCon as optional any
-   variable tCoreMIDIReceiverCallbackProcnHandler as pointer
+   -- variable tCoreMIDIReceiverCallbackProcnHandler as pointer
    	unsafe
       -- variable tBlockPtr as Pointer
       -- variable tBlockDescriptionPointer as Pointer
@@ -315,7 +329,7 @@ public handler CoreMIDIDestinationCreate(in destName as String) returns nothing
 
          put StringToNSString(destName) into tDestNameStrRef
          -- OSStatus MIDIDestinationCreate(MIDIClientRef client, CFStringRef name, MIDIReadProc readProc, void *refCon, MIDIEndpointRef *outDest);
-         put c_MIDIDestinationCreate(sMIDIClientRef,tDestNameStrRef,nothing,tRefCon,sMIDIDestEndpointRef) into tOSStatus
+         put c_MIDIDestinationCreate(sMIDIClientRef,tDestNameStrRef,nothing,nothing,sMIDIDestEndpointRef) into tOSStatus
 
          -- put c_MIDIClientCreate(tClientNameStrRef,nothing,nothing,sMIDIClientRef) into tOSStatus
          -- put c_MIDIClientCreate(tClientNameStrRef,tBlockPtr,tNotifyRefCon,sMIDIClientRef) into tOSStatus
