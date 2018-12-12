@@ -244,8 +244,8 @@ private foreign handler c_MIDIDestinationCreate(in pMIDIClientRef as ObjcId, in 
                                                    out rMIDIDestEndpointRef as ObjcId) returns CInt binds to "c:CoreMIDI.framework>MIDIDestinationCreate"
 -- Returns a reference to a destination, or NULL if an error occurred.
 -- MIDIGetDestination(ItemCount destIndex0); returns MIDIEndpointRef
--- private foreign handler c_MIDIGetDestination(pIndex as CInt) returns ObjCId binds to "c:CoreMIDI.framework>MIDIGetDestination"
-private foreign handler c_MIDIGetDestination( in pSourceIndexNum as Number) returns optional ObjCId binds to "c:CoreMIDI.framework>MIDIGetDestination"
+private foreign handler c_MIDIGetDestination(pIndex as ObjcId) returns ObjCId binds to "c:CoreMIDI.framework>MIDIGetDestination"
+-- private foreign handler c_MIDIGetDestination( in pSourceIndexNum as Number) returns optional ObjCId binds to "c:CoreMIDI.framework>MIDIGetDestination"
 private foreign handler c_MIDIEndpointDispose( in pEndPointRef as ObjCId) returns CInt binds to "c:CoreMIDI.framework>MIDIEndpointDispose"
 
 -- OSStatus MIDISourceCreate(MIDIClientRef client, CFStringRef name, MIDIEndpointRef *outSrc); Creates a virtual source in a client.
@@ -540,28 +540,30 @@ end handler
 -- OSStatus MIDIClientCreate(CFStringRef name, MIDINotifyProc notifyProc, void *notifyRefCon, MIDIClientRef *outClient);
 
 public handler CoreMIDIGetDestinationName(in pIndex as Number) returns String
-
+   unsafe
    -- put c_MIDIObjectGetStringProperty(tMIDIObjRef,StringToNSString("kMIDIPropertyDisplayName"),rMIDIPropertyDisplayNameCFStrRef) into tOSStatus
    variable tOSStatus as optional CInt
    variable rPropertyValueCFStrRef as optional ObjcObject
    variable pPropertyCFStrRef as ObjCId
    variable pPropertyStr as String
-   variable tMIDIDestEndpointRef as optional ObjcObject
-   unsafe
-   put StringToNSString(" ") into rPropertyValueCFStrRef
-   put "kMIDIPropertyDisplayName" into pPropertyStr
+   variable tMIDIDestEndpointRef as ObjcId
+
+   put StringToNSString("") into rPropertyValueCFStrRef
+   -- put "kMIDIPropertyDisplayName" into pPropertyStr
+   put "name" into pPropertyStr
+
    put StringToNSString(pPropertyStr) into pPropertyCFStrRef
 
     log pPropertyCFStrRef
-   -- put c_MIDIGetDestination(NumberToNSNumber(pIndex)) into tMIDIDestEndpointRef
-   put c_MIDIGetDestination(pIndex) into tMIDIDestEndpointRef
+   put c_MIDIGetDestination(NumberToNSNumber(pIndex)) into tMIDIDestEndpointRef
+   -- put c_MIDIGetDestination(pIndex) into tMIDIDestEndpointRef
    log tMIDIDestEndpointRef
    put c_MIDIObjectGetStringProperty( tMIDIDestEndpointRef, pPropertyCFStrRef, rPropertyValueCFStrRef) into tOSStatus
    log pPropertyCFStrRef
    log rPropertyValueCFStrRef
    put StringFromNSString(rPropertyValueCFStrRef) into pPropertyStr
-   end unsafe
    return pPropertyStr
+   end unsafe
 end handler
 --// generic error handler - if err is nonzero, prints error message and exits program.
 --static void CheckError(OSStatus error, const char *operation)
