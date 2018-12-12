@@ -129,24 +129,42 @@ public type MIDITimeStamp is UInt64
 
 private foreign handler c_MIDIClientCreate(in pClientNameCFStrngRef as ObjcId, in pMIDINotifyProc as optional any, in pNotifyRefConst as optional any, \
                                               out rMIDIClientRef as ObjcRetainedId) returns CInt binds to "c:CoreMIDI.framework>MIDIClientCreate"
-                                              
--- Creates an input port through which the client may receive incoming MIDI messages from any MIDI source 
+-- OSStatus MIDIClientDispose(MIDIClientRef client); Disposes a MIDIClient object. It is not essential to call this function
+-- the CoreMIDI framework will automatically dispose all MIDIClients when an application terminates.
+private foreign handler c_MIDIClientDispose(in pMIDIClientRef as ObjcId) returns CInt binds to "c:CoreMIDI.framework>MIDIClientDispose"
+
+-- Input port create through which the client may RECEIVE incoming MIDI messages from any MIDI source
 -- OSStatus MIDIInputPortCreate(MIDIClientRef client, CFStringRef portName, MIDIReadProc readProc, void *refCon, MIDIPortRef *outPort);
 private foreign handler c_MIDIInputPortCreate(in pMIDIClientRef as ObjcId, in pInputPortNameCFStrngRef as ObjCId, out rMIDIInputPortRef as ObjcId) returns CInt binds to "c:CoreMIDI.framework>MIDIInputPortCreate"
+-- Output ports provide a mechanism for MIDI merging. CoreMIDI assumes that each output port will be responsible for
+-- sending only a single MIDI stream to each destination, although a single port may address all of the destinations in the system.
+-- Multiple output ports are only necessary when an application is capable of directing multiple simultaneous MIDI streams to the same destination.
 private foreign handler c_MIDIOutputPortCreate(in pMIDIClientRef as ObjcId, in pOutPortNameCFStrngRef as ObjCId, out rMIDIOutPortRef as ObjcId) returns CInt binds to "c:CoreMIDI.framework>MIDIOutputPortCreate"
+-- OSStatus MIDIPortDispose(MIDIPortRef port);
 private foreign handler c_MIDIPortDispose( in pMIDIPortRef as ObjCId) returns CInt binds to "c:CoreMIDI.framework>MIDIPortDispose"
 -- It is not usually necessary to call this function; when an application's MIDIClient's are automatically disposed at termination,
 -- or explicitly, via MIDIClientDispose, the client's ports are automatically disposed at that time.
 
+-- OSStatus MIDIPortConnectSource(MIDIPortRef port, MIDIEndpointRef source, void *connRefCon);  Establishes a connection from a source to a client's input port.
+-- RefCon passed to the MIDIReadProc, as a way to identify the source
+private foreign handler c_MIDIPortConnectSource( in pMIDIPortRef as ObjCId,in pMIDIEndpointRef as ObjCId, in pRefCon as optional any) returns CInt binds to "c:CoreMIDI.framework>MIDIPortConnectSource"
+-- OSStatus MIDIPortDisconnectSource(MIDIPortRef port, MIDIEndpointRef source);  Closes a previously-established source-to-input port connection.
+private foreign handler c_MIDIPortDisonnectSource( in pMIDIPortRef as ObjCId,in pMIDIEndpointRef as ObjCId) returns CInt binds to "c:CoreMIDI.framework>MIDIPortDisonnectSource"
+
+-- OSStatus MIDIDestinationCreate(MIDIClientRef client, CFStringRef name, MIDIReadProc readProc, void *refCon, MIDIEndpointRef *outDest); Creates a virtual destination in a client.
 private foreign handler c_MIDIDestinationCreate(in pMIDIClientRef as ObjcId, in pMIDIDestinationNameStrRef as ObjcId, in pMIDIReadProc as optional any, in pRefConst as optional any, \
                                                    out rMIDIDestEndpointRef as ObjcId) returns CInt binds to "c:CoreMIDI.framework>MIDIDestinationCreate"
-private foreign handler c_MIDISourceCreate(in pMIDIClientRef as ObjcId, in pSourceNameStrRef as ObjCId, out rMIDISourceEndPointRef as ObjcId) returns CInt binds to "c:CoreMIDI.framework>MIDISourceCreate"
-private foreign handler c_MIDIGetSource( in pSourceIndexNum as Number) returns optional ObjCId binds to "c:CoreMIDI.framework>MIDIEGetSource" -- Returns a reference to a source, or NULL if an error occurred.
+-- Returns a reference to a destination, or NULL if an error occurred.
+private foreign handler c_MIDIGetDestination( in pSourceIndexNum as Number) returns optional ObjCId binds to "c:CoreMIDI.framework>MIDIEGetDestination"
 private foreign handler c_MIDIEndpointDispose( in pEndPointRef as ObjCId) returns CInt binds to "c:CoreMIDI.framework>MIDIEndpointDispose"
 
+-- OSStatus MIDISourceCreate(MIDIClientRef client, CFStringRef name, MIDIEndpointRef *outSrc); Creates a virtual source in a client.
+-- After creating a virtual source, use MIDIReceived to transmit MIDI messages from your virtual source to any clients connected to the virtual source.
+-- After creating a virtual source, it's a good idea to assign it the same unique ID it had the last time your application created it.
+private foreign handler c_MIDISourceCreate(in pMIDIClientRef as ObjcId, in pSourceNameStrRef as ObjCId, out rMIDISourceEndPointRef as ObjcId) returns CInt binds to "c:CoreMIDI.framework>MIDISourceCreate"
+private foreign handler c_MIDIGetSource( in pSourceIndexNum as Number) returns optional ObjCId binds to "c:CoreMIDI.framework>MIDIEGetSource" -- Returns a reference to a source, or NULL if an error occurred.
 
--- OSStatus MIDIPortDispose(MIDIPortRef port);
--- OSStatus MIDIReceived(MIDIEndpointRef src, const MIDIPacketList *pktlist);ai
+-- OSStatus MIDIReceived(MIDIEndpointRef src, const MIDIPacketList *pktlist);ai -- Use for SENDING Notes To Virstual Source (not MIDISend)
 private foreign handler c_MIDIReceived(in pMIDIEndpointRef as ObjCId, in pMIDIPacketListPtr as Pointer) returns CInt binds to "c:CoreMIDI.framework>MIDIReceived"
 private foreign handler c_MIDISend(in pMIDIPortRef as ObjcId, in pMIDIEndpointRef as ObjCId, in pMIDIPacketList as Pointer) returns CInt binds to "c:CoreMIDI.framework>MIDISend"
 private foreign handler c_MIDIPacketListInit(in pMIDIPacketListByteBuffer as Pointer) returns Pointer binds to "c:CoreMIDI.framework>MIDIPacketListInit"
@@ -158,6 +176,24 @@ private foreign handler c_MIDIGetNumberOfDestinations() returns CInt binds to "c
 private foreign handler c_MIDIGetNumberOfSources() returns CInt binds to "c:CoreMIDI.framework>MIDIGetNumberOfSources"
 private foreign handler c_MIDIGetNumberOfDevices() returns CInt binds to "c:CoreMIDI.framework>MIDIGetNumberOfDevices"
 private foreign handler c_MIDIGetNumberOfExternalDevices() returns CInt binds to "c:CoreMIDI.framework>MIDIGetNumberOfExternalDevices"
+-- MIDIGetDestination(ItemCount destIndex0); returns MIDIEndpointRef
+-- MIDIDeviceRef MIDIGetDevice(ItemCount deviceIndex0);
+-- MIDIDeviceGetEntity -- Returns one of a given device's entities.
+-- MIDIDeviceGetNumberOfEntities -- Returns the number of entities in a given device.
+-- MIDIGetNumberOfDevices returns the number of devices in the system.
+-- MIDIEndpointGetEntity Returns an endpoint's entity.
+
+-- OSStatus MIDIRestart(void); This is useful for forcing CoreMIDI to ask its drivers to rescan for hardware.
+private foreign handler c_MIDIRestart() returns CInt binds to "c:CoreMIDI.framework>MIDIRestart"
+
+-- OSStatus MIDIFlushOutput(MIDIEndpointRef dest); -- Parameters dest, All pending events scheduled to be sent to this destination are unscheduled. If NULL, the operation applies to all destinations.
+private foreign handler c_MIDIFlushOutput(in MIDIEndpointRef as optional ObjcId);
+
+-- MIDIObjectSetIntegerProperty
+-- MIDIObjectGetProperties -- Gets all of an object's properties.
+-- MIDINotificationMessageID -- Signifies the type of a MIDINotification.
+-- typedef enum MIDINotificationMessageID : SInt32
+-- MIDIObjectType -- Indicates the type of a MIDI object.
 
 -- Creates and returns an mutable data object containing a given number of zeroed bytes. Toll free bridges to CFMutableDataRef for Foundation C APIs
 private foreign handler objC_NSMutableDataWithLength(in pDataLength as ObjcId) returns ObjcId binds to "objc:NSMutableData.+dataWithLength:"
