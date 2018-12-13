@@ -284,7 +284,7 @@ private foreign handler c_MIDIFlushOutput(in MIDIEndpointRef as optional ObjcId)
 -- MIDIObjectSetIntegerProperty
 -- MIDIObjectGetProperties -- Gets all of an object's properties.
 
-private foreign handler c_MIDIObjectGetStringProperty( in pMIDIObjectRef as ObjcId, in pPropertyCFStrRef as ObjcId, out rPropertyValueCFStrRef as ObjcId) returns CInt binds to "c:CoreMIDI.framework>MIDIObjectGetStringProperty"
+private foreign handler c_MIDIObjectGetStringProperty( in pMIDIObjectRef as ObjcId, in pPropertyCFStrRef as ObjcId, out rPropertyValueCFStrRef as optional ObjcId) returns CInt binds to "c:CoreMIDI.framework>MIDIObjectGetStringProperty"
 
 -- MIDINotificationMessageID -- Signifies the type of a MIDINotification.
 -- typedef enum MIDINotificationMessageID : SInt32
@@ -294,8 +294,13 @@ private foreign handler c_MIDIObjectGetStringProperty( in pMIDIObjectRef as Objc
 private foreign handler objC_NSMutableDataWithLength(in pDataLength as ObjcId) returns ObjcId binds to "objc:NSMutableData.+dataWithLength:"
 private foreign handler objC_NSMutableDataWithCapacity(in pDataLength as ObjcId) returns ObjcId binds to "objc:NSMutableData.+dataWithCapacity:"
 private foreign handler objC_NSMutableDataBytesPtr(in pMutableDataRef as ObjcId) returns Pointer binds to "objc:NSMutableData.mutableBytes"
-private foreign handler objC_NSMutableDataSetData(in pMutableDataRef as ObjcId, in pNSDataToSet as ObjcId) returns nothing binds to "objc:NSMutableData.-setData:"
+private foreign handler objC_NSMutableDataSetData(in pMutableDataRef as ObjcId, in pNSDataToSet as ObjcId) returns any binds to "objc:NSMutableData.-setData:"
 private foreign handler objC_NSDataBytesPtr(in pDataRef as ObjcId) returns Pointer binds to "objc:NSData.bytes"
+-- NSMutableString is “toll-free bridged” with its Core Foundation counterpart, CFMutableStringRef
+private foreign handler objC_NSMutableStringWithCapacity(in pStringLength as ObjcId) returns ObjcRetainedId binds to "objc:NSMutableString.+stringWithCapacity:"
+private foreign handler objC_NSMutableStringInitWithCapacity(in pStringLength as ObjcId) returns ObjcRetainedId binds to "objc:NSMutableString.-initWithCapacity:"
+private foreign handler objC_NSMutableStringSetString(in pMutableStrRef as ObjcId, in pNSStringToSet as ObjcId) returns ObjcId binds to "objc:NSMutableString.-setString:"
+
 
 private variable sMIDIClientRef as ObjcId
 private variable sMIDIOutPortRef as ObjcId
@@ -506,9 +511,9 @@ public handler CoreMIDIGetNumberOfDestinations() returns Number
 end handler
 
 public handler CoreMIDIGetDestination(in pIndex as Number) returns ObjcId
-   variable tDestRef as ObjCId
 		unsafe
-			put CoreMIDIGetDestination(pIndex) into tDestRef
+         variable tDestRef as ObjCId
+			put c_MIDIGetDestination(NumberToNSNumber(pIndex)) into tDestRef
          log tDestRef
    end unsafe
    -- return tDestRef
@@ -543,25 +548,35 @@ public handler CoreMIDIGetDestinationName(in pIndex as Number) returns String
    unsafe
    -- put c_MIDIObjectGetStringProperty(tMIDIObjRef,StringToNSString("kMIDIPropertyDisplayName"),rMIDIPropertyDisplayNameCFStrRef) into tOSStatus
    variable tOSStatus as optional CInt
-   variable rPropertyValueCFStrRef as optional ObjcObject
-   variable pPropertyCFStrRef as ObjCId
+   variable rPropertyValueCFMutStrRef as ObjcId
+   variable pPropertyCFStrRef as ObjcId
    variable pPropertyStr as String
    variable tMIDIDestEndpointRef as ObjcId
+   put " " into pPropertyStr
+         -- put "kMIDIPropertyDisplayName" into pPropertyStr
+         -- put StringToNSString(pPropertyStr) into pPropertyCFStrRef
 
-   put StringToNSString("") into rPropertyValueCFStrRef
-   -- put "kMIDIPropertyDisplayName" into pPropertyStr
-   put "name" into pPropertyStr
+   --private foreign handler objC_NSMutableStringWithCapacity(in pStringLength as ObjcId) returns Pointer binds to "objc:NSMutableString.+stringWithCapacity:"
+   -- private foreign handler objC_NSMutableStringSetString(in pNSString as ObjcId) returns Pointer binds to "objc:NSMutableString.-setString:"
+   put objC_NSMutableStringWithCapacity(NumberToNSNumber(64)) into rPropertyValueCFMutStrRef
+   put objC_NSMutableStringSetString(rPropertyValueCFMutStrRef, StringToNSString("")) into rPropertyValueCFMutStrRef
+   put objC_NSMutableStringWithCapacity(NumberToNSNumber(64)) into pPropertyCFStrRef
 
-   put StringToNSString(pPropertyStr) into pPropertyCFStrRef
+   put objC_NSMutableStringSetString(pPropertyCFStrRef,StringToNSString("name")) into pPropertyCFStrRef
+   -- put objC_NSMutableStringSetString(pPropertyCFStrRef, StringToNSString("kMIDIPropertyName")) into pPropertyCFStrRef
 
-    log pPropertyCFStrRef
+
+   -- put objC_NSMutableDataWithLength(NumberToNSNumber(1024)) into sMIDIPacketByteBufferNSMutableDataRef
+   -- put objC_NSMutableDataBytesPtr(sMIDIPacketByteBufferNSMutableDataRef) into sMIDIPacketByteBufferPtr
+    -- put c_MIDIPacketListInit(sMIDIPacketByteBufferPtr) into sMIDIPacketPtr
+    -- log pPropertyCFStrRef
    put c_MIDIGetDestination(NumberToNSNumber(pIndex)) into tMIDIDestEndpointRef
    -- put c_MIDIGetDestination(pIndex) into tMIDIDestEndpointRef
    log tMIDIDestEndpointRef
-   put c_MIDIObjectGetStringProperty( tMIDIDestEndpointRef, pPropertyCFStrRef, rPropertyValueCFStrRef) into tOSStatus
+   put c_MIDIObjectGetStringProperty(tMIDIDestEndpointRef, pPropertyCFStrRef, rPropertyValueCFMutStrRef) into tOSStatus
    log pPropertyCFStrRef
-   log rPropertyValueCFStrRef
-   put StringFromNSString(rPropertyValueCFStrRef) into pPropertyStr
+   log rPropertyValueCFMutStrRef
+   put StringFromNSString(rPropertyValueCFMutStrRef) into pPropertyStr
    return pPropertyStr
    end unsafe
 end handler
