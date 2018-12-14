@@ -62,7 +62,7 @@ private variable sMIDIPacketByteBufferPtr as Pointer
 public handler CoreMIDIInit()
 end handler
 
-public handler CoreMIDITestNoteOn(pMIDIMsgData as Data) returns nothing
+public handler CoreMIDISendMIDIbytes(pMIDIMsgData as Data) returns nothing
    variable tOSStatus as optional CInt
    variable tTimeStamp as MIDITimeStamp
    variable tMIDIPacket as MIDIPacket
@@ -106,6 +106,12 @@ public handler CoreMIDISourceCreate(in sourceName as String) returns nothing
 		unsafe
 			put StringToNSString(sourceName) into tSourceNameStrRef
          put c_MIDISourceCreate(sMIDIClientRef,tSourceNameStrRef,sMIDISourceEndpointRef) into tOSStatus
+   end unsafe
+end handler
+
+public handler CoreMIDIMIDIGetNumberOfSources() returns Number
+		unsafe
+			return c_MIDIGetNumberOfSources()
    end unsafe
 end handler
 
