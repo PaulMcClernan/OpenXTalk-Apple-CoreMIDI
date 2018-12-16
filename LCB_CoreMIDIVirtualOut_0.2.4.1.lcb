@@ -15,6 +15,7 @@ metadata svgicon is "M66.43,52.07c-0.71,0.32-1.48,0.56-2.31,0.78c-2.35,0.65-5.44
 public foreign type MIDIPacket binds to "MCAggregateTypeInfo:kihhh" --kihhhhhhhh... k=UInt64  i=UInt16 h=3 x UInt8 -- MIDIPacket (timeStamp: MIDITimeStamp, length: UInt16, data: Data: ARRAY OF Bytes(256) x UInt8 )  -- UInt64,UInt16,Data(256))
 public foreign type MIDIMsg binds to "MCAggregateTypeInfo:hhh" -- h=3 x UInt8
 public foreign type MIDIPacketList binds to "MCAggregateTypeInfo:jr" -- Declaration (numPackets: UInt32, *packet(MIDIPacket)) -- j = UInt32
+public foreign type TimeBaseInfo binds to "MCAggregateTypeInfo:jj"
 public type MIDITimeStamp is UInt64
 
 private foreign handler c_MIDIClientCreate(in pClientNameCFStrngRef as ObjcId, in pMIDINotifyProc as optional any, in pNotifyRefConst as optional any, \
@@ -46,12 +47,12 @@ private foreign handler objC_NSMutableDataWithLength(in pDataLength as ObjcId) r
 private foreign handler objC_NSMutableDataWithCapacity(in pDataLength as ObjcId) returns ObjcId binds to "objc:NSMutableData.+dataWithCapacity:"
 private foreign handler objC_NSMutableDataBytesPtr(in pMutableDataRef as ObjcId) returns Pointer binds to "objc:NSMutableData.mutableBytes"
 private foreign handler objC_NSMutableDataSetData(in pMutableDataRef as ObjcId, in pNSDataToSet as ObjcId) returns nothing binds to "objc:NSMutableData.-setData:"
-private foreign handler objC_NSDataBytesPtr(in pDataRef as ObjcId) returns Pointer binds to "objc:NSData.bytes"
+private foreign handler objC_NSDataBytesPtr(inout pMutableDataRef as ObjcId) returns Pointer binds to "objc:NSData.bytes"
 
 -- https://developer.apple.com/documentation/kernel/1462446-mach_absolute_time?language=objc
 -- private foreign handler c_mach_absolute_time() returns MIDITimeStamp binds to "c:Kernel.framework>mach_absolute_time"
 private foreign handler c_mach_absolute_time() returns MIDITimeStamp binds to "c:mach_absolute_time"
-
+private foreign handler c_mach_timebase_info(inout pTimeBaseInfo as TimeBaseInfo) returns nothing binds to "c:mach_timebase_info"
 
 private variable sMIDIClientRef as ObjcId
 private variable sMIDIOutPortRef as ObjcId
@@ -69,7 +70,13 @@ end handler
 
 public handler CoreMIDISendMIDIbytes(pMIDIMsgData as Data) returns nothing
    variable tOSStatus as optional CInt
+   variable tAbsoluteTime as UInt64
+   variable tTBnumerator as UInt32
+   variable tTBdenominator as UInt32
    variable tTimeStamp as MIDITimeStamp
+   variable tTimeBaseInfoRef as ObjCId
+   variable tTimeBaseInfoPtr as Pointer
+   variable tTimebaseInfo as TimeBaseInfo
    variable tMIDIPacket as MIDIPacket
    variable tMIDIPacketList as MIDIPacketList
    variable tBufferSize  as Number
@@ -78,16 +85,28 @@ public handler CoreMIDISendMIDIbytes(pMIDIMsgData as Data) returns nothing
    variable tMIDIMsgBytesPtr as Pointer
    put the number of bytes in pMIDIMsgData into tCnt
    put 256 into tBufferSize
+   put [0,0] into tTimeBaseInfo
    unsafe
-      put c_mach_absolute_time() into tTimeStamp
-      log tTimeStamp
+      -- put objC_NSMutableDataWithLength(NumberToNSNumber(8)) into tTimeBaseInfoRef
+      -- put objC_NSMutableDataBytesPtr(tTimeBaseInfoRef) into tTimeBaseInfoPtr
+
+      put c_mach_absolute_time() into tAbsoluteTime
+      c_mach_timebase_info(tTimeBaseInfo) -- into tTimeBaseInfo
+      put element 1 of tTimeBaseInfo into tTBnumerator
+      put element 2 of tTimeBaseInfo into tTBdenominator
+      log "TimeBaseInfo:"
+      log tTimeBaseInfo
+      log tTBnumerator
+      log tTBdenominator
+      log "TIME:"
+      log tAbsoluteTime
       put objC_NSMutableDataWithLength(NumberToNSNumber(tBufferSize)) into sMIDIPacketByteBufferNSMutableDataRef
       put objC_NSMutableDataBytesPtr(sMIDIPacketByteBufferNSMutableDataRef) into sMIDIPacketByteBufferPtr
       put c_MIDIPacketListInit(sMIDIPacketByteBufferPtr) into sMIDIPacketPtr
       put objC_NSMutableDataWithLength(NumberToNSNumber(tCnt)) into tMIDIMsgBytesNSDataRef
       objC_NSMutableDataSetData(tMIDIMsgBytesNSDataRef, DataToNSData(pMIDIMsgData))
       put objC_NSMutableDataBytesPtr(tMIDIMsgBytesNSDataRef) into tMIDIMsgBytesPtr
-      put c_MIDIPacketListAdd(sMIDIPacketByteBufferPtr,tBufferSize,sMIDIPacketPtr,tTimeStamp,tCnt,tMIDIMsgBytesPtr) into sMIDIPacketPtr
+      put c_MIDIPacketListAdd(sMIDIPacketByteBufferPtr,tBufferSize,sMIDIPacketPtr,0,tCnt,tMIDIMsgBytesPtr) into sMIDIPacketPtr
       put c_MIDIReceived(sMIDISourceEndpointRef,sMIDIPacketByteBufferPtr) into tOSStatus
       end unsafe
 end handler
