@@ -1,0 +1,18 @@
+import module community.coremidi.paulmcclernan
+  use com.livecode.foreign
+  use com.livecode.objc
+  use com.livecode.byte
+  use com.livecode.list
+  use com.livecode.arithmetic
+  use com.livecode.engine
+  foreign type MIDIPacket
+  foreign type MIDIMsg
+  foreign type MIDIPacketList
+  foreign type TimeBaseInfo
+  type MIDITimeStamp is UInt64
+  handler CoreMIDIInit() returns optional any
+  handler CoreMIDISendMIDIbytes(in pTimeOffsetMillisecs as optional Number, in pMIDIMsgData as Data) returns nothing
+  handler CoreMIDIClientCreate(in clientName as String) returns nothing
+  handler CoreMIDISourceCreate(in clientName as String) returns nothing
+  handler CoreMIDIMIDIGetNumberOfSources() returns Number
+end module
