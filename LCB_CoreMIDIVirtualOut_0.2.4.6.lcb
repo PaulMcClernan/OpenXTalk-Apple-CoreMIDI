@@ -38,18 +38,31 @@ private foreign handler c_MIDIDestinationCreate(in pMIDIClientRef as ObjcId, in 
                                                    out rMIDIDestEndpointRef as ObjcId) returns CSInt binds to "c:CoreMIDI.framework>MIDIDestinationCreate"
 private foreign handler c_MIDIGetNumberOfDestinations() returns CInt binds to "c:CoreMIDI.framework>MIDIGetNumberOfDestinations"
 private foreign handler c_MIDIGetDestination(in pSourceIndexNum as optional UInt32) returns ObjCId binds to "c:CoreMIDI.framework>MIDIGetDestination"
-
-------------------------------------------------  MIDI Endpoints & Entities ------------------------------------------------------------
+------------------------------------------------  MIDI Endpoints------------------------------------------------------------
+-- OSStatus MIDIEndpointDispose(MIDIEndpointRef endpt); -- Disposes a virtual source or destination your client created.
+-- endpt = The endpoint to be disposed, returns a result code.
+private foreign handler c_MIDIEndpointDispose(in pMIDIEndpointRef as ObjcId) returns CSInt binds to "c:CoreMIDI.framework>MIDIEndpointDispose"
 -- OSStatus MIDIEndpointGetEntity(MIDIEndpointRef inEndpoint, MIDIEntityRef *outEntity);
 -- inEndpoint = The endpoint being queried. outEntity = On exit, the endpoint's owning entity, or NULL if none.
 private foreign handler c_MIDIEndpointGetEntity(in pMIDIEndpointRef as ObjcId, out pEntityRef as optional ObjCId) returns CSInt binds to "c:CoreMIDI.framework>MIDIEndpointGetEntity"
 -- OSStatus MIDIEntityGetDevice(MIDIEntityRef inEntity, MIDIDeviceRef *outDevice);
 -- inEntity = The entity being queried. outDevice = On successful return, the entity's owning device.
-private foreign handler c_MIDIEntityGetDevice(in pMIDIEntitytRef as ObjcId, out rDeviceRef as optional ObjCId) returns CSInt binds to "c:CoreMIDI.framework>MIDIEndpointGetEntity"
+------------------------------------------------  MIDI Entities ------------------------------------------------------------
+private foreign handler c_MIDIEntityGetDevice(in pMIDIEntitytRef as ObjcId, out rDeviceRef as optional ObjCId) returns CSInt binds to "c:CoreMIDI.framework>MIDIEntityGetDevice"
+-- ItemCount MIDIEntityGetNumberOfSources(MIDIEntityRef entity);
+private foreign handler MIDIEntityGetNumberOfSources(in MIDIEntityRef as ObjCId) returns CInt binds to "c:CoreMIDI.framework>MIDIEntityGetNumberOfSources"
+-- MIDIEndpointRef MIDIEntityGetSource(MIDIEntityRef entity, ItemCount sourceIndex0);
+-- entity = entity being queried, sourceIndex0 = index (0...MIDIEntityGetNumberOfSources(entity)-1) of the source to return. Return Value is reference to a source, or NULL if an error occurred.
+private foreign handler c_MIDIEntityGetSource(in pMIDIEntitytRef as ObjcId, in pSourceIndex as Cint) returns ObjCId binds to "c:CoreMIDI.framework>MIDIEntityGetSource"
+-- ItemCount MIDIEntityGetNumberOfDestinations(MIDIEntityRef entity);
+private foreign handler c_MIDIEntityGetNumberOfDestinations(in MIDIEntityRef as ObjCId) returns CInt binds to "c:CoreMIDI.framework>MIDIEntityGetNumberOfDestinations"
+-- MIDIEndpointRef MIDIEntityGetDestination(MIDIEntityRef entity, ItemCount destIndex0);
+-- entity = entity being queried, sourceIndex0 = index (0...MIDIEntityGetNumberOfDestinations(entity)-1) of the source to return. Return Value is reference to a source, or NULL if an error occurred.
+private foreign handler MIDIEntityGetDestination(in pMIDIEntitytRef as ObjcId, in pDestIndex as Cint) returns ObjCId binds to "c:CoreMIDI.framework>MIDIEntityGetDestination"
 ----------------------------------------------------------------- MIDI Devices ------------------------------------------------------------
+private foreign handler c_MIDIGetNumberOfDevices() returns CInt binds to "c:CoreMIDI.framework>MIDIGetNumberOfDevices"
 private foreign handler c_MIDIGetNumberOfExternalDevices() returns CInt binds to "c:CoreMIDI.framework>MIDIGetNumberOfExternalDevices"
 private foreign handler c_MIDIGetExternalDevice(in pSourceIndexNum as optional UInt32) returns ObjCId binds to "c:CoreMIDI.framework>MIDIGetExternalDevice"
-private foreign handler c_MIDIGetNumberOfDevices() returns CInt binds to "c:CoreMIDI.framework>MIDIGetNumberOfDevices"
 private foreign handler c_MIDIGetDevice(in pSourceIndexNum as optional UInt32) returns ObjCId binds to "c:CoreMIDI.framework>MIDIGetDevice"
 private foreign handler c_MIDIDeviceGetNumberOfEntities(in pMIDIDeviceRef as ObjCId) returns CInt binds to "c:CoreMIDI.framework>MIDIDeviceGetNumberOfEntities"
 private foreign handler c_MIDIDeviceGetEntity(in pDeviceRef as ObjCId, in pSourceIndexNum as UInt32) returns ObjCId binds to "c:CoreMIDI.framework>MIDIDeviceGetEntity"
@@ -62,11 +75,14 @@ private foreign handler c_MIDIPacketListAdd(in pMIDIPacketListByteBuffer as Poin
 private foreign handler c_MIDIRestart() returns CSInt binds to  "c:CoreMIDI.framework>MIDIRestart" -- OSStatus MIDIRestart(void); This is useful for forcing CoreMIDI to ask its drivers to rescan for hardware.
 private foreign handler c_MIDIFlushOutput(in MIDIEndpointRef as optional ObjcId) returns CSInt binds to  "c:CoreMIDI.framework>MIDIFlushOutput" -- OSStatus MIDIFlushOutput(MIDIEndpointRef dest); -- Parameters dest, All pending events scheduled to be sent to this destination are unscheduled. If NULL, the operation applies to all destinations.
 ----------------------------------------------------------------- MIDI Object Properties ------------------------------------------------------------
+-- OSStatus MIDIObjectGetStringProperty(MIDIObjectRef obj, CFStringRef propertyID, CFStringRef  _Nullable *str);
+-- obj = object whose property is to be returned, propertyID = Name of the property to return, str = on success the value of the property, Returns result code.
+private foreign handler c_MIDIObjectGetStringProperty(in pMIDIObjectRef as ObjCId, in rPropertyIDCFStrRef as ObjCId, out rPropertyValCFStrRef as optional ObjCId) returns CSInt binds to "c:CoreMIDI.framework>MIDIObjectGetStringProperty"
 -- MIDIObjectGetProperties -- Gets all of an object's properties.
 -- OSStatus MIDIObjectGetProperties(MIDIObjectRef obj, CFPropertyListRef  _Nullable *outProperties, Boolean deep);
 private foreign handler c_MIDIObjectGetProperties(in pMIDIObjectRef as ObjCId, out rCFPropertyListRef as ObjCId, in pDeep as Boolean) returns CSInt binds to "c:CoreMIDI.framework>MIDIObjectGetProperties"
 --CFDataRef CFPropertyListCreateData(CFAllocatorRef allocator, CFPropertyListRef propertyList, CFPropertyListFormat format, CFOptionFlags options, CFErrorRef *error); -- CFOptionFlags parameter is currently unused and should be set to 0.
-private foreign handler c_CFPropertyListCreateData(in pCFAllocatorRef as optional ObjCId, in pCFPropertyListRef as ObjCId, in pFormat as CInt, in pCFOptionFlags as CUInt, out rCFErrorRef as optional any) returns ObjCId binds to "c:CFPropertyListCreateData"
+private foreign handler c_CFPropertyListCreateData(in pCFAllocatorRef as optional ObjCId, in pCFPropertyListRef as ObjCId, in pFormat as CInt, in pOptionFlags as CUInt, out rCFErrorRef as optional any) returns ObjCId binds to "c:CFPropertyListCreateData"
 -- pFormat kCFPropertyListXMLFormat_v1_0 = 100 or kCFPropertyListBinaryFormat_v1_0 = 200 or kCFPropertyListOpenStepFormat = 1 (discouraged)
 ----------------------------------------------------------------- Data Buffer ------------------------------------------------------------
 private foreign handler objC_NSMutableDataWithLength(in pDataLength as ObjcId) returns ObjcId binds to "objc:NSMutableData.+dataWithLength:" -- Creates and returns an mutable data object containing a given number of zeroed bytes. Toll free bridges to CFMutableDataRef for Foundation C APIs
@@ -246,11 +262,20 @@ public handler CoreMIDIGetDeviceInfo(in pIndex as UInt32) returns Data
    variable tDeviceRef as ObjcId
    variable tOSStatus as optional CSInt
    variable tCFError as optional ObjCId
+   variable tPropertyValCFStrRef as optional ObjCId
+   variable tPropertyValCFStr as optional String
    variable tCFPropertyListRef as ObjCId
    variable tCFPropertyListDataRef as ObjCId
    variable tCFPropertyListData as Data
 	unsafe
 			put c_MIDIGetDevice(pIndex -1) into tDeviceRef
+         -- put c_MIDIObjectGetStringProperty(tDeviceRef,StringToNSString("displayName"),tPropertyValCFStrRef) into tOSStatus
+         put c_MIDIObjectGetStringProperty(tDeviceRef,StringToNSString("name"),tPropertyValCFStrRef) into tOSStatus
+         if tPropertyValCFStrRef is not nothing then
+            put StringFromNSString(tPropertyValCFStrRef) into tPropertyValCFStr
+            -- log tPropertyValCFStrRef
+            log tPropertyValCFStr
+         end if
          put c_MIDIObjectGetProperties(tDeviceRef,tCFPropertyListRef,true) into tOSStatus
          put c_CFPropertyListCreateData(nothing, tCFPropertyListRef, 100, 0, tCFError) into tCFPropertyListDataRef
          put DataFromNSData(tCFPropertyListDataRef) into tCFPropertyListData
@@ -276,7 +301,6 @@ public handler CoreMIDIGetExternalDeviceInfo(in pIndex as UInt32) returns Data
    variable tCFPropertyListData as Data
 	unsafe
 			put c_MIDIGetDevice(pIndex -1) into tDeviceRef
-
          put c_MIDIObjectGetProperties(tExternalDeviceRef,tCFPropertyListRef,true) into tOSStatus
          put c_CFPropertyListCreateData(nothing, tCFPropertyListRef, 100, 0, tCFError) into tCFPropertyListDataRef
          put DataFromNSData(tCFPropertyListDataRef) into tCFPropertyListData
@@ -311,8 +335,8 @@ public handler CoreMIDIGetDeviceEntityInfo(in pDevIndex as UInt32, in pEntityInd
          put c_MIDIDeviceGetEntity(tDeviceRef, pEntityIndex -1) into tDeviceEntityRef
          -- if tDeviceEntityRef is not nothing then
          put c_MIDIObjectGetProperties(tDeviceEntityRef,tCFPropertyListRef,true) into tOSStatus
-            put c_CFPropertyListCreateData(nothing, tCFPropertyListRef, 100, 0, tCFError) into tCFPropertyListDataRef
-            put DataFromNSData(tCFPropertyListDataRef) into tCFPropertyListData
+         put c_CFPropertyListCreateData(nothing, tCFPropertyListRef, 100, 0, tCFError) into tCFPropertyListDataRef
+         put DataFromNSData(tCFPropertyListDataRef) into tCFPropertyListData
          --  end if
          -- put tCFPropertyListData after rData
          -- end repeat
