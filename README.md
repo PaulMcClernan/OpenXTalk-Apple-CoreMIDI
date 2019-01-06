@@ -26,5 +26,6 @@ To Do:
 
 To Do, Maybe:
 
-- maybe merge in my GM MIDI Utils Project (GM/GS standard Names, Numbers, Controller Names, etc.)
-- maybe add in UDI's Hypercard style 'ABC' Notation compatible opensource LCS Lib called MakeSMF.
+- maybe merge in my GM MIDI Utils Project (for GM/GS standard Names, Numbers, Controller Names, etc.)
+- maybe Port to LCB or replace with LCB, UDI's Hypercard style 'ABC' Notation compatible opensource LCS Lib called makeSMF.
+- maybe port to LCB or replace with LCB, my LCS style 'ABC' Notation compatible opensource LCS Lib called MakeSMF.
