@@ -4,7 +4,7 @@ IT'S ALIVE!!!
 
 WHAT IS IT?:
 
-  This is a LiveCode Builder Library, it builds a binary module that, when the module is loaded in the LiveCode Engine, adds handlers and utility functions for use in LiveCode Script for interacting with Apple's MIDI/Music Services.
+  This is a LiveCode Builder Library for macOS (possibly iOS too) that builds as a binary module that, when the module is loaded in the LiveCode Engine, adds handlers and utility functions for use in LiveCode Script for interacting with Apple's MIDI/Music Services.
   It allows your LiveCode scripts to do things like register as a MIDI Client, register as a virtual MIDI Source, send arbitrary bytes as MIDI Data though that LC Virtual Source, Retreive info from macOS various infos about the current state of the MIDI setup on the current system. This repo also includes a few demo LiveCode stacks that can be used in conjunction with GarageBand or other external MIDI app to see how it works.
 
 So far this library consists of:
@@ -14,4 +14,6 @@ So far this library consists of:
 - LiveCode Builder (LCB) Bindings to retreive various infos about the present state of the MIDI Setup on the system. (WIP)
 
 To Do:
-Create an AUGraph and load Apple's DLS Synth virtual instrument, giving LiveCode Script handlers to load SoundFont SF2 files or Downloadable DLS files into it for uses in direct playback of MIDI. I already created a few LC Scripts that 
+
+- Create an AUGraph and load Apple's DLS Synth virtual instrument, this will give LiveCode Script new handlers to load SoundFont SF2 files or Downloadable DLS files into it for uses in direct playback of MIDI from LiveCode (no GarageBand or other MIDI apps needed).
+- Also need to add functions to read SoundBank info from the SoundFont SF2 or DLS files, for use with selecting sounds from the file and in sending Bank Change/Patch Change MIDI Messages to select them in your MIDI streams or file. I already created a few LC Scripts that parse both SF2 and DLS (they're both are RIFF Container format) for bank/names info, see the demo stacks in my other project LiveCode AVMIDIPLayer.
