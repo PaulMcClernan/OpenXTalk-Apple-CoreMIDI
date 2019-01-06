@@ -75,6 +75,10 @@ private foreign handler c_MIDIPacketListAdd(in pMIDIPacketListByteBuffer as Poin
 private foreign handler c_MIDIRestart() returns CSInt binds to  "c:CoreMIDI.framework>MIDIRestart" -- OSStatus MIDIRestart(void); This is useful for forcing CoreMIDI to ask its drivers to rescan for hardware.
 private foreign handler c_MIDIFlushOutput(in MIDIEndpointRef as optional ObjcId) returns CSInt binds to  "c:CoreMIDI.framework>MIDIFlushOutput" -- OSStatus MIDIFlushOutput(MIDIEndpointRef dest); -- Parameters dest, All pending events scheduled to be sent to this destination are unscheduled. If NULL, the operation applies to all destinations.
 ----------------------------------------------------------------- MIDI Object Properties ------------------------------------------------------------
+
+-- OSStatus MIDIObjectGetIntegerProperty(MIDIObjectRef obj, CFStringRef propertyID, SInt32 *outValue);
+private foreign handler c_MIDIObjectGetIntegerProperty(in pMIDIObjectRef as ObjCId, in rPropertyIDCFStrRef as ObjCId, out rPropertyVal as optional SInt32) returns CSInt binds to "c:CoreMIDI.framework>MIDIObjectGetIntegerProperty"
+
 -- OSStatus MIDIObjectGetStringProperty(MIDIObjectRef obj, CFStringRef propertyID, CFStringRef  _Nullable *str);
 -- obj = object whose property is to be returned, propertyID = Name of the property to return, str = on success the value of the property, Returns result code.
 private foreign handler c_MIDIObjectGetStringProperty(in pMIDIObjectRef as ObjCId, in rPropertyIDCFStrRef as ObjCId, out rPropertyValCFStrRef as optional ObjCId) returns CSInt binds to "c:CoreMIDI.framework>MIDIObjectGetStringProperty"
@@ -264,6 +268,7 @@ public handler CoreMIDIGetDeviceInfo(in pIndex as UInt32) returns Data
    variable tCFError as optional ObjCId
    variable tPropertyValCFStrRef as optional ObjCId
    variable tPropertyValCFStr as optional String
+   variable tPropertyValSInt32 as optional Number
    variable tCFPropertyListRef as ObjCId
    variable tCFPropertyListDataRef as ObjCId
    variable tCFPropertyListData as Data
@@ -275,6 +280,12 @@ public handler CoreMIDIGetDeviceInfo(in pIndex as UInt32) returns Data
             put StringFromNSString(tPropertyValCFStrRef) into tPropertyValCFStr
             -- log tPropertyValCFStrRef
             log tPropertyValCFStr
+         end if
+         put c_MIDIObjectGetIntegerProperty(tDeviceRef,StringToNSString("uniqueID"),tPropertyValSInt32) into tOSStatus
+         if tPropertyValSInt32 is not nothing then
+            put StringFromNSString(tPropertyValCFStrRef) into tPropertyValCFStr
+            -- log tPropertyValCFStrRef
+            log tPropertyValSInt32
          end if
          put c_MIDIObjectGetProperties(tDeviceRef,tCFPropertyListRef,true) into tOSStatus
          put c_CFPropertyListCreateData(nothing, tCFPropertyListRef, 100, 0, tCFError) into tCFPropertyListDataRef
