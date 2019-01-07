@@ -159,7 +159,6 @@ public handler CoreMIDISendMIDIbytesInTime(in pTimeOffsetMillisecs as optional N
    unsafe
       -- put objC_NSMutableDataWithLength(NumberToNSNumber(8)) into tTimeBaseInfoRef
       -- put objC_NSMutableDataBytesPtr(tTimeBaseInfoRef) into tTimeBaseInfoPtr
-
       put c_mach_absolute_time() into tAbsoluteTime
       c_mach_timebase_info(tTimeBaseInfo) -- into tTimeBaseInfo
       put element 1 of tTimeBaseInfo into tTBnumerator
@@ -196,13 +195,29 @@ public handler CoreMIDIClientCreate(in clientName as String) returns nothing
    end unsafe
 end handler
 
-public handler CoreMIDISourceCreate(in sourceName as String) returns nothing
+public handler CoreMIDISourceCreate(in sourceName as String) returns Number -- Data
    -- OSStatus MIDISourceCreate(MIDIClientRef client, CFStringRef name, MIDIEndpointRef *outSrc);
    variable tSourceNameStrRef as ObjcObject
    variable tOSStatus as optional CSInt
+   variable tCFError as optional ObjCId
+   variable tPropertyValSInt32 as optional Number
+
+   --variable tCFPropertyListRef as ObjCId
+   --variable tCFPropertyListDataRef as ObjCId
+   --variable tCFPropertyListData as Data
 		unsafe
 			put StringToNSString(sourceName) into tSourceNameStrRef
          put c_MIDISourceCreate(sMIDIClientRef,tSourceNameStrRef,sMIDISourceEndpointRef) into tOSStatus
+         put c_MIDIObjectGetIntegerProperty(sMIDISourceEndpointRef,StringToNSString("uniqueID"),tPropertyValSInt32) into tOSStatus
+         if tPropertyValSInt32 is not nothing then
+            -- log tPropertyValSInt32
+            return tPropertyValSInt32
+         end if
+         --put c_MIDIObjectGetProperties(sMIDISourceEndpointRef,tCFPropertyListRef,true) into tOSStatus
+         --put c_CFPropertyListCreateData(nothing, tCFPropertyListRef, 100, 0, tCFError) into tCFPropertyListDataRef
+         -- put DataFromNSData(tCFPropertyListDataRef) into tCFPropertyListData
+         -- put c_MIDIObjectGetStringProperty(in sMIDISourceEndpointRef as ObjCId, in rPropertyIDCFStrRef as ObjCId, out rPropertyValCFStrRef as optional ObjCId) returns CSInt binds to "c:CoreMIDI.framework>MIDIObjectGetStringProperty"
+         -- return tCFPropertyListData
    end unsafe
 end handler
 
@@ -246,10 +261,10 @@ public handler CoreMIDIGetSourceInfo(in pIndex as UInt32) returns Data
    variable tCFPropertyListDataRef as ObjCId
    variable tCFPropertyListData as Data
 	unsafe
-			put c_MIDIGetSource(pIndex-1) into tSourceRef
-         put c_MIDIObjectGetProperties(tSourceRef,tCFPropertyListRef,true) into tOSStatus
-         put c_CFPropertyListCreateData(nothing, tCFPropertyListRef, 100, 0, tCFError) into tCFPropertyListDataRef
-         put DataFromNSData(tCFPropertyListDataRef) into tCFPropertyListData
+		put c_MIDIGetSource(pIndex-1) into tSourceRef
+      put c_MIDIObjectGetProperties(tSourceRef,tCFPropertyListRef,true) into tOSStatus
+      put c_CFPropertyListCreateData(nothing, tCFPropertyListRef, 100, 0, tCFError) into tCFPropertyListDataRef
+      put DataFromNSData(tCFPropertyListDataRef) into tCFPropertyListData
    end unsafe
    return tCFPropertyListData
 end handler
@@ -283,7 +298,7 @@ public handler CoreMIDIGetDeviceInfo(in pIndex as UInt32) returns Data
          end if
          put c_MIDIObjectGetIntegerProperty(tDeviceRef,StringToNSString("uniqueID"),tPropertyValSInt32) into tOSStatus
          if tPropertyValSInt32 is not nothing then
-            put StringFromNSString(tPropertyValCFStrRef) into tPropertyValCFStr
+            -- put NumberFromNSNumber(tPropertyValCFStrRef) into tPropertyValCFStr
             -- log tPropertyValCFStrRef
             log tPropertyValSInt32
          end if
