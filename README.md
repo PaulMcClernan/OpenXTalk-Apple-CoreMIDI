@@ -22,7 +22,7 @@ To Do:
 - Also need to add functions to read SoundBank info from the SoundFont SF2 or DLS files, for use with selecting sounds from the file and in sending Bank Change/Patch Change MIDI Messages to select them in your MIDI streams or file. I already created a few LC Scripts that parse both SF2 and DLS (they are both RIFF Container formats) for bank/patch names info, see the demo stacks in my other project LiveCode AVMIDIPLayer (that can already load SF2 or DLS but can only playback Standard MIDI Files, not for live performance/instantaneous play)
 - Add handlers & functions for using Apple's Music Player Sequencing Services to create and record tracks in multi-track sequences, associate endpoints with tracks, right data out to Standard Files, etc.
 - Add transport function MIDI Messages Stop, Start, Pause, Play, Record (See demo stack for transport control of GarageBand via AppleSCript.)
-
+- Add bindings for MIDI Thru Connection, a part of Core MIDI that facilitates realtime manipulation of MIDI Data as it passes though the MIDI Setup.
 
 To Do, Maybe:
 
