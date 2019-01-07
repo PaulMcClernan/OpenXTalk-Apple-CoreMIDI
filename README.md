@@ -16,6 +16,7 @@ So far this library consists of:
 
 
 To Do:
+- Some Error Checking and Reporting in the LCB end to return descriptive information about any errors that may occur.
 - MIDI In with callbacks to tell new incoming MIDI Data is available for passing to the LiveCode engine and any processing any related TimeStamp info for received MIDI events (Core MIDI nanoseconds to milliseconds for LC)
 - MIDI Setup changed notifications to alert LiveCode of changes to the current setup (a MIDI Instrument gets turned off for example)
 - Add AudioToolbox / AUAudioUnit / Core Audio Kit bindings to create an AUGraph and load Apple's DLS Synth virtual instrument, this will give LiveCode Script new handlers to load SoundFont SF2 files or Downloadable DLS files into it for uses in direct playback of MIDI from LiveCode (no GarageBand or other MIDI apps needed).
@@ -28,5 +29,5 @@ To Do:
 To Do, Maybe:
 
 - maybe merge in my GM MIDI Utils Project (for GM/GS standard Names, Numbers, Controller Names, etc.)
-- maybe Port to LCB or replace with LCB, UDI's Hypercard style 'ABC' Notation compatible opensource LCS Lib called makeSMF.
-- maybe port to LCB or replace with LCB, my LCS style 'ABC' Notation compatible opensource LCS Lib called MakeSMF.
+- maybe Port to LCB, or replace with LCB, UDI's Hypercard style 'ABC' Notation compatible opensource LCS Lib called makeSMF.
+- maybe port to LCB, or replace with LCB, my LCS scripts for dealing with MIDI's variable length quantities (VLQ), conversion back and forth from 7-bits-per-byte (VLQ) to and from standard 8 bit bytes, hex or decimal numbers.
