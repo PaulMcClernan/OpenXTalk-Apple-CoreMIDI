@@ -30,5 +30,5 @@ To Do:
 To Do, Maybe:
 
 - maybe merge in my GM MIDI Utils Project (for GM/GS standard Names, Numbers, Controller Names, etc.)
-- maybe Port to LCB, or replace with LCB, UDI's Hypercard style 'ABC' Notation compatible opensource LCS Lib called makeSMF. This library was very well written all the way back in the early 2000s (late 1990s?), I've slightly updated it, mostly to use 'bytes' instead of 'char' keyword (since it was written LiveCode has since become fully Unicode ready, so a 'char' could be multi-byte unicode).
+- maybe Port to LCB, or replace with LCB, UDI's Hypercard style 'ABC' Notation compatible opensource LCS Lib called makeSMF. This library was very well written all the way back in the early 2000s (late 1990s?). I've already updated it slightly, mostly to use 'bytes' instead of 'char' keyword (since it was written LiveCode has since become fully Unicode ready, so a 'char' could be multi-byte unicode).
 - maybe port to LCB, or replace with LCB, my LCS scripts for dealing with MIDI's variable length quantities (VLQ), converting back and forth from 7-bits-per-byte (VLQ) to and from standard 8 bit bytes, hex, or decimal numbers. Mostly useful for encoding and decoding TimeStamp numbers in the Standard MIDI file specification.
