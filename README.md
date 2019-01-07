@@ -16,7 +16,8 @@ So far this library consists of:
 
 
 To Do:
-
+- MIDI In with callbacks to tell new incoming MIDI Data is available for passing to the LiveCode engine and any processing any related TimeStamp info for received MIDI events (Core MIDI nanoseconds to milliseconds for LC)
+- MIDI Setup changed notifications to alert LiveCode of changes to the current setup (a MIDI Instrument gets turned off for example)
 - Add AudioToolbox / AUAudioUnit / Core Audio Kit bindings to create an AUGraph and load Apple's DLS Synth virtual instrument, this will give LiveCode Script new handlers to load SoundFont SF2 files or Downloadable DLS files into it for uses in direct playback of MIDI from LiveCode (no GarageBand or other MIDI apps needed).
 - Add handlers & functions for connecting to/from other Sources, Destinations, Ports, Entities and Endpoints that are available on the current system, and for determining whether an Device / object is offline or not.
 - Also need to add functions to read SoundBank info from the SoundFont SF2 or DLS files, for use with selecting sounds from the file and in sending Bank Change/Patch Change MIDI Messages to select them in your MIDI streams or file. I already created a few LC Scripts that parse both SF2 and DLS (they are both RIFF Container formats) for bank/patch names info, see the demo stacks in my other project LiveCode AVMIDIPLayer (that can already load SF2 or DLS but can only playback Standard MIDI Files, not for live performance/instantaneous play)
