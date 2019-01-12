@@ -18,7 +18,7 @@ So far this library consists of:
 To Do:
 - Some Error Checking and Reporting in the LCB end to return descriptive information about any errors that may occur.
 - Create the in-line Documentation markup describing the handlers of the library module for LiveCode's Dictionary.
-- MIDI In with callbacks to tell new incoming MIDI Data is available for passing to the LiveCode engine and any processing any related TimeStamp info for received MIDI events (Core MIDI nanoseconds to milliseconds for LC)
+- MIDI In with callbacks to tell LiveCode engine that new incoming MIDI Data is available for receiving and processing any related TimeStamp info for received MIDI events (Core MIDI nanoseconds to milliseconds for LC)
 - MIDI Setup changed notifications to alert LiveCode of changes to the current setup (a MIDI Instrument gets turned off for example)
 - Add AudioToolbox / AUAudioUnit / Core Audio Kit bindings to create an AUGraph and load Apple's DLS Synth virtual instrument, this will give LiveCode Script new handlers to load SoundFont SF2 files or Downloadable DLS files into it for uses in direct playback of MIDI from LiveCode (no GarageBand or other MIDI apps needed).
 - Add handlers & functions for connecting to/from other Sources, Destinations, Ports, Entities and Endpoints that are available on the current system, and for determining whether an Device / object is offline or not.
