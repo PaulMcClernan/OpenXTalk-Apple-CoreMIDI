@@ -233,7 +233,6 @@ end handler
 
 public handler CoreMIDIObjectTypeFromID(in uniqueIDnum as optional SInt32) returns String
    variable tOSStatus as optional CSInt
-   variable tCFError as optional ObjCId
    variable rMIDIObjectRef as optional ObjCId
    variable rMIDIObjectType as optional Number
    variable rReturnString as String
@@ -264,6 +263,25 @@ public handler CoreMIDIObjectTypeFromID(in uniqueIDnum as optional SInt32) retur
        end if
        if rMIDIObjectType = kMIDIObjectType_Other then
           put "Other Type Object" into rReturnString --- kMIDIObjectType_Other = -1
+       end if
+   end unsafe
+   return rReturnString
+end handler
+
+public handler CoreMIDISelectSourceByID(in uniqueIDnum as optional SInt32) returns String
+   variable tOSStatus as optional CSInt
+   variable rMIDIObjectRef as optional ObjCId
+   variable rMIDIObjectType as optional Number
+   variable rReturnString as String
+   unsafe
+      put c_MIDIObjectFindByUniqueID( uniqueIDnum, rMIDIObjectRef, rMIDIObjectType) into tOSStatus -- rMIDIObjectType is an SInt32
+      -- if rMIDIObjectRef is not nothing then
+      --    put rMIDIObjectRef into sMIDISourceEndpointRef
+      -- end if
+         if rMIDIObjectType is kMIDIObjectType_Source then
+             put rMIDIObjectRef into sMIDISourceEndpointRef
+         else
+            put "No Source Object Found" into rReturnString
        end if
    end unsafe
    return rReturnString
@@ -302,7 +320,8 @@ public handler CoreMIDIGetDestinationNameAndID(in pIndex as UInt32) returns Stri
    variable tPropertyValSInt32 as optional Number
    unsafe
       put c_MIDIGetDestination(pIndex -1) into tDestinationRef
-         put c_MIDIObjectGetStringProperty(tDestinationRef,StringToNSString("name"),tPropertyValCFStrRef) into tOSStatus
+         put c_MIDIObjectGetStringProperty(tDestinationRef,StringToNSString("displayName"),tPropertyValCFStrRef) into tOSStatus -- "displayName" gets Entity Name & the Endpoint's Name
+         -- put c_MIDIObjectGetStringProperty(tDestinationRef,StringToNSString("name"),tPropertyValCFStrRef) into tOSStatus -- "name" just gets the EndPoint's name
          if tPropertyValCFStrRef is not nothing then
             put StringFromNSString(tPropertyValCFStrRef) into tPropertyValCFStr
             -- log tPropertyValCFStr
@@ -348,7 +367,8 @@ public handler CoreMIDIGetSourceNameAndID(in pIndex as UInt32) returns String
    variable tPropertyValSInt32 as optional Number
    unsafe
          put c_MIDIGetSource(pIndex-1) into tSourceRef
-         put c_MIDIObjectGetStringProperty(tSourceRef,StringToNSString("name"),tPropertyValCFStrRef) into tOSStatus
+         put c_MIDIObjectGetStringProperty(tSourceRef,StringToNSString("displayName"),tPropertyValCFStrRef) into tOSStatus
+         -- put c_MIDIObjectGetStringProperty(tSourceRef,StringToNSString("name"),tPropertyValCFStrRef) into tOSStatus
          if tPropertyValCFStrRef is not nothing then
             put StringFromNSString(tPropertyValCFStrRef) into tPropertyValCFStr
             -- log tPropertyValCFStr
