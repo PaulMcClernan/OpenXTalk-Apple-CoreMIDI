@@ -32,7 +32,7 @@ private foreign handler c_MIDIPortDisonnectSource( in pMIDIPortRef as ObjCId,in 
 private foreign handler c_MIDISourceCreate(in pMIDIClientRef as ObjcId, in pSourceNameStrRef as ObjCId, out rMIDISourceEndPointRef as ObjcId) \
                                                                                  returns CSInt binds to "c:CoreMIDI.framework>MIDISourceCreate"
 private foreign handler c_MIDIGetNumberOfSources() returns CInt binds to "c:CoreMIDI.framework>MIDIGetNumberOfSources"
-private foreign handler c_MIDIGetSource( in pSourceIndexNum as optional UInt32) returns ObjCId binds to "c:CoreMIDI.framework>MIDIGetSource" -- Returns a reference to a source, or NULL if an error occurred.
+private foreign handler c_MIDIGetSource( in pSourceIndexNum as optional UInt32) returns optional ObjCId binds to "c:CoreMIDI.framework>MIDIGetSource" -- Returns a reference to a source, or NULL if an error occurred.
 ------------------------------------------------  MIDI Destinations ------------------------------------------------------------
 -- OSStatus MIDIDestinationCreate(MIDIClientRef client, CFStringRef name, MIDIReadProc readProc, void *refCon, MIDIEndpointRef *outDest); Creates a virtual destination in a client.
 private foreign handler c_MIDIDestinationCreate(in pMIDIClientRef as ObjcId, in pMIDIDestinationNameStrRef as ObjcId, in pMIDIReadProc as optional any, in pRefConst as optional any, \
@@ -83,7 +83,7 @@ private foreign handler c_MIDIFlushOutput(in MIDIEndpointRef as optional ObjcId)
 -- Return Value is sn OSStatus error code, including kMIDIObjectNotFound if there is no object with the specified uniqueID.
 private foreign handler c_MIDIObjectFindByUniqueID(in pMIDIObjectUID as SInt32, out rMIDIObjectRef as optional ObjCId, out rMIDIObjectType as optional SInt32) returns CSInt binds to "c:CoreMIDI.framework>MIDIObjectFindByUniqueID"
 -- OSStatus MIDIObjectGetIntegerProperty(MIDIObjectRef obj, CFStringRef propertyID, SInt32 *outValue);
-private foreign handler c_MIDIObjectGetIntegerProperty(in pMIDIObjectRef as ObjCId, in rPropertyIDCFStrRef as ObjCId, out rPropertyVal as optional SInt32) returns CSInt binds to "c:CoreMIDI.framework>MIDIObjectGetIntegerProperty"
+private foreign handler c_MIDIObjectGetIntegerProperty(in pMIDIObjectRef as optional ObjCId, in rPropertyIDCFStrRef as ObjCId, out rPropertyVal as optional SInt32) returns CSInt binds to "c:CoreMIDI.framework>MIDIObjectGetIntegerProperty"
 --OSStatus MIDIObjectSetIntegerProperty(MIDIObjectRef obj, CFStringRef propertyID, SInt32 newvalue);
 private foreign handler c_MIDIObjectSetIntegerProperty(in pMIDIObjectRef as ObjCId, in rPropertyIDCFStrRef as ObjCId, in rPropertyVal as optional SInt32) returns CSInt binds to "c:CoreMIDI.framework>MIDIObjectSetIntegerProperty"
 -- OSStatus MIDIObjectGetStringProperty(MIDIObjectRef obj, CFStringRef propertyID, CFStringRef  _Nullable *str);
@@ -122,7 +122,7 @@ private variable sMIDIClientRef as ObjcId
 private variable sMIDIOutPortRef as ObjcId
 private variable sMIDIInputPortRef as ObjcId
 private variable sMIDIDestEndpointRef as ObjcId
-private variable sMIDISourceEndpointRef as ObjcId
+private variable sMIDISourceEndpointRef as ObjcId -- ObjcAutoreleasedId
 private variable sMIDIPacketPtr as Pointer
 private variable sMIDIPacketListPtr as Pointer
 -- private variable sMIDITimeStamp as optional MIDITimeStamp
@@ -247,10 +247,10 @@ public handler CoreMIDIObjectTypeFromID(in uniqueIDnum as optional SInt32) retur
          put "MIDI Object not found" into rReturnString
        end if
        if rMIDIObjectType > 3 then
-         put "External Object " & rMIDIObjectType formatted as string into rReturnString -- all external object constants are defined as 0x10
+         put "External Object, Mask=" & rMIDIObjectType formatted as string into rReturnString -- all external object constants are defined as 0x10
        end if
        if rMIDIObjectType = kMIDIObjectType_Destination then
-          put "Destination Object, Mask=" into rReturnString ---  kMIDIObjectType_Destination = 3
+          put "Destination Object" into rReturnString ---  kMIDIObjectType_Destination = 3
        end if
        if rMIDIObjectType = kMIDIObjectType_Source then
           put "Source Object" into rReturnString ---  kMIDIObjectType_Source = 2
@@ -263,25 +263,6 @@ public handler CoreMIDIObjectTypeFromID(in uniqueIDnum as optional SInt32) retur
        end if
        if rMIDIObjectType = kMIDIObjectType_Other then
           put "Other Type Object" into rReturnString --- kMIDIObjectType_Other = -1
-       end if
-   end unsafe
-   return rReturnString
-end handler
-
-public handler CoreMIDISelectSourceByID(in uniqueIDnum as optional SInt32) returns String
-   variable tOSStatus as optional CSInt
-   variable rMIDIObjectRef as optional ObjCId
-   variable rMIDIObjectType as optional Number
-   variable rReturnString as String
-   unsafe
-      put c_MIDIObjectFindByUniqueID( uniqueIDnum, rMIDIObjectRef, rMIDIObjectType) into tOSStatus -- rMIDIObjectType is an SInt32
-      -- if rMIDIObjectRef is not nothing then
-      --    put rMIDIObjectRef into sMIDISourceEndpointRef
-      -- end if
-         if rMIDIObjectType is kMIDIObjectType_Source then
-             put rMIDIObjectRef into sMIDISourceEndpointRef
-         else
-            put "No Source Object Found" into rReturnString
        end if
    end unsafe
    return rReturnString
@@ -317,19 +298,15 @@ public handler CoreMIDIGetDestinationNameAndID(in pIndex as UInt32) returns Stri
    variable tCFError as optional ObjCId
    variable tPropertyValCFStrRef as optional ObjCId
    variable tPropertyValCFStr as optional String
-   variable tPropertyValSInt32 as optional Number
+   variable tPropertyValSInt32 as optional SInt32
    unsafe
       put c_MIDIGetDestination(pIndex -1) into tDestinationRef
          put c_MIDIObjectGetStringProperty(tDestinationRef,StringToNSString("displayName"),tPropertyValCFStrRef) into tOSStatus -- "displayName" gets Entity Name & the Endpoint's Name
          -- put c_MIDIObjectGetStringProperty(tDestinationRef,StringToNSString("name"),tPropertyValCFStrRef) into tOSStatus -- "name" just gets the EndPoint's name
          if tPropertyValCFStrRef is not nothing then
             put StringFromNSString(tPropertyValCFStrRef) into tPropertyValCFStr
-            -- log tPropertyValCFStr
          end if
          put c_MIDIObjectGetIntegerProperty(tDestinationRef,StringToNSString("uniqueID"),tPropertyValSInt32) into tOSStatus
-         if tPropertyValSInt32 is not nothing then
-            -- log tPropertyValSInt32
-         end if
       end unsafe
    return tPropertyValCFStr &  "," & tPropertyValSInt32 formatted as string
 end handler
@@ -374,11 +351,47 @@ public handler CoreMIDIGetSourceNameAndID(in pIndex as UInt32) returns String
             -- log tPropertyValCFStr
          end if
          put c_MIDIObjectGetIntegerProperty(tSourceRef,StringToNSString("uniqueID"),tPropertyValSInt32) into tOSStatus
-         if tPropertyValSInt32 is not nothing then
+         -- if tPropertyValSInt32 is not nothing then
             -- log tPropertyValSInt32
-         end if
+         -- end if
    end unsafe
    return tPropertyValCFStr &  "," & tPropertyValSInt32 formatted as string
+end handler
+
+public handler CoreMIDISelectSourceByID(in uniqueIDnum as optional SInt32) returns String
+   variable tOSStatus as optional CSInt
+   variable rMIDIObjectRef as optional ObjCId
+   variable rMIDIObjectType as optional Number
+   variable rReturnString as String
+   unsafe
+      put c_MIDIObjectFindByUniqueID( uniqueIDnum, rMIDIObjectRef, rMIDIObjectType) into tOSStatus -- rMIDIObjectType is an SInt32
+      -- if rMIDIObjectRef is not nothing then
+      --    put rMIDIObjectRef into sMIDISourceEndpointRef
+      -- end if
+         if rMIDIObjectType is kMIDIObjectType_Source then
+             put rMIDIObjectRef into sMIDISourceEndpointRef
+         else
+            put "No Source Object Found" into rReturnString
+       end if
+   end unsafe
+   return rReturnString
+end handler
+
+public handler CoreMIDISelectSourceByIndex(in pIndex as UInt32) returns String
+   variable tSourceRef as optional ObjCId
+   variable tOSStatus as optional CSInt
+   variable tPropertyValSInt32 as optional Number
+   variable rMIDIObjectType as optional Number
+   unsafe
+      put c_MIDIGetSource(pIndex-1) into tSourceRef
+      put c_MIDIObjectGetIntegerProperty(tSourceRef,StringToNSString("uniqueID"),tPropertyValSInt32) into tOSStatus
+      if tOSStatus is 0 then
+        put c_MIDIObjectFindByUniqueID( tPropertyValSInt32, sMIDISourceEndpointRef, rMIDIObjectType) into tOSStatus -- rMIDIObjectType is an SInt32
+        return tPropertyValSInt32 formatted as string
+      else
+        return "Error " & tOSStatus formatted as string
+      end if
+   end unsafe
 end handler
 
 public handler CoreMIDIGetNumberOfDevices() returns Number
