@@ -122,11 +122,10 @@ private variable sMIDIClientRef as ObjcId
 private variable sMIDIOutPortRef as ObjcId
 private variable sMIDIInputPortRef as ObjcId
 private variable sMIDIDestEndpointRef as ObjcId
-private variable sMIDISourceEndpointRef as ObjcId -- ObjcAutoreleasedId
+private variable sMIDISourceEndpointRef as ObjcId
 private variable sMIDIPacketPtr as Pointer
 private variable sMIDIPacketListPtr as Pointer
--- private variable sMIDITimeStamp as optional MIDITimeStamp
-private variable sMIDIPacketByteBufferNSMutableDataRef as ObjcId -- tCFMutableDataRef
+private variable sMIDIPacketByteBufferNSMutableDataRef as ObjcId
 private variable sMIDIPacketByteBufferPtr as Pointer
 
 public handler CoreMIDISendMIDIbytesNow (in pMIDIMsgData as Data) returns nothing
@@ -375,6 +374,24 @@ public handler CoreMIDISelectSourceByID(in uniqueIDnum as optional SInt32) retur
        end if
    end unsafe
    return rReturnString
+end handler
+
+public handler CoreMIDISelectSourceByIndexBug(in pIndex as UInt32) returns String
+   variable tSourceRef as optional ObjCId
+   variable tOSStatus as optional CSInt
+   variable tPropertyValSInt32 as optional Number
+   unsafe
+      put c_MIDIGetSource(pIndex-1) into tSourceRef
+      if tSourceRef is not nothing then
+         put c_MIDIObjectGetIntegerProperty(tSourceRef,StringToNSString("uniqueID"),tPropertyValSInt32) into tOSStatus
+         if tOSStatus is 0 then
+            return tPropertyValSInt32 formatted as string
+            put tSourceRef into sMIDISourceEndpointRef
+         else
+            return "Error " & tOSStatus formatted as string
+         end if
+      end if
+   end unsafe
 end handler
 
 public handler CoreMIDISelectSourceByIndex(in pIndex as UInt32) returns String
