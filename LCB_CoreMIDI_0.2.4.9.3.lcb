@@ -376,7 +376,7 @@ public handler CoreMIDISelectSourceByID(in uniqueIDnum as optional SInt32) retur
    return rReturnString
 end handler
 
-public handler CoreMIDISelectSourceByIndexBug(in pIndex as UInt32) returns String
+public handler CoreMIDISelectSourceByIndex(in pIndex as UInt32) returns String
    variable tSourceRef as optional ObjCId
    variable tOSStatus as optional CSInt
    variable tPropertyValSInt32 as optional Number
@@ -394,7 +394,7 @@ public handler CoreMIDISelectSourceByIndexBug(in pIndex as UInt32) returns Strin
    end unsafe
 end handler
 
-public handler CoreMIDISelectSourceByIndex(in pIndex as UInt32) returns String
+public handler CoreMIDISelectSourceByIndexAlt(in pIndex as UInt32) returns String
    variable tSourceRef as optional ObjCId
    variable tOSStatus as optional CSInt
    variable tPropertyValSInt32 as optional Number
