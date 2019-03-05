@@ -226,6 +226,34 @@ public handler CoreMIDISendMIDIbytesNow (in pMIDIMsgData as Data) returns nothin
    end unsafe
 end handler
 
+public handler CoreMIDINoteOn (in pMIDINoteNum as UInt8,in pMIDIVeloNum as UInt8,in pMIDIChanNum as UInt8) returns nothing
+   variable pMIDIMsgData as Data
+   variable tOSStatus as optional CSInt
+   variable tTimeStamp as MIDITimeStamp
+   variable tMIDIPacket as MIDIPacket
+   variable tMIDIPacketList as MIDIPacketList
+   variable tBufferSize  as Number
+   variable tCnt as Number
+   variable tMIDIMsgBytesNSDataRef as ObjCId
+   variable tMIDIMsgBytesPtr as Pointer
+   put 3 into tCnt
+   add 144 to pMIDIChanNum
+   put the byte with code pMIDIChanNum into pMIDIMsgData
+   put the byte with code pMIDINoteNum after pMIDIMsgData
+   put the byte with code pMIDIVeloNum after pMIDIMsgData
+   put 32 into tBufferSize
+   put 0 into tTimeStamp
+   unsafe
+      put objC_NSMutableDataWithLength(NumberToNSNumber(tBufferSize)) into sMIDIPacketByteBufferNSMutableDataRef
+      put objC_NSMutableDataBytesPtr(sMIDIPacketByteBufferNSMutableDataRef) into sMIDIPacketByteBufferPtr
+      put c_MIDIPacketListInit(sMIDIPacketByteBufferPtr) into sMIDIPacketPtr
+      put objC_NSMutableDataWithLength(NumberToNSNumber(tCnt)) into tMIDIMsgBytesNSDataRef
+      objC_NSMutableDataSetData(tMIDIMsgBytesNSDataRef, DataToNSData(pMIDIMsgData))
+      put objC_NSMutableDataBytesPtr(tMIDIMsgBytesNSDataRef) into tMIDIMsgBytesPtr
+      put c_MIDIPacketListAdd(sMIDIPacketByteBufferPtr,tBufferSize,sMIDIPacketPtr,tTimeStamp,tCnt,tMIDIMsgBytesPtr) into sMIDIPacketPtr
+      put c_MIDIReceived(sMIDISourceEndpointRef,sMIDIPacketByteBufferPtr) into tOSStatus
+   end unsafe
+end handler
 /**
 Sends arbitrary bytes to the MIDI Client's Queue in millisecond Offsets from now.
 
