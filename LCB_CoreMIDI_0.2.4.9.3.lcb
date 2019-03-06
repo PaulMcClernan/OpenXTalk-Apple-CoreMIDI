@@ -256,6 +256,7 @@ end handler
 public handler CoreMIDIPitchbend (in pPitchBendCoarse as UInt8,in pPitchBendFine as UInt8,in pMIDIChanNum as UInt8) returns nothing
    variable tMIDIMsgData as Data
    add 224 to pMIDIChanNum -- 0xE0	Pitch bend	2	lsb (7 bits)	msb (7 bits)
+   --- round of total div 128 (=coarse), round of total mod 128 (=fine)
    put the byte with code pMIDIChanNum into tMIDIMsgData
    put the byte with code pPitchBendCoarse after tMIDIMsgData
    put the byte with code pPitchBendFine after tMIDIMsgData
@@ -273,6 +274,7 @@ public handler CoreMIDIStop () returns nothing
    put the byte with code 252 into tMIDIMsgData
    CoreMIDISendMIDIbytesNow(tMIDIMsgData)
 end handler
+
 -- 0xA0	Aftertouch	2	key	touch
 -- 0xC0	Patch change	2	instrument #
 -- 0xD0	Channel Pressure	1	pressure
@@ -287,9 +289,9 @@ end handler
 -- 0xF6	Tune Request (Sys Common)
 -- 0xF7	end of system exclusive message	0
 -- 0xF8	Timing Clock (Sys Realtime)
--- 0xFA	Start (Sys Realtime)
+
 -- 0xFB	Continue (Sys Realtime)
--- 0xFC	Stop (Sys Realtime)
+
 -- 0xFD	???
 -- 0xFE	Active Sensing (Sys Realtime)
 -- 0xFF	System Reset (Sys Realtime)
