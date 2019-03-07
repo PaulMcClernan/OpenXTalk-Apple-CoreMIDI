@@ -253,13 +253,48 @@ public handler CoreMIDIController (in pController as UInt8,in pControllerVal as 
    CoreMIDISendMIDIbytesNow(tMIDIMsgData)
 end handler
 
-public handler CoreMIDIPitchbend (in pPitchBendCoarse as UInt8,in pPitchBendFine as UInt8,in pMIDIChanNum as UInt8) returns nothing
+public handler CoreMIDIPitchbendFine (in pPitchBendCoarseNFine as Number,in pMIDIChanNum as UInt8) returns nothing
    variable tMIDIMsgData as Data
-   add 224 to pMIDIChanNum -- 0xE0	Pitch bend	2	lsb (7 bits)	msb (7 bits)
-   --- round of total div 128 (=coarse), round of total mod 128 (=fine)
+   variable tNum as Number
+   variable pPitchBendCoarse as UInt8
+   variable pPitchBendFine as UInt8
+   add 224 to pMIDIChanNum -- 0xEx Pitchbend + channel
+   put pPitchBendCoarseNFine into tNum
+   divide tNum by 128
+   round tNum
+   put tNum into pPitchBendCoarse
+   put pPitchBendCoarseNFine into tNum
+   put tNum mod 128 into tNum
+   round tNum
+   put tNum into pPitchBendFine
    put the byte with code pMIDIChanNum into tMIDIMsgData
    put the byte with code pPitchBendCoarse after tMIDIMsgData
    put the byte with code pPitchBendFine after tMIDIMsgData
+   CoreMIDISendMIDIbytesNow(tMIDIMsgData)
+end handler
+
+public handler CoreMIDIPitchbend (in pPitchBendCoarse as UInt8,in pMIDIChanNum as UInt8) returns nothing
+   variable tMIDIMsgData as Data
+   add 224 to pMIDIChanNum
+   put the byte with code pMIDIChanNum into tMIDIMsgData
+   put the byte with code pPitchBendCoarse after tMIDIMsgData
+   put the byte with code 0 after tMIDIMsgData -- no "fine" steps, just 128 "coarse" steps
+   CoreMIDISendMIDIbytesNow(tMIDIMsgData)
+end handler
+
+public handler CoreMIDIAftertouch (in pNoteNum as UInt8,in pKeyPressure as UInt8,in pMIDIChanNum as UInt8) returns nothing
+   variable tMIDIMsgData as Data
+   add 160 to pMIDIChanNum
+   put the byte with code pMIDIChanNum into tMIDIMsgData
+   put the byte with code pNoteNum after tMIDIMsgData
+   put the byte with code pKeyPressure after tMIDIMsgData
+   CoreMIDISendMIDIbytesNow(tMIDIMsgData)
+end handler
+public handler CoreMIDIChannelPressure (in pChannelPressure as UInt8,in pMIDIChanNum as UInt8) returns nothing
+   variable tMIDIMsgData as Data
+   add 208 to pMIDIChanNum
+   put the byte with code pMIDIChanNum into tMIDIMsgData
+   put the byte with code pChannelPressure after tMIDIMsgData
    CoreMIDISendMIDIbytesNow(tMIDIMsgData)
 end handler
 
@@ -268,17 +303,19 @@ public handler CoreMIDIStart () returns nothing
    put the byte with code 250 into tMIDIMsgData
    CoreMIDISendMIDIbytesNow(tMIDIMsgData)
 end handler
-
+public handler CoreMIDIContinue () returns nothing
+   variable tMIDIMsgData as Data
+   put the byte with code 251 into tMIDIMsgData -- 0xFB
+   CoreMIDISendMIDIbytesNow(tMIDIMsgData)
+end handler
 public handler CoreMIDIStop () returns nothing
    variable tMIDIMsgData as Data
    put the byte with code 252 into tMIDIMsgData
    CoreMIDISendMIDIbytesNow(tMIDIMsgData)
 end handler
 
--- 0xA0	Aftertouch	2	key	touch
+
 -- 0xC0	Patch change	2	instrument #
--- 0xD0	Channel Pressure	1	pressure
---
 -- 0xF0	(non-musical commands) -- here is a basic table of them:
 -- 0xF0	start of system exclusive message	variable
 -- 0xF1	MIDI Time Code Quarter Frame (Sys Common)
@@ -290,7 +327,7 @@ end handler
 -- 0xF7	end of system exclusive message	0
 -- 0xF8	Timing Clock (Sys Realtime)
 
--- 0xFB	Continue (Sys Realtime)
+-- 0xFB	 (Sys Realtime)
 
 -- 0xFD	???
 -- 0xFE	Active Sensing (Sys Realtime)
