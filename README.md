@@ -1,4 +1,4 @@
-# LCB_CoreMIDI
+# LCB CoreMIDI Library
 
 IT'S ALIVE!!!
 
