@@ -268,8 +268,8 @@ public handler CoreMIDIPitchbendFine (in pPitchBendCoarseNFine as Number,in pMID
    round tNum
    put tNum into pPitchBendFine
    put the byte with code pMIDIChanNum into tMIDIMsgData
-   put the byte with code pPitchBendCoarse after tMIDIMsgData
    put the byte with code pPitchBendFine after tMIDIMsgData
+   put the byte with code pPitchBendCoarse after tMIDIMsgData
    CoreMIDISendMIDIbytesNow(tMIDIMsgData)
 end handler
 
@@ -277,8 +277,8 @@ public handler CoreMIDIPitchbend (in pPitchBendCoarse as UInt8,in pMIDIChanNum a
    variable tMIDIMsgData as Data
    add 224 to pMIDIChanNum
    put the byte with code pMIDIChanNum into tMIDIMsgData
-   put the byte with code pPitchBendCoarse after tMIDIMsgData
    put the byte with code 0 after tMIDIMsgData -- no "fine" steps, just 128 "coarse" steps
+   put the byte with code pPitchBendCoarse after tMIDIMsgData
    CoreMIDISendMIDIbytesNow(tMIDIMsgData)
 end handler
 
@@ -694,7 +694,7 @@ public handler CoreMIDISelectSourceByID(in uniqueIDnum as optional SInt32) retur
    return rReturnString
 end handler
 
-public handler CoreMIDISelectSourceByIndex(in pIndex as UInt32) returns String
+public handler CoreMIDISelectSourceByIndexAlt(in pIndex as UInt32) returns String
    variable tSourceRef as optional ObjCId
    variable tOSStatus as optional CSInt
    variable tPropertyValSInt32 as optional Number
@@ -712,7 +712,7 @@ public handler CoreMIDISelectSourceByIndex(in pIndex as UInt32) returns String
    end unsafe
 end handler
 
-public handler CoreMIDISelectSourceByIndexAlt(in pIndex as UInt32) returns String
+public handler CoreMIDISelectSourceByIndex(in pIndex as UInt32) returns String
    variable tSourceRef as optional ObjCId
    variable tOSStatus as optional CSInt
    variable tPropertyValSInt32 as optional Number
