@@ -932,7 +932,6 @@ public handler CoreMIDIRestart()
       c_MIDIRestart()
    end unsafe
 end handler
-
 public handler CoreMIDIFlushOutput()
    unsafe
       c_MIDIFlushOutput(sMIDISourceEndpointRef)
