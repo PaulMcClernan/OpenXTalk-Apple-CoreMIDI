@@ -7,6 +7,9 @@ WHAT IS IT?:
   This is a LiveCode Builder Library for macOS (possibly iOS too) that builds as a binary module that, when the module is loaded in the LiveCode Engine, adds handlers and utility functions for use in LiveCode Script for interacting with Apple's MIDI/Music Services.
   It allows your LiveCode scripts to do things like register as a MIDI Client, register as a virtual MIDI Source, send arbitrary bytes as MIDI Data though that LC Virtual Source, and Retreive various infos about the current state of the MIDI setup from the OS. This repo also includes a few demo LiveCode stacks that can be used in conjunction with GarageBand or other external MIDI app to see how it works.
 
+A short video demonstration (early version) is veiwable here:
+https://www.youtube.com/watch?v=ruauWh3INfw
+
 So far this library consists of:
 
 - LiveCode Builder (LCB) Bindings to create a MIDI Client and register as a Virtual MIDI Source from LiveCode Script.
