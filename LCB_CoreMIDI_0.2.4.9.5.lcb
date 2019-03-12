@@ -193,6 +193,8 @@ private variable sMIDIPacketByteBufferPtr as Pointer
 /**
 Sends arbitrary bytes to the MIDI Client.
 
+Type: command
+
 Example:
 CoreMIDISendMIDIbytesNow pMIDIMsgData
 
@@ -233,7 +235,9 @@ end handler
 /**
 Immediately sends a MIDI Note On message with the given pitch and velocity on the given channel.
 
-Syntax: CoreMIDINoteOn <pMIDINoteNum>,pMIDIVeloNum,<pMIDIChanNum>
+Type: command
+
+Syntax: CoreMIDINoteOn <MIDINoteNumber>,pMIDIVelocityNumber,<pMIDIChannelNumber>
 
 Example:
 CoreMIDINoteOn 60,127,1 -- 60=Middle C, 127=Full velocity, 1=MIDI channel 1
@@ -260,9 +264,9 @@ end handler
 /**
 Name: CoreMIDINoteOff
 
-Type: handler
+Type: command
 
-Syntax: CoreMIDINoteOff <pMIDINoteNum>,<pMIDIChanNum>
+Syntax: CoreMIDINoteOff <MIDINoteNumber>,<MIDIChannelNumber>
 
 Summary:
 Immediately sends a MIDI Note On message with the given pitch and velocity on the given channel.
@@ -277,7 +281,7 @@ pMIDIChanNum: The MIDI Channel to send the message to, 0 to 15, 0 = Channel 1
 Description:
 Immediately sends a MIDI Note Off message with the given pitch on the given channel.
 */
-public handler CoreMIDINoteOff (in pMIDINoteNum as UInt8,in pMIDIChanNum as UInt8) returns nothing
+public handler CoreMIDINoteOff(in pMIDINoteNum as UInt8,in pMIDIChanNum as UInt8) returns nothing
    expect that (pMIDINoteNum >= 0 and pMIDINoteNum <= 127 ) because "MIDI pitch values must be in the range of 0 to 127"
    expect that (pMIDIChanNum >= 1 and pMIDIChanNum <= 16 ) because "MIDI channel values must be in the range of 1 to 16"
    variable tMIDIMsgData as Data
@@ -291,7 +295,7 @@ end handler
 /**
 Name: CoreMIDIController
 
-Type: handler
+Type: command
 
 Syntax: CoreMIDIController(<pController>,<pControllerVal><pMIDIChanNum>)
 
@@ -299,7 +303,6 @@ Summary:
 The send a controller with a single data byte value to on a given channel
 
 Example:
-
 CoreMIDIController 7,127,1 -- 7 = Volume Controller, Data Byte 1, channel 1
 
 Parameters:
@@ -325,6 +328,8 @@ end handler
 /**
 The send pitchbend with fine range from 0 to 16384, 8192 is centered (no bend)
 
+Type: command
+
 Syntax: CoreMIDIPitchbendFine <pPitchBendCoarseNFine>,<pMIDIChanNum>
 
 Example:
@@ -339,7 +344,7 @@ pMIDIChanNum: MIDI Channel to send the bend value on, 1 to 16
 Description:
 The send pitchbend with fine range from 0 to 16384, 8192 is centered (no bend)
 */
-public handler CoreMIDIPitchbendFine (in pPitchBendCoarseNFine as Number,in pMIDIChanNum as UInt8) returns nothing
+public handler CoreMIDIPitchbendFine(in pPitchBendCoarseNFine as Number,in pMIDIChanNum as UInt8) returns nothing
    expect that (pPitchBendCoarseNFine >= 0 and pPitchBendCoarseNFine <= 16384 ) because "MIDI controller selection must be in the range of 0 to 127"
    expect that (pMIDIChanNum >= 1 and pMIDIChanNum <= 16 ) because "MIDI channel values must be in the range of 1 to 16"
    variable tMIDIMsgData as Data
@@ -363,6 +368,10 @@ end handler
 
 /**
 The send pitchbend with coarse range from 0 to 127, 64 is centered (no bend)
+
+Type: command
+
+Syntax: CoreMIDIPitchbend <pPitchBendCoarse>,<pMIDIChannelNum>
 
 Example:
 CoreMIDIPitchbendFine 0,1 -- Pitchbend Maximum Down, channel 1
@@ -391,6 +400,8 @@ end handler
 /**
 The send Aftertouch (key pressure) for specified note on the given channel
 
+Type: command
+
 Example:
 CoreMIDIAftertouch 60,127,1 -- Middle C=60, 127=Maximum Pressure, channel 1
 
@@ -417,6 +428,8 @@ end handler
 
 /**
 The send Channel Pressure on the given channel
+
+Type: command
 
 Example:
 CoreMIDIChannelPressure 127,1 -- 127=Maximum Pressure, channel 1
