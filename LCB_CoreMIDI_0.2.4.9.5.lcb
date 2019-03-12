@@ -196,7 +196,7 @@ Sends arbitrary bytes to the MIDI Client.
 Type: command
 
 Example:
-CoreMIDISendMIDIbytesNow pMIDIMsgData
+CoreMIDISendMIDIbytesNow <pMIDIMsgData>
 
 Parameters:
 pMIDIMsgData: arbitrary bytes, does not check for the bytes for validity as MIDI messages
@@ -435,7 +435,7 @@ Example:
 CoreMIDIChannelPressure 127,1 -- 127=Maximum Pressure, channel 1
 
 Parameters:
-pChannelPressure (Integer): The channel ressure value, range 0 to 127
+pChannelPressure (Integer): The channel pressure value, range 0 to 127
 pMIDIChanNum (Integer): MIDI Channel to send the value on, 1 to 16
 
 Description:
@@ -451,22 +451,110 @@ public handler CoreMIDIChannelPressure(in pChannelPressure as UInt8,in pMIDIChan
    CoreMIDISendMIDIbytesNow(tMIDIMsgData)
 end handler
 
-public handler CoreMIDIStart () returns nothing
+/**
+Sends Program Change message on the given channel
+
+Type: command
+
+Example:
+CoreMIDIProgramChange 10,1 -- 10=, channel 1
+
+Parameters:
+pPatch (Integer): The patch number to change to, range 1 to 128
+pMIDIChanNum (Integer): MIDI Channel to send the value on, 1 to 16
+
+Description:
+Sends Program Change message on the given channel.
+*/
+public handler CoreMIDIProgramChange(in pPatch as UInt8,in pMIDIChanNum as UInt8) returns nothing
+   expect that (pPatch >= 1 and pPatch <= 128 ) because "MIDI controller selection must be in the range of 0 to 127"
+   expect that (pMIDIChanNum >= 1 and pMIDIChanNum <= 16 ) because "MIDI channel values must be in the range of 1 to 16"
    variable tMIDIMsgData as Data
-   put the byte with code 250 into tMIDIMsgData
+   add 191 to pMIDIChanNum -- 192 is MIDI PatchChange
+   subtract 1 from pPatch -- change range from 1-128 to 0-127
+
+   put the byte with code pMIDIChanNum into tMIDIMsgData
+   put the byte with code pPatch after tMIDIMsgData
    CoreMIDISendMIDIbytesNow(tMIDIMsgData)
 end handler
-public handler CoreMIDIContinue () returns nothing
+
+/**
+Sends System Realtime Start message
+
+Type: command
+
+Example:
+CoreMIDIStart
+
+Description:
+Sends Start message for receivers such as Drum Machines that respond to System Realtime messages
+*/
+public handler CoreMIDIStart() returns nothing
+   variable tMIDIMsgData as Data
+   put the byte with code 249 into tMIDIMsgData
+   CoreMIDISendMIDIbytesNow(tMIDIMsgData)
+end handler
+
+/**
+Sends System Realtime Continue message
+
+Type: command
+
+Example:
+CoreMIDIContinue
+
+Description:
+Sends Continue message for receivers such as Drum Machines that respond to System Realtime messages
+*/
+public handler CoreMIDIContinue() returns nothing
    variable tMIDIMsgData as Data
    put the byte with code 251 into tMIDIMsgData -- 0xFB
    CoreMIDISendMIDIbytesNow(tMIDIMsgData)
 end handler
-public handler CoreMIDIStop () returns nothing
+
+/**
+Sends System Realtime Stop message
+
+Type: command
+
+Example:
+CoreMIDIStop
+
+Description:
+Sends Stop message for receivers such as Drum Machines that respond to System Realtime messages
+*/
+public handler CoreMIDIStop() returns nothing
    variable tMIDIMsgData as Data
    put the byte with code 252 into tMIDIMsgData
    CoreMIDISendMIDIbytesNow(tMIDIMsgData)
 end handler
 
+/**
+Sends System Realtime Reset message
+
+Type: command
+
+Example:
+CoreMIDISystemReset
+
+Description:
+Sends System Reset message for receivers such that respond to such messages.
+
+The receiver should be reset to the following states if available:
+- Omni on, Polyphonic
+- Local control on
+- All notes turned off
+- All controllers returned to their 'normal' settings
+- Any song playing stopped
+- Song Position Pointer = 0
+- Running Status is cleared
+- Reset to power-up conditions
+*/
+public handler CoreMIDISystemReset() returns nothing
+   variable tMIDIMsgData as Data
+   put the byte with code 255 into tMIDIMsgData
+   CoreMIDISendMIDIbytesNow(tMIDIMsgData)
+end handler
 
 -- 0xC0	Patch change	2	instrument #
 -- 0xF0	(non-musical commands) -- here is a basic table of them:
@@ -478,13 +566,10 @@ end handler
 -- 0xF5	???
 -- 0xF6	Tune Request (Sys Common)
 -- 0xF7	end of system exclusive message	0
--- 0xF8	Timing Clock (Sys Realtime)
 
 -- 0xFB	 (Sys Realtime)
 
--- 0xFD	???
--- 0xFE	Active Sensing (Sys Realtime)
--- 0xFF	System Reset (Sys Realtime)
+-- 0xFE	Active Sensing (Sys Realtime) -- Rarely Used, was used by Yamaha DX-7
 
 /**
 Sends arbitrary bytes to the MIDI Client's Queue in millisecond Offsets from now.
