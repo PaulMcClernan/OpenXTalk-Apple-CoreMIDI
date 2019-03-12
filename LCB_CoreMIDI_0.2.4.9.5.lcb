@@ -269,7 +269,7 @@ Type: command
 Syntax: CoreMIDINoteOff <MIDINoteNumber>,<MIDIChannelNumber>
 
 Summary:
-Immediately sends a MIDI Note On message with the given pitch and velocity on the given channel.
+Immediately sends a MIDI Note Off message with the given pitch and velocity on the given channel.
 
 Example:
 CoreMIDINoteOff 60,1 -- Turns off Middle C on MIDI channel 1
