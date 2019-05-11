@@ -1,0 +1,73 @@
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,Key,,,,,Rel m,,,Key,,Rel M,,,,,,Key,,Rel M,,,,,,Key,,Rel M,,,,,,Note Equivalencies,,,,,
+,I,ii,iii,IV,V,vi,vii,,i,ii,III,iv,v,VI,VII,,i,ii,III,iv,V,VI,vii,,i,ii,III,IV,V,vi,vii,,C#,Db,C##,D,C###,D#
+,Maj,min,min,Maj,Maj,min,dim,,min,dim,Maj,min,min,Maj,Maj,,min,dim,aug,min,Maj,Maj,dim,,min,min,aug,Maj,Maj,dim,dim,,D#,Eb,D##,E,D###,F
+,C,D,E,F,G,A,B,,C,D,Eb,F,G,Ab,Bb,,C,D,Eb,F,G,Ab,B,,C,D,Eb,F,G,A,B,,E#,F,E##,F#,E###,G
+,C#,D#,E#,F#,G#,A#,B#,,C#,D#,E,F#,G#,A,B,,C#,D#,E,F#,G#,A,B#,,C#,D#,E,F#,G#,A#,B#,,F#,Gb,F##,G,F###,G#
+,Db,Eb,F,Gb,Ab,Bb,C,,Db,Eb,Fb,Gb,Ab,Bbb,Cb,,Db,Eb,Fb,Gb,Ab,Bbb,C,,Db,Eb,Fb,Gb,Ab,Bb,C,,G#,Ab,G##,A,G###,A#
+,D,E,F#,G,A,B,C#,,D,E,F,G,A,Bb,C,,D,E,F,G,A,Bb,C#,,D,E,F,G,A,B,C#,,A#,Bb,A##,B,A###,C
+,D#,E#,F##,G#,A#,B#,C##,,D#,E#,F#,G#,A#,B,C#,,D#,E#,F#,G#,A#,B,C##,,D#,E#,F#,G#,A#,B#,C##,,B#,C,B##,C#,B###,D
+,Eb,F,G,Ab,Bb,C,D,,Eb,F,Gb,Ab,Bb,Cb,Db,,Eb,F,Gb,Ab,Bb,Cb,D,,Eb,F,Gb,Ab,Bb,C,D,,Cb,B,Cbb,A#,Cbbb,A
+,E,F#,G#,A,B,C#,D#,,E,F#,G,A,B,C,D,,E,F#,G,A,B,C,D#,,E,F#,G,A,B,C#,D#,,Db,C#,Dbb,C,Dbbb,B
+,E#,F##,G##,A#,B#,C##,D##,,E#,F##,G#,A#,B#,C#,D#,E#,E#,F##,G#,A#,B#,C#,D##,E#,E#,F##,G#,A#,B#,C##,D##,,Eb,D#,Ebb,D,Ebbb,C#
+,Fb,Gb,Ab,Bbb,Cb,Db,Eb,,Fb,Gb,Abb,Bbb,Cb,Dbb,Ebb,Fb,Fb,Gb,Abb,Bbb,Cb,Dbb,Eb,Fb,Fb,Gb,Abb,Bbb,Cb,Db,Eb,,Fb,E,Fbb,D#,Fbbb,D
+,F,G,A,Bb,C,D,E,,F,G,Ab,Bb,C,Db,Eb,F,F,G,Ab,Bb,C,Db,E,F,F,G,Ab,Bb,C,D,E,,Gb,F#,Gbb,F,Gbbb,E
+,F#,G#,A#,B,C#,D#,E#,,F#,G#,A,B,C#,D,E,,F#,G#,A,B,C#,D,E#,,F#,G#,A,B,C#,D#,E#,,Ab,G#,Abb,G,Abbb,F#
+,Gb,Ab,Bb,Cb,Db,Eb,F,,Gb,Ab,Bbb,Cb,Db,Ebb,Fb,,Gb,Ab,Bbb,Cb,Db,Ebb,F,,Gb,Ab,Bbb,Cb,Db,Eb,F,,Bb,A#,Bbb,A,Bbbb,G#
+,G,A,B,C,D,E,F#,,G,A,Bb,C,D,Eb,F,,G,A,Bb,C,D,Eb,F#,,G,A,Bb,C,D,E,F#,,,,,,,
+,G#,A#,B#,C#,D#,E#,F##,,G#,A#,B,C#,D#,E,F#,,G#,A#,B,C#,D#,E,F##,,G#,A#,B,C#,D#,E#,F##,,,,,,,
+,Ab,Bb,C,Db,Eb,F,G,,Ab,Bb,Cb,Db,Eb,Fb,Gb,,Ab,Bb,Cb,Db,Eb,Fb,G,,Ab,Bb,Cb,Db,Eb,F,G,,,,,,,
+,A,B,C#,D,E,F#,G#,,A,B,C,D,E,F,G,,A,B,C,D,E,F,G#,,A,B,C,D,E,F#,G#,,,,,,,
+,A#,B#,C##,D#,E#,F##,G##,,A#,B#,C#,D#,E#,F#,G#,,A#,B#,C#,D#,E#,F#,G##,,A#,B#,C#,D#,E#,F##,G##,,,,,,,
+,Bb,C,D,Eb,F,G,A,,Bb,C,Db,Eb,F,Gb,Ab,,Bb,C,Db,Eb,F,Gb,A,,Bb,C,Db,Eb,F,G,A,,,,,,,
+,B,C#,D#,E,F#,G#,A#,,B,C#,D,E,F#,G,A,,B,C#,D,E,F#,G,A#,,B,C#,D,E,F#,G#,A#,,,,,,,
+,B#,C##,D##,E#,F##,G##,A##,,B#,C##,D#,E#,F##,G#,A#,,B#,C##,D#,E#,F##,G#,A##,,B#,C##,D#,E#,F##,G##,A##,,,,,,,
+,Cb,Db,Eb,Fb,Gb,Ab,Bb,,Cb,Db,Ebb,Fb,Gb,Abb,Bbb,,Cb,Db,Ebb,Fb,Gb,Abb,Bb,,Cb,Db,Ebb,Fb,Gb,Ab,Bb,,,,,,,
+,C##,D##,E##,F##,G##,A##,B##,,C##,D##,E#,F##,G##,A#,B#,,C##,D##,E#,F##,G##,A#,B##,,C##,D##,E#,F##,G##,A##,B##,,,,,,,
+,Dbb,Ebb,Fb,Gbb,Abb,Bbb,Cb,,Dbb,Ebb,Fbb,Gbb,Abb,Bbbb,Cbb,,Dbb,Ebb,Fbb,Gbb,Abb,Bbbb,Cb,,Dbb,Ebb,Fbb,Gbb,Abb,Bbb,Cb,,,,,,,
+,D##,E##,F###,G##,A##,B##,C###,,D##,E##,F##,G##,A##,B#,C##,,D##,E##,F##,G##,A##,B#,C###,,D##,E##,F##,G##,A##,B##,C###,,,,,,,
+,Ebb,Fb,Gb,Abb,Bbb,Cb,Db,,Ebb,Fb,Gbb,Abb,Bbb,Cbb,Dbb,,Ebb,Fb,Gbb,Abb,Bbb,Cbb,Db,,Ebb,Fb,Gbb,Abb,Bbb,Cb,Db,,,,,,,
+,F##,G##,A##,B#,C##,D##,E##,,F##,G##,A#,B#,C##,D#,E#,,F##,G##,A#,B#,C##,D#,E##,,F##,G##,A#,B#,C##,D##,E##,,,,,,,
+,G##,A##,B##,C##,D##,E##,F###,,G##,A##,B#,C##,D##,E#,F##,,G##,A##,B#,C##,D##,E#,F###,,G##,A##,B#,C##,D##,E##,F###,,,,,,,
+,Abb,Bbb,Cb,Dbb,Ebb,Fb,Gb,,Abb,Bbb,Cbb,Dbb,Ebb,Fbb,Gbb,,Abb,Bbb,Cbb,Dbb,Ebb,Fbb,Gb,,Abb,Bbb,Cbb,Dbb,Ebb,Fb,Gb,,,,,,,
+,A##,B##,C###,D##,E##,F###,G###,,A##,B##,C##,D##,E##,F##,G##,,A##,B##,C##,D##,E##,F##,G###,,A##,B##,C##,D##,E##,F###,G###,,,,,,,
+,Bbb,Cb,Db,Ebb,Fb,Gb,Ab,,Bbb,Cb,Dbb,Ebb,Fb,Gbb,Abb,,Bbb,Cb,Dbb,Ebb,Fb,Gbb,Ab,,Bbb,Cb,Dbb,Ebb,Fb,Gb,Ab,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,The Major Scale,,,,,,,,The Minor Scale,,,,,,,,The Harmonic Minor Scale,,,,,,,,The Melodic Minor Scale,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,Key,,,,Rel m,,,,Key,Rel M,,,,,,Key,,,,,,,,Key,,,,,,,,,,,,,
+,,I,ii,iii,V,vi,,,,i,III,iv,v,VII,,,I,II,III,IV,V,IV,,,,,,,,,,,,,,,,
+,,Maj,min,min,Maj,min,,,,min,Maj,min,min,Maj,,,beyond the scope of this document,,,,,,,,,,,,,,,,,,,,,
+,,C,D,E,G,A,,,,C,Eb,F,G,Bb,,,C,Eb,F,Gb,G,Bb,,,C,,,,,,,,,,,,,
+,,C#,D#,E#,G#,A#,,,,C#,E,F#,G#,B,,,C#,E,F#,G,G#,B,,,C#,,,,,,,,,,,,,
+,,Db,Eb,F,Ab,Bb,,,,Db,Fb,Gb,Ab,Cb,,,Db,E,Gb,G,Ab,B,,,Db,,,,,,,,,,,,,
+,,D,E,F#,A,B,,,,D,F,G,A,C,,,D,F,G,Ab,A,C,,,D,,,,,,,,,,,,,
+,,D#,E#,F##,A#,B#,,,,D#,F#,G#,A#,C#,,,D#,F#,G#,A,A#,C#,,,D#,,,,,,,,,,,,,
+,,Eb,F,G,Bb,C,,,,Eb,Gb,Ab,Bb,Db,,,Eb,Gb,Ab,A,Bb,Db,,,Eb,,,,,,,,,,,,,
+,,E,F#,G#,B,C#,,,,E,G,A,B,D,,,E,G,A,Bb,B,D,,,E,,,,,,,,,,,,,
+E#,,E#,F##,G##,B#,C##,,E#,,E#,G#,A#,B#,D#,,E#,F,Ab,Bb,B,C,Eb,,E#,E#,,,,,,,,,,,,,
+Fb,,Fb,Gb,Ab,Cb,Db,,Fb,,Fb,Abb,Bbb,Cb,Ebb,,Fb,F#,A,B,C,C#,E,,Fb,Fb,,,,,,,,,,,,,
+F,,F,G,A,C,D,,F,,F,Ab,Bb,C,Eb,,F,Gb,A,B,C,Db,E,,F,F,,,,,,,,,,,,,
+,,F#,G#,A#,C#,D#,,,,F#,A,B,C#,E,,,G,Bb,C,Db,D,F,,,F#,,,,,,,,,,,,,
+,,Gb,Ab,Bb,Db,Eb,,,,Gb,Bbb,Cb,Db,Fb,,,G#,B,C#,D,D#,F#,,,Gb,,,,,,,,,,,,,
+,,G,A,B,D,E,,,,G,Bb,C,D,F,,,Ab,B,Db,D,Eb,Gb,,,G,,,,,,,,,,,,,
+,,G#,A#,B#,D#,E#,,,,G#,B,C#,D#,F#,,,A,C,D,Eb,E,G,,,G#,,,,,,,,,,,,,
+,,Ab,Bb,C,Eb,F,,,,Ab,Cb,Db,Eb,Gb,,,A#,C#,D#,E,F,G#,,,Ab,,,,,,,,,,,,,
+,,A,B,C#,E,F#,,,,A,C,D,E,G,,,Bb,Db,Eb,E,F,Ab,,,A,,,,,,,,,,,,,
+,,A#,B#,C##,E#,F##,,,,A#,C#,D#,E#,G#,,,B,D,E,F,F#,A,,,A#,,,,,,,,,,,,,
+,,Bb,C,D,F,G,,,,Bb,Db,Eb,F,Ab,,,Cb,D,E,F,Gb,A,,,Bb,,,,,,,,,,,,,
+,,B,C#,D#,F#,G#,,,,B,D,E,F#,A,,,,,,,,,,,B,,,,,,,,,,,,,
+,,B#,C##,D##,F##,G##,,,,B#,D#,E#,F##,A#,,,The Blues Scale,,,,,,,,B#,,,,,,,,,,,,,
+,,Cb,Db,Eb,Gb,Ab,,,,Cb,Ebb,Fb,Gb,Bbb,,,,,,,,,,,Cb,,,,,,,,,,,,,
+,,C##,D##,E##,G##,A##,,,,C##,E#,F##,G##,B#,,,,,,,,,,,C##,,,,,,,,,,,,,
+,,Dbb,Ebb,Fb,Abb,Bbb,,,,Dbb,Fbb,Gbb,Abb,Cbb,,,,,,,,,,,Dbb,,,,,,,,,,,,,
+,,D##,E##,F###,A##,B##,,,,D##,F##,G##,A##,C##,,,,,,,,,,,D##,,,,,,,,,,,,,
+,,Ebb,Fb,Gb,Bbb,Cb,,,,Ebb,Gbb,Abb,Bbb,Dbb,,,,,,,,,,,Ebb,,,,,,,,,,,,,
+,,F##,G##,A##,C##,D##,,,,F##,A#,B#,C##,E#,,,,,,,,,,,F##,,,,,,,,,,,,,
+,,G##,A##,B##,D##,E##,,,,G##,B#,C##,D##,F##,,,,,,,,,,,G##,,,,,,,,,,,,,
+,,Abb,Bbb,Cb,Ebb,Fb,,,,Abb,Cbb,Dbb,Ebb,Gbb,,,,,,,,,,,Abb,,,,,,,,,,,,,
+,,A##,B##,C###,E##,F###,,,,A##,C##,D##,E##,G##,,,,,,,,,,,A##,,,,,,,,,,,,,
+,,Bbb,Cb,Db,Fb,Gb,,,,Bbb,Dbb,Ebb,Fb,Abb,,,,,,,,,,,Bbb,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,The Major Pentatonic Scale,,,,,,,,The Minor Pentatonic Scale,,,,,,,,,,,,,,,,To Be Determined,,,,,,,,,,,,,
