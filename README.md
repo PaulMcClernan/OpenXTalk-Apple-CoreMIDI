@@ -7,6 +7,8 @@ WHAT IT IS:
 
 A short video demonstration (early version) is veiwable here:
 https://www.youtube.com/watch?v=ruauWh3INfw
+Another more recent demo:
+https://www.youtube.com/watch?v=s_knX8mJg1c
 
 So far this library consists of:
 
