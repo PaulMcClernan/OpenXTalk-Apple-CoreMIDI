@@ -2,8 +2,9 @@
 This library contains bindings for macOS & iOS CoreMIDI, useful sending musical performance data to other applications or communicating with external musical devices.
 
 OS:
-macOS, iOS
+macOS, iOS (untested)
 
+Edition: Community
 Description:
 This library is a (currently incomplete) wrapper for Apple's CoreMIDI API.
 
@@ -829,6 +830,8 @@ Returns a count of MIDI Sources in the MIDI Setup that are currently available.
 
 Example:
 put CoreMIDIGetNumberOfSources() into tDestinationsCount
+
+Returns: Count of currently available MIDI Sources
 
 Description:
 Returns a count of MIDI Sources in the MIDI Setup that are currently available.
