@@ -558,16 +558,14 @@ public handler CoreMIDISendMIDIbytesInTime(in pTimeOffsetMillisecs as optional N
    put 256 into tBufferSize
    put [0,0] into tTimeBaseInfo
    unsafe
-      -- put objC_NSMutableDataWithLength(NumberToNSNumber(8)) into tTimeBaseInfoRef
-      -- put objC_NSMutableDataBytesPtr(tTimeBaseInfoRef) into tTimeBaseInfoPtr
+  
       put c_mach_absolute_time() into tAbsoluteTime
       c_mach_timebase_info(tTimeBaseInfo) -- into tTimeBaseInfo
       put element 1 of tTimeBaseInfo into tTBnumerator
       put element 2 of tTimeBaseInfo into tTBdenominator
       put tAbsoluteTime * tTBnumerator / tTBdenominator into tTimeStamp
-      -- log tTimeStamp
       put tTimeStamp + (pTimeOffsetMillisecs * 1000000) into tTimeStamp
-
+      
       put objC_NSMutableDataWithLength(NumberToNSNumber(tBufferSize)) into sMIDIPacketByteBufferNSMutableDataRef
       put objC_NSMutableDataBytesPtr(sMIDIPacketByteBufferNSMutableDataRef) into sMIDIPacketByteBufferPtr
 
@@ -582,7 +580,7 @@ public handler CoreMIDISendMIDIbytesInTime(in pTimeOffsetMillisecs as optional N
    end unsafe
 end handler
 
-private variable sCoreMIDISetupCangedHandler as optional ObjcBlockPointer
+private variable sCoreMIDISetupChangedHandler as optional ObjcBlockPointer
 public foreign type MIDINotification binds to "MCAggregateTypeInfo:Jj"
 
 public handler CoreMIDISetupChangedCallbackProc(in pContext as ObjcBlockPointer,in pMIDINotification as MIDINotification, in pRefCon as optional any) returns optional any
@@ -592,7 +590,6 @@ public handler CoreMIDISetupChangedCallbackProc(in pContext as ObjcBlockPointer,
    -- in tMsg as optional any, in tRefCon as optional any
    -- post "CoreMIDISetupChanged
    log "CoreMIDISetupChanged"
-    -- MCEngineRunloopBreakWait()
 end handler
 
 /**
@@ -615,14 +612,13 @@ public handler CoreMIDIClientCreate(in clientName as String) returns nothing
    variable tBlockPtr as Pointer
    variable tBlockDescriptionPointer as Pointer
    unsafe
-   if not CreateObjcBlockPointerFromHandler(CoreMIDISetupChangedCallbackProc, sCoreMIDISetupCangedHandler) then
-      put nothing into sCoreMIDISetupCangedHandler
+   if not CreateObjcBlockPointerFromHandler(CoreMIDISetupChangedCallbackProc, sCoreMIDISetupChangedHandler) then
+      put nothing into sCoreMIDISetupChangedHandler
    end if
        put StringToNSString(clientName) into tClientNameStrRef
-
+       
          -- put c_MIDIClientCreate(tClientNameStrRef,tBlockPtr,nothing,sMIDIClientRef) into tOSStatus
-
-       put c_MIDIClientCreate(tClientNameStrRef,sCoreMIDISetupCangedHandler,nothing,sMIDIClientRef) into tOSStatus
+       put c_MIDIClientCreate(tClientNameStrRef,sCoreMIDISetupChangedHandler,nothing,sMIDIClientRef) into tOSStatus
 
    end unsafe
 end handler
