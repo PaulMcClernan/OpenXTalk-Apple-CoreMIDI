@@ -32,7 +32,8 @@ public foreign type MIDIPacket binds to "MCAggregateTypeInfo:kihhh" --kihhhhhhhh
 public foreign type MIDIMsg binds to "MCAggregateTypeInfo:hhh" -- h=3 x UInt8
 public foreign type MIDIPacketList binds to "MCAggregateTypeInfo:jr" -- Declaration (numPackets: UInt32, *packet(MIDIPacket)) -- j = UInt32
 public foreign type TimeBaseInfo binds to "MCAggregateTypeInfo:jj"
-public foreign type MIDINotification binds to "MCAggregateTypeInfo:Jj"
+-- public foreign type MIDINotification binds to "MCAggregateTypeInfo:Jj" -- message ID, message size
+public foreign type MIDINotification binds to "MCAggregateTypeInfo:r" -- pointer to notification MIDIObject ?
 public type MIDITimeStamp is UInt64
 
 private foreign handler NSApplicationSharedApplication() returns ObjcId binds to "objc:NSApplication.+sharedApplication"
@@ -156,14 +157,16 @@ private variable sTarget as ScriptObject
 -- public handler CoreMIDISetupChangedCallbackProc(in pContext as optional ObjcBlockPointer,in pMIDINotificationObj as optional any)
 -- public handler CoreMIDISetupChangedCallbackProc(in pContext as optional ObjcBlockPointer,in pMIDINotificationObj as optional any, inout pRefCon as optional ObjCId)
 public handler CoreMIDISetupChangedCallbackProc(in pContext as optional ObjcBlockPointer,in pMIDINotification as MIDINotification)
+-- public handler CoreMIDISetupChangedCallbackProc(in pContext as optional ObjcBlockPointer,in pMIDINotification as Data)
    -- MIDINotification is a structure passed to a MIDINotifyProc, when CoreMIDI wishes to inform a client of a change in the state of the system
    -- const MIDINotification *message, void *refCon
    -- *message = MIDINotificationMessageID : SInt32  and  messageSize : UInt32
    -- in tMsg as optional any, in tRefCon as optional any
    -- post "CoreMIDISetupChanged" to sTarget
    log "CoreMIDISetupChanged"
-   log element 1 of pMIDINotification
-   log element 2 of pMIDINotification
+   log pMIDINotification
+   -- log element 1 of pMIDINotification
+   -- log element 2 of pMIDINotification
     -- MCEngineRunloopBreakWait()
 end handler
 
