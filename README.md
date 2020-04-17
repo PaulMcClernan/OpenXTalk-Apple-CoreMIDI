@@ -1,6 +1,6 @@
-# LCB CoreMIDI Library
+# LiveCode Builder CoreMIDI Library
 
-WHAT IT IS:
+## WHAT IT IS:
 
   This is a LiveCode Builder Library for macOS (possibly iOS too) that builds as a binary module that, when the module is loaded in the LiveCode Engine, adds handlers and utility functions for use in LiveCode Script for interacting with Apple's MIDI/Music Services.
   It allows your LiveCode scripts to do things like register as a MIDI Client, register as a virtual MIDI Source, send arbitrary bytes as MIDI Data though that LC Virtual Source, and Retreive various infos about the current state of the MIDI setup from the OS. This repo also includes a few demo LiveCode stacks that can be used in conjunction with GarageBand or other external MIDI app to see how it works.
@@ -11,7 +11,7 @@ https://www.youtube.com/watch?v=ruauWh3INfw
 Another more recent demo:
 https://www.youtube.com/watch?v=s_knX8mJg1c
 
-So far this library consists of:
+#So far this library consists of:
 
 - LiveCode Builder (LCB) Bindings to create a MIDI Client and register as a Virtual MIDI Source from LiveCode Script.
 - Handlers which creates a byte buffer that enables sending binary MIDI data out from LiveCode Script (LCS)
@@ -20,12 +20,11 @@ So far this library consists of:
 - LiveCode Builder (LCB) Bindings to retreive various infos about the present state of the MIDI Setup on the system, mostly Plist XML right now (WIP).
 - Utility handlers for generating common MIDI messages (no converting to bytes needed) such as Note On/Off, Pitchbend, Controllers, etc.
 - Some more Error Checking and Reporting in the LCB end to return descriptive information about any errors that may occur.
+- MIDI Setup changed notifications to alert LiveCode of changes to the current setup (a MIDI Instrument gets turned off for example)
 
 To Do:
 
 - MIDI In with callbacks to tell LiveCode engine that new incoming MIDI Data is available for receiving and processing any related TimeStamp info for received MIDI events (Core MIDI nanoseconds to milliseconds for LC)
-
-- MIDI Setup changed notifications to alert LiveCode of changes to the current setup (a MIDI Instrument gets turned off for example)
 
 - Add handlers & functions for connecting to/from Destinations, Ports, Entities and Endpoints that are available on the current system, and for determining whether an Device / object is offline or not.
 
