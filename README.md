@@ -11,7 +11,7 @@ https://www.youtube.com/watch?v=ruauWh3INfw
 Another more recent demo:
 https://www.youtube.com/watch?v=s_knX8mJg1c
 
-#So far this library consists of:
+# So far this library consists of:
 
 - LiveCode Builder (LCB) Bindings to create a MIDI Client and register as a Virtual MIDI Source from LiveCode Script.
 - Handlers which creates a byte buffer that enables sending binary MIDI data out from LiveCode Script (LCS)
