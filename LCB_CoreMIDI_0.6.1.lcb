@@ -32,8 +32,6 @@ public foreign type MIDIPacket binds to "MCAggregateTypeInfo:kihhh" --kihhhhhhhh
 public foreign type MIDIMsg binds to "MCAggregateTypeInfo:hhh" -- h=3 x UInt8
 public foreign type MIDIPacketList binds to "MCAggregateTypeInfo:jr" -- Declaration (numPackets: UInt32, *packet(MIDIPacket)) -- j = UInt32
 public foreign type TimeBaseInfo binds to "MCAggregateTypeInfo:jj"
--- public foreign type MIDINotification binds to "MCAggregateTypeInfo:Jj" -- message ID, message size
-public foreign type MIDINotification binds to "MCAggregateTypeInfo:r" -- pointer to notification MIDIObject ?
 public type MIDITimeStamp is UInt64
 
 private foreign handler NSApplicationSharedApplication() returns ObjcId binds to "objc:NSApplication.+sharedApplication"
@@ -154,20 +152,71 @@ private variable sMIDIPacketByteBufferPtr as Pointer
 private variable sCoreMIDISetupChangedHandler as optional ObjcBlockPointer
 private variable sTarget as ScriptObject
 
+public foreign type MIDINotificationIDnSize binds to "MCAggregateTypeInfo:Jj" -- message ID, message size
+public foreign type MIDIObjectAddRemoveNotification binds to "MCAggregateTypeInfo:JjjJjJ" -- message ID, message size
+--public foreign type MIDINotifyStructPtr binds to "MCAggregateTypeInfo:r" -- pointer to notification struct
+-------------------------- UTIL ----------------------------
+foreign handler PointerToMIDINotificationIDnSize(out rAggregate as MIDINotificationIDnSize, in pPointer as Pointer, in pSize as UIntSize) returns nothing binds to "c:memcpy"
+foreign handler PointerToMIDIObjectAddRemoveNotification(out rAggregate as MIDIObjectAddRemoveNotification, in pPointer as Pointer, in pSize as UIntSize) returns nothing binds to "c:memcpy"
+
 -- public handler CoreMIDISetupChangedCallbackProc(in pContext as optional ObjcBlockPointer,in pMIDINotificationObj as optional any)
--- public handler CoreMIDISetupChangedCallbackProc(in pContext as optional ObjcBlockPointer,in pMIDINotificationObj as optional any, inout pRefCon as optional ObjCId)
-public handler CoreMIDISetupChangedCallbackProc(in pContext as optional ObjcBlockPointer,in pMIDINotification as MIDINotification)
--- public handler CoreMIDISetupChangedCallbackProc(in pContext as optional ObjcBlockPointer,in pMIDINotification as Data)
+-- public handler CoreMIDISetupChangedCallbackProc(in pContext as optional ObjcBlockPointer,in pMIDINotification as MIDINotification, in pRefCon as optional Pointer)
+public handler CoreMIDISetupChangedCallbackProc( in pContext as optional ObjcBlockPointer,in pMIDINotifyStructPtr as Pointer)
+   -- public handler CoreMIDISetupChangedCallbackProc(in pContext as optional ObjcBlockPointer,in pMIDINotification as Data)
    -- MIDINotification is a structure passed to a MIDINotifyProc, when CoreMIDI wishes to inform a client of a change in the state of the system
    -- const MIDINotification *message, void *refCon
    -- *message = MIDINotificationMessageID : SInt32  and  messageSize : UInt32
-   -- in tMsg as optional any, in tRefCon as optional any
    -- post "CoreMIDISetupChanged" to sTarget
-   log "CoreMIDISetupChanged"
-   log pMIDINotification
-   -- log element 1 of pMIDINotification
-   -- log element 2 of pMIDINotification
-    -- MCEngineRunloopBreakWait()
+   -- variable tSize as Integer
+   variable tMIDINotificationIDnSize as optional MIDINotificationIDnSize
+   variable tMIDIObjectAddRemoveNotification as optional MIDIObjectAddRemoveNotification
+   unsafe
+      PointerToMIDINotificationIDnSize(tMIDINotificationIDnSize,pMIDINotifyStructPtr,8)
+   end unsafe
+   log tMIDINotificationIDnSize
+   if element 1 of tMIDINotificationIDnSize = 1 then
+      post "CoreMIDISetupChanged" --- basic notification,  -- can ignore if 2-6 are handled
+      -- no other data follows so size is always 8 Bytes
+   end if
+   if element 1 of tMIDINotificationIDnSize = 2 then
+      PointerToMIDIObjectAddRemoveNotification(tMIDIObjectAddRemoveNotification,pMIDINotifyStructPtr,24)
+      log tMIDIObjectAddRemoveNotification
+      post "CoreMIDIObjectAdded"
+      -- MIDIObjectAddRemoveNotification
+      -- ID SInt32, Size UInt32, Parrent_MIDIObjRef UInt32, Parrent_MIDIObjectType SInt32, Child_MIDIObjRef UInt32, Child_MIDIObjectType SInt32
+      --- 24 Bytes
+   end if
+   if element 1 of tMIDINotificationIDnSize = 3 then
+      PointerToMIDIObjectAddRemoveNotification(tMIDIObjectAddRemoveNotification,pMIDINotifyStructPtr,24)
+      log tMIDIObjectAddRemoveNotification
+      post "CoreMIDIObjectRemoved"
+      -- MIDIObjectAddRemoveNotification
+      -- ID SInt32, Size UInt32, Parrent_MIDIObjRef UInt32, Parrent_MIDIObjectType SInt32, Child_MIDIObjRef UInt32, Child_MIDIObjectType SInt32
+      --- 24 Bytes
+   end if
+   if element 1 of tMIDINotificationIDnSize = 4 then
+      post "CoreMIDIPropertyChanged"
+      -- MIDIObjectPropertyChangeNotification: A message describing the addition or removal of an object.
+      -- ID SInt32, Size UInt32, MIDIObjRef UInt32, MIDIObjectType SInt32, propertyName CFStringRef (or CFString? (length?)
+      --- 4 to 12? 16? N Bytes
+   end if
+   if element 1 of tMIDINotificationIDnSize = 5 then
+      post "CoreMIDIThruConnectionsChanged"
+      --- basic notification, no other data follows so size is always 8 Bytes
+   end if
+   if element 1 of tMIDINotificationIDnSize = 6 then
+      post "CoreMIDISerialPortOwnerChanged"
+      --- basic notification, no other data follows so size is always 8 Bytes
+   end if
+   if element 1 of tMIDINotificationIDnSize = 7 then
+      post "CoreMIDIIOErrorOccured"
+      --  ID SInt32, Size UInt32, Driver MIDIDeviceRef UInt32, OSStatus CSInt (2 or 4 bytes?)
+      -- 14 or 16 Bytes?
+   end if
+   -- execute script "CoreMIDISetupChanged"
+   -- send "CoreMIDISetupChanged" to sTarget with NotificationID
+   -- variable sMIDINotificationObj as ObjcObject
+   -- put PointerToObjcObject(pMIDINotification) into sMIDINotificationObj
 end handler
 
 /**
@@ -185,25 +234,24 @@ Creates a MIDI Client named with string provided (client name is not generally v
 public handler CoreMIDIClientCreate(in clientName as String) returns nothing
    variable tClientNameStrRef as ObjcObject
    variable tOSStatus as optional CSInt
-   variable tMIDINotifyProc as optional any
-   variable tNotifyRefCon as optional Pointer
-   variable tBlockPtr as Pointer
-   variable tBlockDescriptionPointer as Pointer
-   unsafe
+   -- variable tMIDINotifyProc as optional any
+   -- variable tNotifyRefCon as optional Pointer
+
    if not CreateObjcBlockPointerFromHandler(CoreMIDISetupChangedCallbackProc, sCoreMIDISetupChangedHandler) then
       put nothing into sCoreMIDISetupChangedHandler
    end if
    -- put nothing into tNotifyRefCon
    put StringToNSString(clientName) into tClientNameStrRef
+   unsafe
       -- put NSApplicationSharedApplication() into sNSAppSharedApp
-   -- -- put c_MIDIClientCreate(tClientNameStrRef,tCallbackBlockPtr,refCon,sMIDIClientRef) into tOSStatus
+   -- put c_MIDIClientCreate(tClientNameStrRef,sCoreMIDISetupChangedHandler,CoreMIDIClientCreate,sMIDIClientRef) into tOSStatus
 
    -- OSStatus MIDIClientCreateWithBlock(CFStringRef name, MIDIClientRef *outClient, MIDINotifyBlock notifyBlock);
-   put c_MIDIClientCreateWithBlock(tClientNameStrRef,sMIDIClientRef,sCoreMIDISetupChangedHandler) into tOSStatus
    -- put c_MIDIClientCreate(tClientNameStrRef,sCoreMIDISetupChangedHandler,tNotifyRefCon,sMIDIClientRef) into tOSStatus
+      put c_MIDIClientCreateWithBlock(tClientNameStrRef,sMIDIClientRef,sCoreMIDISetupChangedHandler) into tOSStatus
+   end unsafe
    resolve script object "this stack"
    put the result into sTarget
-   end unsafe
 end handler
 
 /**
