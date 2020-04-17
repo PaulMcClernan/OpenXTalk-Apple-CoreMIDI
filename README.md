@@ -11,7 +11,7 @@ https://www.youtube.com/watch?v=ruauWh3INfw
 Another more recent demo:
 https://www.youtube.com/watch?v=s_knX8mJg1c
 
-# So far this library consists of:
+### So far this library consists of:
 
 - LiveCode Builder (LCB) Bindings to create a MIDI Client and register as a Virtual MIDI Source from LiveCode Script.
 - Handlers which creates a byte buffer that enables sending binary MIDI data out from LiveCode Script (LCS)
@@ -22,7 +22,7 @@ https://www.youtube.com/watch?v=s_knX8mJg1c
 - Some more Error Checking and Reporting in the LCB end to return descriptive information about any errors that may occur.
 - MIDI Setup changed notifications to alert LiveCode of changes to the current setup (a MIDI Instrument gets turned off for example)
 
-To Do:
+### To Do:
 
 - MIDI In with callbacks to tell LiveCode engine that new incoming MIDI Data is available for receiving and processing any related TimeStamp info for received MIDI events (Core MIDI nanoseconds to milliseconds for LC)
 
@@ -34,7 +34,7 @@ To Do:
 
 - Add bindings for MIDI Thru Connection, a part of Core MIDI that facilitates realtime manipulation of MIDI Data as it passes though the MIDI Setup.
 
-To Do...(Maybe):
+### To Do...(Maybe):
 
 - maybe merge in my GM MIDI Utils Project (for GM/GS standard Names, Numbers, Controller Names, etc.)
 
