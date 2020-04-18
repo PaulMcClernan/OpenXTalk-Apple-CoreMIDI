@@ -153,11 +153,14 @@ private variable sCoreMIDISetupChangedHandler as optional ObjcBlockPointer
 private variable sTarget as ScriptObject
 
 public foreign type MIDINotificationIDnSize binds to "MCAggregateTypeInfo:Jj" -- message ID, message size
-public foreign type MIDIObjectAddRemoveNotification binds to "MCAggregateTypeInfo:JjjJjJ" -- message ID, message size
+public foreign type MIDIObjectAddRemoveNotification binds to "MCAggregateTypeInfo:JjjJjJ" -- message ID, message size, ...
+public foreign type MIDIObjectPropertyChangeNotification binds to "MCAggregateTypeInfo:JjjJr" -- message ID, message size
 --public foreign type MIDINotifyStructPtr binds to "MCAggregateTypeInfo:r" -- pointer to notification struct
 -------------------------- UTIL ----------------------------
 foreign handler PointerToMIDINotificationIDnSize(out rAggregate as MIDINotificationIDnSize, in pPointer as Pointer, in pSize as UIntSize) returns nothing binds to "c:memcpy"
 foreign handler PointerToMIDIObjectAddRemoveNotification(out rAggregate as MIDIObjectAddRemoveNotification, in pPointer as Pointer, in pSize as UIntSize) returns nothing binds to "c:memcpy"
+foreign handler PointerToMIDIObjectPropertyChangeNotification(out rAggregate as MIDIObjectPropertyChangeNotification, in pPointer as Pointer, in pSize as UIntSize) returns nothing binds to "c:memcpy"
+foreign handler MCStringCreateWithCString(in pString as Pointer, out rString as String) returns CBool binds to "<builtin>"
 
 -- public handler CoreMIDISetupChangedCallbackProc(in pContext as optional ObjcBlockPointer,in pMIDINotificationObj as optional any)
 -- public handler CoreMIDISetupChangedCallbackProc(in pContext as optional ObjcBlockPointer,in pMIDINotification as MIDINotification, in pRefCon as optional Pointer)
@@ -169,17 +172,21 @@ public handler CoreMIDISetupChangedCallbackProc( in pContext as optional ObjcBlo
    -- post "CoreMIDISetupChanged" to sTarget
    -- variable tSize as Integer
    variable tMIDINotificationIDnSize as optional MIDINotificationIDnSize
+   variable tCFStringRef as optional Pointer
+   variable tNSStringObj as optional ObjCId
+   variable tCFStringRefString as optional String
    variable tMIDIObjectAddRemoveNotification as optional MIDIObjectAddRemoveNotification
+   variable tMIDIObjectPropertyChangeNotification as optional MIDIObjectPropertyChangeNotification
    unsafe
-      PointerToMIDINotificationIDnSize(tMIDINotificationIDnSize,pMIDINotifyStructPtr,8)
-   end unsafe
-   log tMIDINotificationIDnSize
+   PointerToMIDINotificationIDnSize(tMIDINotificationIDnSize,pMIDINotifyStructPtr,8)
    if element 1 of tMIDINotificationIDnSize = 1 then
+      log "CoreMIDISetupChanged"
       post "CoreMIDISetupChanged" --- basic notification,  -- can ignore if 2-6 are handled
       -- no other data follows so size is always 8 Bytes
    end if
    if element 1 of tMIDINotificationIDnSize = 2 then
       PointerToMIDIObjectAddRemoveNotification(tMIDIObjectAddRemoveNotification,pMIDINotifyStructPtr,24)
+      log "CoreMIDIObjectAdded"
       log tMIDIObjectAddRemoveNotification
       post "CoreMIDIObjectAdded"
       -- MIDIObjectAddRemoveNotification
@@ -188,6 +195,7 @@ public handler CoreMIDISetupChangedCallbackProc( in pContext as optional ObjcBlo
    end if
    if element 1 of tMIDINotificationIDnSize = 3 then
       PointerToMIDIObjectAddRemoveNotification(tMIDIObjectAddRemoveNotification,pMIDINotifyStructPtr,24)
+      log "CoreMIDIObjectRemoved"
       log tMIDIObjectAddRemoveNotification
       post "CoreMIDIObjectRemoved"
       -- MIDIObjectAddRemoveNotification
@@ -195,24 +203,40 @@ public handler CoreMIDISetupChangedCallbackProc( in pContext as optional ObjcBlo
       --- 24 Bytes
    end if
    if element 1 of tMIDINotificationIDnSize = 4 then
+      PointerToMIDIObjectPropertyChangeNotification(tMIDIObjectPropertyChangeNotification,pMIDINotifyStructPtr,20)
+      log "CoreMIDIPropertyChanged"
+      log tMIDIObjectPropertyChangeNotification
+      put element 5 of tMIDIObjectPropertyChangeNotification into tCFStringRef
+
+      -- CFStringRef CFStringCreateCopy(CFAllocatorRef alloc, CFStringRef theString);
+      -- put StringFromNSString(element 5 of tMIDIObjectPropertyChangeNotification) into tCFStringRefString
+      -- if MCStringCreateWithCString(element 5 of tMIDIObjectPropertyChangeNotification, tCFStringRefString) then
+         -- log element 5 of tMIDIObjectPropertyChangeNotification
+         -- log tCFStringRefString
+      -- end if
       post "CoreMIDIPropertyChanged"
       -- MIDIObjectPropertyChangeNotification: A message describing the addition or removal of an object.
       -- ID SInt32, Size UInt32, MIDIObjRef UInt32, MIDIObjectType SInt32, propertyName CFStringRef (or CFString? (length?)
-      --- 4 to 12? 16? N Bytes
+      --- 4 to 18? 20? N Bytes
    end if
    if element 1 of tMIDINotificationIDnSize = 5 then
+      log "CoreMIDIThruConnectionsChanged"
       post "CoreMIDIThruConnectionsChanged"
       --- basic notification, no other data follows so size is always 8 Bytes
    end if
    if element 1 of tMIDINotificationIDnSize = 6 then
+      log "CoreMIDISerialPortOwnerChanged"
       post "CoreMIDISerialPortOwnerChanged"
       --- basic notification, no other data follows so size is always 8 Bytes
    end if
    if element 1 of tMIDINotificationIDnSize = 7 then
+      log "CoreMIDIIOErrorOccured"
       post "CoreMIDIIOErrorOccured"
       --  ID SInt32, Size UInt32, Driver MIDIDeviceRef UInt32, OSStatus CSInt (2 or 4 bytes?)
       -- 14 or 16 Bytes?
    end if
+      log tMIDINotificationIDnSize
+   end unsafe
    -- execute script "CoreMIDISetupChanged"
    -- send "CoreMIDISetupChanged" to sTarget with NotificationID
    -- variable sMIDINotificationObj as ObjcObject
