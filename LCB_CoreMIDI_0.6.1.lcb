@@ -129,36 +129,37 @@ private foreign handler c_mach_absolute_time() returns UInt64 binds to "c:mach_a
 private foreign handler c_mach_timebase_info(inout pTimeBaseInfo as TimeBaseInfo) returns nothing binds to "c:mach_timebase_info"
 ----------------------------------------------------------------- Constants ------------------------------------------------------------
 ----------------------------------------------------------------- MIDIObjectTypes Constants ------------------------------------------------------------
-constant kMIDIObjectType_ExternalDestination is 0x10
-constant kMIDIObjectType_ExternalSource is 0x10
-constant kMIDIObjectType_ExternalEntity is 0x10
-constant kMIDIObjectType_ExternalDevice is 0x10
-
+constant kMIDIObjectType_ExternalDestination is 0x10 --- 0x10 is just a temporary bitfield place holder
+constant kMIDIObjectType_ExternalSource is 0x10 --- 0x10 is just a temporary bitfield place holder
+constant kMIDIObjectType_ExternalEntity is 0x10 --- 0x10 is just a temporary bitfield place holder
+constant kMIDIObjectType_ExternalDevice is 0x10 --- 0x10 is just a temporary bitfield place holder
 constant kMIDIObjectType_Destination is 3
 constant kMIDIObjectType_Source is 2
 constant kMIDIObjectType_Entity is 1
 constant kMIDIObjectType_Device is 0
 constant kMIDIObjectType_Other is -1
-public handler CoreMIDIObjectTypeToString(in pMIDIObjTypeEnum as optional Number) -- returns String
+public handler CoreMIDIObjectTypeToString(in pMIDIObjTypeEnum as optional Number) returns optional String
    if pMIDIObjTypeEnum is -1 then
-      -- return "Other"
-      post "CoreMIDIPropertyChanged Other"
+      return "Other"
+      -- post "CoreMIDIPropertyChanged Other"
    end if
    if pMIDIObjTypeEnum is 0 then
-      -- return "Device"
-      post "CoreMIDIPropertyChanged Device"
+      return "Device"
+      -- post "CoreMIDIPropertyChanged Device"
    end if
    if pMIDIObjTypeEnum is 1 then
-      -- return "Entity"
-      post "CoreMIDIPropertyChanged Entity"
+      return "Entity"
+      -- post "CoreMIDIPropertyChanged Entity"
    end if
    if pMIDIObjTypeEnum is 2 then
-      -- return "Source"
-      post "CoreMIDIPropertyChanged Source"
+      return "Source"
+      --post "CoreMIDIPropertyChanged Source"
    end if
    if pMIDIObjTypeEnum is 3 then
-      -- return "Destination"
-      post "CoreMIDIPropertyChanged Destination"
+      return "Destination"
+      -- post "CoreMIDIPropertyChanged Destination"
+   else
+      return "External" -- temporary, bitfield holds additonal information
    end if
    -- post "CoreMIDIPropertyChanged " && tString
 end handler
@@ -184,8 +185,8 @@ public foreign type MIDIObjectPropertyChangeNotification binds to "MCAggregateTy
 foreign handler PointerToMIDINotificationIDnSize(out rAggregate as MIDINotificationIDnSize, in pPointer as Pointer, in pSize as UIntSize) returns nothing binds to "c:memcpy"
 foreign handler PointerToMIDIObjectAddRemoveNotification(out rAggregate as MIDIObjectAddRemoveNotification, in pPointer as Pointer, in pSize as UIntSize) returns nothing binds to "c:memcpy"
 foreign handler PointerToMIDIObjectPropertyChangeNotification(out rAggregate as MIDIObjectPropertyChangeNotification, in pPointer as Pointer, in pSize as UIntSize) returns nothing binds to "c:memcpy"
-private foreign handler c_CFStringCreateCopy(in pCFAllocatorRef as optional Pointer, in pCFStringRef as optional ObjCId) returns optional ObjCId binds to "c:CoreFoundation.framework>CFStringCreateCopy"
-private foreign handler c_CFBridgingRelease(in pCFStringRef as optional Pointer) returns optional ObjCId binds to "c:CoreFoundation.framework>CFBridgingRelease"
+private foreign handler c_CFStringCreateCopy(in pCFAllocatorRef as optional Pointer, in pCFStringRef as optional ObjCId) returns optional ObjCId binds to "c:Foundation.framework>CFStringCreateCopy"
+private foreign handler c_CFBridgingRelease(in pCFStringRef as optional Pointer) returns optional ObjCId binds to "c:Foundation.framework>CFBridgingRelease"
 foreign handler MCStringCreateWithCString(in pString as Pointer, out rString as String) returns CBool binds to "<builtin>"
 
 -- public handler CoreMIDISetupChangedCallbackProc(in pContext as optional ObjcBlockPointer,in pMIDINotificationObj as optional any)
@@ -199,7 +200,7 @@ public handler CoreMIDISetupChangedCallbackProc( in pContext as optional ObjcBlo
    -- variable tSize as Integer
    variable tMIDINotificationIDnSize as optional MIDINotificationIDnSize
    variable tCFStringRef as optional Pointer
-   variable tNSStringObj as optional ObjCId
+   variable tNSStringObj as optional ObjcObject
    variable tString as optional String
    variable tMIDIObjectAddRemoveNotification as optional MIDIObjectAddRemoveNotification
    variable tMIDIObjectPropertyChangeNotification as optional MIDIObjectPropertyChangeNotification
@@ -213,6 +214,8 @@ public handler CoreMIDISetupChangedCallbackProc( in pContext as optional ObjcBlo
    if element 1 of tMIDINotificationIDnSize = 2 then
       PointerToMIDIObjectAddRemoveNotification(tMIDIObjectAddRemoveNotification,pMIDINotifyStructPtr,24)
       log "CoreMIDIObjectAdded"
+      put CoreMIDIObjectTypeToString(element 6 of tMIDIObjectAddRemoveNotification) into tString
+      log tString
       log tMIDIObjectAddRemoveNotification
       post "CoreMIDIObjectAdded" to sTarget
       -- MIDIObjectAddRemoveNotification
@@ -222,6 +225,8 @@ public handler CoreMIDISetupChangedCallbackProc( in pContext as optional ObjcBlo
    if element 1 of tMIDINotificationIDnSize = 3 then
       PointerToMIDIObjectAddRemoveNotification(tMIDIObjectAddRemoveNotification,pMIDINotifyStructPtr,24)
       log "CoreMIDIObjectRemoved"
+      put CoreMIDIObjectTypeToString(element 4 of tMIDIObjectAddRemoveNotification) into tString
+      log tString
       log tMIDIObjectAddRemoveNotification
       post "CoreMIDIObjectRemoved" to sTarget
       -- MIDIObjectAddRemoveNotification
@@ -229,19 +234,24 @@ public handler CoreMIDISetupChangedCallbackProc( in pContext as optional ObjcBlo
       --- 24 Bytes
    end if
    if element 1 of tMIDINotificationIDnSize = 4 then
-      PointerToMIDIObjectPropertyChangeNotification(tMIDIObjectPropertyChangeNotification,pMIDINotifyStructPtr,20)
-      -- put element 5 of tMIDIObjectPropertyChangeNotification into tCFStringRef
+      PointerToMIDIObjectPropertyChangeNotification(tMIDIObjectPropertyChangeNotification,pMIDINotifyStructPtr, element 2 of tMIDINotificationIDnSize )
+      put element 5 of tMIDIObjectPropertyChangeNotification into tCFStringRef
+      -- log tCFStringRef
       -- id CFBridgingRelease(CFTypeRef X); -- You use this function to cast a Core Foundation-style object as an Objective-C object and transfer ownership of the object to ARC
       -- CFStringRef CFStringCreateCopy(CFAllocatorRef alloc, CFStringRef theString);
       -- put c_CFBridgingRelease(tCFStringRef) into tNSStringObj
+      -- put PointerToObjcObject(tCFStringRef) into tNSStringObj
+      -- put StringFromNSString(tNSStringObj) into tString
+      -- put StringFromNSString(tCFStringRef) into tString
+      -- log tString
       -- put c_CFStringCreateCopy(nothing,element 5 of tMIDIObjectPropertyChangeNotification) into tNSStringObj
       -- put StringFromNSString(tCFStringRef) into tCFStringRefString
       -- if MCStringCreateWithCString(element 5 of tMIDIObjectPropertyChangeNotification, tCFStringRefString) then
          -- log element 5 of tMIDIObjectPropertyChangeNotification
       -- log tCFStringRef
-      -- get CoreMIDIObjectTypeToString(element 4 of tMIDIObjectPropertyChangeNotification)
       -- put CoreMIDIObjectTypeToString(element 4 of tMIDIObjectPropertyChangeNotification) into tString
-       CoreMIDIObjectTypeToString(element 4 of tMIDIObjectPropertyChangeNotification)
+      put CoreMIDIObjectTypeToString(element 4 of tMIDIObjectPropertyChangeNotification) into tString
+      log tString
       -- execute script "CoreMIDIPropertyChanged " && tString in sTarget
       -- post "CoreMIDIPropertyChanged " && tString
       log "CoreMIDIPropertyChanged"
@@ -253,17 +263,17 @@ public handler CoreMIDISetupChangedCallbackProc( in pContext as optional ObjcBlo
    end if
    if element 1 of tMIDINotificationIDnSize = 5 then
       log "CoreMIDIThruConnectionsChanged"
-      post "CoreMIDIThruConnectionsChanged" to sTarget
+      -- post "CoreMIDIThruConnectionsChanged" to sTarget
       --- basic notification, no other data follows so size is always 8 Bytes
    end if
    if element 1 of tMIDINotificationIDnSize = 6 then
       log "CoreMIDISerialPortOwnerChanged"
-      post "CoreMIDISerialPortOwnerChanged" to sTarget
+      --post "CoreMIDISerialPortOwnerChanged" to sTarget
       --- basic notification, no other data follows so size is always 8 Bytes
    end if
    if element 1 of tMIDINotificationIDnSize = 7 then
       log "CoreMIDIIOErrorOccured"
-      post "CoreMIDIIOErrorOccured" to sTarget
+      --post "CoreMIDIIOErrorOccured" to sTarget
       --  ID SInt32, Size UInt32, Driver MIDIDeviceRef UInt32, OSStatus CSInt (2 or 4 bytes?)
       -- 14 or 16 Bytes?
    end if
@@ -308,6 +318,7 @@ public handler CoreMIDIClientCreate(in clientName as String) returns nothing
    end unsafe
    resolve script object "this stack"
    put the result into sTarget
+   log sTarget
 end handler
 
 /**
