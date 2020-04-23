@@ -795,6 +795,31 @@ public handler CoreMIDISourceCreate(in sourceName as String,in uniqueIDnum as op
    end unsafe
 end handler
 
+
+public handler CoreMIDIEndPointDispose(in uniqueIDnum as optional SInt32) returns optional any -- Data
+   -- private foreign handler c_MIDIEndpointDispose(in pMIDIEndpointRef as ObjcId) returns CSInt binds to "c:CoreMIDI.framework>MIDIEndpointDispose"
+   variable tOSStatus as optional CSInt
+   variable rMIDIObjectRef as optional ObjCId
+   variable rMIDIObjectType as optional Number
+   variable rReturnString as String
+   variable tCFError as optional ObjCId
+   variable tPropertyValSInt32 as optional SInt32
+   unsafe
+   -- OSStatus = MIDIObjectFindByUniqueID(MIDIUniqueID inUniqueID, MIDIObjectRef *outObject, MIDIObjectType *outObjectType);
+   -- inUniqueID of object to search for (This should be the result of an earlier call to MIDIObjectGetIntegerProperty "UniqueID")
+   -- outObject returned object, or NULL if the object was not found or an error occurred. This should be cast to the appropriate type (MIDIDeviceRef, MIDIEntityRef, MIDIEndpointRef), according to *outObjectType.
+   -- outObjectType on exit, the type of object which was found; undefined if none found.
+   -- Return Value is sn OSStatus error code, including kMIDIObjectNotFound if there is no object with the specified uniqueID.
+   if uniqueIDnum is not nothing then
+      put c_MIDIObjectFindByUniqueID( uniqueIDnum, rMIDIObjectRef, rMIDIObjectType) into tOSStatus
+      put c_MIDIEndpointDispose(rMIDIObjectRef) into tOSStatus
+   else
+      put c_MIDIEndpointDispose(sMIDISourceEndpointRef) into tOSStatus
+   end if
+   return tOSStatus
+   end unsafe
+end handler
+
 /**
 Given the unique ID number of an object in the current MIDI setup returns the object's type.
 
