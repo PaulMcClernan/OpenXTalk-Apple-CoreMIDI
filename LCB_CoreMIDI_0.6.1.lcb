@@ -190,7 +190,6 @@ private foreign handler c_CFStringCreateCopy(in pCFAllocatorRef as optional Poin
 private foreign handler c_CFBridgingRelease(in pCFStringRef as optional Pointer) returns optional ObjCId binds to "c:Foundation.framework>CFBridgingRelease"
 foreign handler MCStringCreateWithCString(in pString as Pointer, out rString as String) returns CBool binds to "<builtin>"
 
--- public handler CoreMIDISetupChangedCallbackProc(in pContext as optional ObjcBlockPointer,in pMIDINotificationObj as optional any)
 -- public handler CoreMIDISetupChangedCallbackProc(in pContext as optional ObjcBlockPointer,in pMIDINotification as MIDINotification, in pRefCon as optional Pointer)
 public handler CoreMIDISetupChangedCallbackProc( in pContext as optional ObjcBlockPointer,in pMIDINotifyStructPtr as Pointer)
    -- public handler CoreMIDISetupChangedCallbackProc(in pContext as optional ObjcBlockPointer,in pMIDINotification as Data)
