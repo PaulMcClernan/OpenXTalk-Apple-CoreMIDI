@@ -240,6 +240,13 @@ public handler CoreMIDISetupChangedCallbackProc( in pContext as optional ObjcBlo
       log tString
       log tMIDIObjectAddRemoveNotification
       post "CoreMIDIObjectRemoved" to sTarget
+      -- put c_MIDIObjectGetIntegerProperty( element 3 of tMIDIObjectAddRemoveNotification, StringToNSString("uniqueID"), tPropertyValSInt32) into tOSStatus
+      -- log tPropertyValSInt32
+      put c_MIDIObjectGetStringProperty( element 3 of tMIDIObjectAddRemoveNotification, StringToNSString("name"),tNSStringObj) into tOSStatus
+      if tNSStringObj is not nothing then
+         put StringFromNSString(tNSStringObj) into tString
+         log tString
+      end if
       -- MIDIObjectAddRemoveNotification
       -- ID SInt32, Size UInt32, Parrent_MIDIObjRef UInt32, Parrent_MIDIObjectType SInt32, Child_MIDIObjRef UInt32, Child_MIDIObjectType SInt32
       --- 24 Bytes
@@ -247,10 +254,10 @@ public handler CoreMIDISetupChangedCallbackProc( in pContext as optional ObjcBlo
    if element 1 of tMIDINotificationIDnSize = 4 then
       PointerToMIDIObjectPropertyChangeNotification(tMIDIObjectPropertyChangeNotification,pMIDINotifyStructPtr, element 2 of tMIDINotificationIDnSize )
       put element 5 of tMIDIObjectPropertyChangeNotification into tCFStringRef
+      put PointerToObjcObject(tCFStringRef) into tNSStringObj
+      put StringFromNSString(tNSStringObj) into tString
       -- log tCFStringRef
-      -- id CFBridgingRelease(CFTypeRef X); -- You use this function to cast a Core Foundation-style object as an Objective-C object and transfer ownership of the object to ARC
       -- CFStringRef CFStringCreateCopy(CFAllocatorRef alloc, CFStringRef theString);
-      -- put c_CFBridgingRelease(tCFStringRef) into tNSStringObj
       -- put PointerToObjcObject(tCFStringRef) into tNSStringObj
       -- put StringFromNSString(tNSStringObj) into tString
       -- put StringFromNSString(tCFStringRef) into tString
@@ -260,7 +267,6 @@ public handler CoreMIDISetupChangedCallbackProc( in pContext as optional ObjcBlo
       -- if MCStringCreateWithCString(element 5 of tMIDIObjectPropertyChangeNotification, tCFStringRefString) then
          -- log element 5 of tMIDIObjectPropertyChangeNotification
       -- log tCFStringRef
-      -- put CoreMIDIObjectTypeToString(element 4 of tMIDIObjectPropertyChangeNotification) into tString
       put CoreMIDIObjectTypeToString(element 4 of tMIDIObjectPropertyChangeNotification) into tString
       log tString
       -- execute script "CoreMIDIPropertyChanged " && tString in sTarget
