@@ -202,8 +202,12 @@ public handler CoreMIDISetupChangedCallbackProc( in pContext as optional ObjcBlo
    variable tCFError as optional ObjCId
    variable tPropertyValSInt32 as optional SInt32
    variable tMIDINotificationIDnSize as optional MIDINotificationIDnSize
-   variable tCFStringRef as optional Pointer
+   -- variable tCFStringRef as Pointer
+   variable tCFStringRef as ObjcObject
+   -- variable tNSStringObj as optional ObjcRetainedId
+   -- variable tNSStringObj as ObjcObject
    variable tNSStringObj as optional ObjcObject
+
    variable tString as optional String
    variable tMIDIObjectAddRemoveNotification as optional MIDIObjectAddRemoveNotification
    variable tMIDIObjectPropertyChangeNotification as optional MIDIObjectPropertyChangeNotification
@@ -224,7 +228,9 @@ public handler CoreMIDISetupChangedCallbackProc( in pContext as optional ObjcBlo
       post "CoreMIDIObjectAdded" to sTarget
       -- get element 5 of tMIDIObjectAddRemoveNotification
       put c_MIDIObjectGetIntegerProperty( element 5 of tMIDIObjectAddRemoveNotification, StringToNSString("uniqueID"), tPropertyValSInt32) into tOSStatus
-      log tPropertyValSInt32
+      if tPropertyValSInt32 is not nothing then
+         log tPropertyValSInt32
+      end if
       put c_MIDIObjectGetStringProperty( element 5 of tMIDIObjectAddRemoveNotification, StringToNSString("name"),tNSStringObj) into tOSStatus
       if tNSStringObj is not nothing then
          put StringFromNSString(tNSStringObj) into tString
@@ -252,11 +258,20 @@ public handler CoreMIDISetupChangedCallbackProc( in pContext as optional ObjcBlo
       --- 24 Bytes
    end if
    if element 1 of tMIDINotificationIDnSize = 4 then
+      log "CoreMIDIPropertyChanged"
       PointerToMIDIObjectPropertyChangeNotification(tMIDIObjectPropertyChangeNotification,pMIDINotifyStructPtr, element 2 of tMIDINotificationIDnSize )
+      log tMIDIObjectPropertyChangeNotification
+
       put element 5 of tMIDIObjectPropertyChangeNotification into tCFStringRef
-      put PointerToObjcObject(tCFStringRef) into tNSStringObj
-      put StringFromNSString(tNSStringObj) into tString
-      -- log tCFStringRef
+      log tCFStringRef
+
+      put PointerToObjcObject(nothing) into tNSStringObj
+
+      -- put PointerToObjcObject(tCFStringRef) into tNSStringObj
+      -- if tNSStringObj is not nothing then
+         --put StringFromNSString(tNSStringObj) into tString
+      --   log tString
+      -- end if
       -- CFStringRef CFStringCreateCopy(CFAllocatorRef alloc, CFStringRef theString);
       -- put PointerToObjcObject(tCFStringRef) into tNSStringObj
       -- put StringFromNSString(tNSStringObj) into tString
@@ -271,9 +286,6 @@ public handler CoreMIDISetupChangedCallbackProc( in pContext as optional ObjcBlo
       log tString
       -- execute script "CoreMIDIPropertyChanged " && tString in sTarget
       -- post "CoreMIDIPropertyChanged " && tString
-      log "CoreMIDIPropertyChanged"
-      -- log tString
-      log tMIDIObjectPropertyChangeNotification
       put c_MIDIObjectGetStringProperty(element 3 of tMIDIObjectPropertyChangeNotification,StringToNSString("name"),tNSStringObj) into tOSStatus
       if tNSStringObj is not nothing then
          put StringFromNSString(tNSStringObj) into tString
