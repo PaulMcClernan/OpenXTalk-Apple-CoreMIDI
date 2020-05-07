@@ -831,6 +831,30 @@ public handler CoreMIDISourceCreate(in sourceName as String,in uniqueIDnum as op
    end unsafe
 end handler
 
+public handler CoreMIDIInputPortCreate(in portName as String,in uniqueIDnum as optional SInt32) returns Number -- Data
+   variable tPortNameStrRef as ObjcObject
+   variable tOSStatus as optional CSInt
+   variable tCFError as optional ObjCId
+   variable tPropertyValSInt32 as optional SInt32
+   if not CreateObjcBlockPointerFromHandler(CoreMIDISetupChangedCallbackProc, sCoreMIDISetupChangedHandler) then
+      put nothing into sCoreMIDISetupChangedHandler
+   end if
+		unsafe
+			put StringToNSString(portName) into tPortNameStrRef
+         --  c_MIDIInputPortCreate(pMIDIClientRef as MIDIObjRef, in pInputPortNameCFStrngRef as ObjCId, out rMIDIInputPortRef as MIDIObjRef) returns CSInt binds to "c:CoreMIDI.framework>MIDIInputPortCreate"
+         put c_MIDIInputPortCreate(sMIDIClientRef,tPortNameStrRef,sMIDIInputPortRef) into tOSStatus
+         if uniqueIDnum is not nothing then
+               put c_MIDIObjectSetIntegerProperty(sMIDISourceEndpointRef,StringToNSString("uniqueID"),uniqueIDnum) into tOSStatus
+         end if
+         put c_MIDIObjectGetIntegerProperty(sMIDISourceEndpointRef,StringToNSString("uniqueID"),tPropertyValSInt32) into tOSStatus
+         if tPropertyValSInt32 is not nothing then
+            return tPropertyValSInt32
+         else
+            return tOSStatus
+         end if
+   end unsafe
+end handler
+
 
 public handler CoreMIDIEndPointDispose(in uniqueIDnum as optional SInt32) returns optional any -- Data
    -- private foreign handler c_MIDIEndpointDispose(in pMIDIEndpointRef as ObjcId) returns CSInt binds to "c:CoreMIDI.framework>MIDIEndpointDispose"
