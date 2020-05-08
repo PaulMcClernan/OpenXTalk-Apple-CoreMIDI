@@ -56,6 +56,9 @@ private foreign handler c_MIDISourceCreate(in pMIDIClientRef as MIDIObjRef, in p
 private foreign handler c_MIDIGetNumberOfSources() returns CInt binds to "c:CoreMIDI.framework>MIDIGetNumberOfSources"
 private foreign handler c_MIDIGetSource( in pSourceIndexNum as optional UInt32) returns optional MIDIObjRef binds to "c:CoreMIDI.framework>MIDIGetSource" -- Returns a reference to a source, or NULL if an error occurred.
 ------------------------------------------------  MIDI Destinations ------------------------------------------------------------
+-- OSStatus MIDIDestinationCreateWithBlock(MIDIClientRef client, CFStringRef name, MIDIEndpointRef *outDest, MIDIReadBlock readBlock);
+private foreign handler c_MIDIDestinationCreateWithBlock(in pMIDIClientRef as MIDIObjRef, in pMIDIDestinationNameStrRef as ObjcId, \
+                                                   out rMIDIDestEndpointRef as MIDIObjRef, in pMIDIReadProc as optional any) returns CSInt binds to "c:CoreMIDI.framework>MIDIDestinationCreateWithBlock"
 -- OSStatus MIDIDestinationCreate(MIDIClientRef client, CFStringRef name, MIDIReadProc readProc, void *refCon, MIDIEndpointRef *outDest); Creates a virtual destination in a client.
 private foreign handler c_MIDIDestinationCreate(in pMIDIClientRef as MIDIObjRef, in pMIDIDestinationNameStrRef as ObjcId, in pMIDIReadProc as optional any, in pRefConst as optional any, \
                                                    out rMIDIDestEndpointRef as MIDIObjRef) returns CSInt binds to "c:CoreMIDI.framework>MIDIDestinationCreate"
@@ -831,17 +834,43 @@ public handler CoreMIDISourceCreate(in sourceName as String,in uniqueIDnum as op
    end unsafe
 end handler
 
+private variable sCoreMIDIReadCallbackProcPtr as optional ObjcBlockPointer
+-- public foreign type MIDIPacket binds to "MCAggregateTypeInfo:kihhh" --kihhhhhhhh... k=UInt64  i=UInt16 h=3 x UInt8 -- MIDIPacket (timeStamp: MIDITimeStamp, length: UInt16, data: Data: ARRAY OF Bytes(256) x UInt8 )  -- UInt64,UInt16,Data(256))
+-- public foreign type MIDIMsg binds to "MCAggregateTypeInfo:hhh" -- h=3 x UInt8
+-- public foreign type MIDIPacketList binds to "MCAggregateTypeInfo:jr" -- Declaration (numPackets: UInt32, *packet(MIDIPacket)) -- j = UInt32
+-- public foreign type TimeBaseInfo binds to "MCAggregateTypeInfo:jj"
+-- public type MIDITimeStamp is UInt64
+-- public type MIDIObjRef is UInt32
+
+foreign handler PointerToMIDIPacketList(out rAggregate as MIDIPacketList, in pPointer as Pointer, in pSize as UIntSize) returns nothing binds to "c:memcpy"
+-- typedef void (*MIDIReadProc)(const MIDIPacketList *pktlist, void *readProcRefCon, void *srcConnRefCon);
+-- typedef void (^MIDIReadBlock)(const MIDIPacketList *pktlist, void *srcConnRefCon);
+-- public handler CoreMIDIReadCallbackProcedure( in pContext as optional ObjcBlockPointer, in pMIDIPacketListPtr as MIDIPacketList, in readProcRefCont as optional Pointer, in srcConnRefCont as optional Pointer)
+public handler CoreMIDIReadCallbackProcedure( in pContext as ObjcBlockPointer, in pMIDIPacketListPtr as optional any, in pSourceRefCon as optional any)
+   log "MIDI IN!"
+   -- log pMIDIPacketListPtr
+   -- variable tMIDIPacketList as MIDIPacketList
+   -- unsafe
+      -- PointerToMIDIPacketList(tMIDIPacketList,pMIDIPacketListPtr,8)
+      -- log tMIDIPacketList
+   -- end unsafe
+end handler
+
 public handler CoreMIDIDestinationCreate(in destinationName as String,in uniqueIDnum as optional SInt32) returns Number -- Data
    variable tDestNameStrRef as ObjcObject
    variable tOSStatus as optional CSInt
    variable tCFError as optional ObjCId
    variable tPropertyValSInt32 as optional SInt32
 		unsafe
+      if not CreateObjcBlockPointerFromHandler(CoreMIDIReadCallbackProcedure, sCoreMIDIReadCallbackProcPtr) then
+         put nothing into sCoreMIDIReadCallbackProcPtr
+      end if
 			put StringToNSString(destinationName) into tDestNameStrRef
+         put c_MIDIDestinationCreateWithBlock(sMIDIClientRef,tDestNameStrRef,sMIDIDestEndpointRef,sCoreMIDIReadCallbackProcPtr) into tOSStatus
          -- put c_MIDIDestinationCreate(sMIDIClientRef,pMIDIDestinationNameCFStrRef,pMIDIReadProc,pRefConst,sMIDIDestEndpointRef) into tOSStatus
-         put c_MIDIDestinationCreate(sMIDIClientRef,tDestNameStrRef,nothing,nothing,sMIDIDestEndpointRef) into tOSStatus
+         -- put c_MIDIDestinationCreate(sMIDIClientRef,tDestNameStrRef,sCoreMIDIReadCallbackProcPtr,nothing,sMIDIDestEndpointRef) into tOSStatus
          if uniqueIDnum is not nothing then
-               put c_MIDIObjectSetIntegerProperty(sMIDIDestEndpointRef,StringToNSString("uniqueID"),uniqueIDnum) into tOSStatus
+            put c_MIDIObjectSetIntegerProperty(sMIDIDestEndpointRef,StringToNSString("uniqueID"),uniqueIDnum) into tOSStatus
          end if
          put c_MIDIObjectGetIntegerProperty(sMIDIDestEndpointRef,StringToNSString("uniqueID"),tPropertyValSInt32) into tOSStatus
          if tPropertyValSInt32 is not nothing then
