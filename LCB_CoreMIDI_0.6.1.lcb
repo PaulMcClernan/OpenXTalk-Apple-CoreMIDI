@@ -58,9 +58,9 @@ private foreign handler c_MIDIGetSource( in pSourceIndexNum as optional UInt32) 
 ------------------------------------------------  MIDI Destinations ------------------------------------------------------------
 -- OSStatus MIDIDestinationCreateWithBlock(MIDIClientRef client, CFStringRef name, MIDIEndpointRef *outDest, MIDIReadBlock readBlock);
 private foreign handler c_MIDIDestinationCreateWithBlock(in pMIDIClientRef as MIDIObjRef, in pMIDIDestinationNameStrRef as ObjcId, \
-                                                   out rMIDIDestEndpointRef as MIDIObjRef, in pMIDIReadProc as optional any) returns CSInt binds to "c:CoreMIDI.framework>MIDIDestinationCreateWithBlock"
+                                                   out rMIDIDestEndpointRef as MIDIObjRef, in pMIDIReadProc as optional ObjcBlockPointer) returns CSInt binds to "c:CoreMIDI.framework>MIDIDestinationCreateWithBlock"
 -- OSStatus MIDIDestinationCreate(MIDIClientRef client, CFStringRef name, MIDIReadProc readProc, void *refCon, MIDIEndpointRef *outDest); Creates a virtual destination in a client.
-private foreign handler c_MIDIDestinationCreate(in pMIDIClientRef as MIDIObjRef, in pMIDIDestinationNameStrRef as ObjcId, in pMIDIReadProc as optional any, in pRefConst as optional any, \
+private foreign handler c_MIDIDestinationCreate(in pMIDIClientRef as MIDIObjRef, in pMIDIDestinationNameStrRef as ObjcId, in pMIDIReadProc as optional ObjcBlockPointer, in pRefConst as optional ObjcId, \
                                                    out rMIDIDestEndpointRef as MIDIObjRef) returns CSInt binds to "c:CoreMIDI.framework>MIDIDestinationCreate"
 private foreign handler c_MIDIGetNumberOfDestinations() returns CInt binds to "c:CoreMIDI.framework>MIDIGetNumberOfDestinations"
 private foreign handler c_MIDIGetDestination(in pSourceIndexNum as optional UInt32) returns MIDIObjRef binds to "c:CoreMIDI.framework>MIDIGetDestination"
@@ -846,7 +846,7 @@ foreign handler PointerToMIDIPacketList(out rAggregate as MIDIPacketList, in pPo
 -- typedef void (*MIDIReadProc)(const MIDIPacketList *pktlist, void *readProcRefCon, void *srcConnRefCon);
 -- typedef void (^MIDIReadBlock)(const MIDIPacketList *pktlist, void *srcConnRefCon);
 -- public handler CoreMIDIReadCallbackProcedure( in pContext as optional ObjcBlockPointer, in pMIDIPacketListPtr as MIDIPacketList, in readProcRefCont as optional Pointer, in srcConnRefCont as optional Pointer)
-public handler CoreMIDIReadCallbackProcedure( in pContext as ObjcBlockPointer, in pMIDIPacketListPtr as optional any, in pSourceRefCon as optional any)
+public handler CoreMIDIReadCallbackProcedure( in pContext as ObjcBlockPointer, in pMIDIPacketListPtr as Pointer, in pSourceRefCon as optional any)
    log "MIDI IN!"
    -- log pMIDIPacketListPtr
    -- variable tMIDIPacketList as MIDIPacketList
