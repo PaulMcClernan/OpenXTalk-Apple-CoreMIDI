@@ -843,7 +843,12 @@ private variable sCoreMIDIReadCallbackProcPtr as optional ObjcBlockPointer
 -- public foreign type TimeBaseInfo binds to "MCAggregateTypeInfo:jj"
 -- public type MIDITimeStamp is UInt64
 -- public type MIDIObjRef is UInt32
-public foreign type MIDIPacketListData binds to "MCAggregateTypeInfo:ihhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh" -- Declaration (numPackets: UInt32, *packet(MIDIPacket)) -- j = UInt32
+
+-- numPackeets is j=UInt32 (4bytes), packet[1] is MIDITimeStamp k=UInt64 (8bytes),numBytes i=UInt16 (2 Bytes), MIDIData (defined by default as 256bytes), + 2 bytes padding
+-- public foreign type MIDIPacketListData binds to "MCAggregateTypeInfo:jkihhhh"
+--public foreign type MIDIPacketListData binds to "MCAggregateTypeInfo:ihhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh"
+
+public foreign type MIDIPacketListData binds to "MCAggregateTypeInfo:ihhhhhhhhhhhhhhhhhhhhhhhhhhhhhh"
 
 foreign handler PointerToMIDIPacketList(out rAggregate as MIDIPacketListData, in pPointer as Pointer, in pSize as UIntSize) returns nothing binds to "c:memcpy"
 -- foreign handler PointerToMIDIPacket(out rAggregate as MIDIPacket, in pPointer as Pointer, in pSize as UIntSize) returns nothing binds to "c:memcpy"
@@ -854,8 +859,8 @@ foreign handler PointerToMIDIPacketList(out rAggregate as MIDIPacketListData, in
 public handler CoreMIDIReadCallbackProcedure( in pContext as ObjcBlockPointer, in pMIDIPacketListPtr as Pointer, in pSourceRefCon as optional Pointer)
    variable tMIDIPacketListData as MIDIPacketListData
    unsafe
-      -- PointerToMIDIPacketList(tMIDIPacketList, pMIDIPacketListPtr, 270)
-      PointerToMIDIPacketList(tMIDIPacketListData, pMIDIPacketListPtr, 270)
+      -- PointerToMIDIPacketList(tMIDIPacketListData, pMIDIPacketListPtr, 270) -- 4+8+2+256 (+2 padding?)
+      PointerToMIDIPacketList(tMIDIPacketListData, pMIDIPacketListPtr, 32)
       log tMIDIPacketListData
    end unsafe
 end handler
