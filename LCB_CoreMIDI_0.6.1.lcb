@@ -846,22 +846,28 @@ private variable sCoreMIDIReadCallbackProcPtr as optional ObjcBlockPointer
 
 -- numPackeets is j=UInt32 (4bytes), packet[1] is MIDITimeStamp k=UInt64 (8bytes),numBytes i=UInt16 (2 Bytes), MIDIData (defined by default as 256bytes), + 2 bytes padding
 -- public foreign type MIDIPacketListData binds to "MCAggregateTypeInfo:jkihhhh"
---public foreign type MIDIPacketListData binds to "MCAggregateTypeInfo:ihhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh"
-
-public foreign type MIDIPacketListData binds to "MCAggregateTypeInfo:ihhhhhhhhhhhhhhhhhhhhhhhhhhhhhh"
+-- public foreign type MIDIPacketListData binds to "MCAggregateTypeInfo:jjjihhhhhhhhhhhhhhhhhh"
+public foreign type MIDIPacketListData binds to "MCAggregateTypeInfo:jjjihhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh"
 
 foreign handler PointerToMIDIPacketList(out rAggregate as MIDIPacketListData, in pPointer as Pointer, in pSize as UIntSize) returns nothing binds to "c:memcpy"
 -- foreign handler PointerToMIDIPacket(out rAggregate as MIDIPacket, in pPointer as Pointer, in pSize as UIntSize) returns nothing binds to "c:memcpy"
 
+variable sMIDIPacketListData as MIDIPacketListData
 -- typedef void (*MIDIReadProc)(const MIDIPacketList *pktlist, void *readProcRefCon, void *srcConnRefCon);
 -- typedef void (^MIDIReadBlock)(const MIDIPacketList *pktlist, void *srcConnRefCon);
 -- public handler CoreMIDIReadCallbackProcedure( in pContext as optional ObjcBlockPointer, in pMIDIPacketListPtr as MIDIPacketList, in readProcRefCont as optional Pointer, in srcConnRefCont as optional Pointer)
-public handler CoreMIDIReadCallbackProcedure( in pContext as ObjcBlockPointer, in pMIDIPacketListPtr as Pointer, in pSourceRefCon as optional Pointer)
-   variable tMIDIPacketListData as MIDIPacketListData
+public handler CoreMIDIReadCallbackProcedure( in pContext as ObjcBlockPointer, in pMIDIPacketListPtr as Pointer, in pSourceRefCon as optional Pointer) returns nothing
+   -- put nothing into sMIDIPacketListData
    unsafe
       -- PointerToMIDIPacketList(tMIDIPacketListData, pMIDIPacketListPtr, 270) -- 4+8+2+256 (+2 padding?)
-      PointerToMIDIPacketList(tMIDIPacketListData, pMIDIPacketListPtr, 32)
-      log tMIDIPacketListData
+      PointerToMIDIPacketList(sMIDIPacketListData, pMIDIPacketListPtr, 14 + 256 )
+      log sMIDIPacketListData
+      if element 5 of sMIDIPacketListData is 144 then
+         log "NoteOn Chan 1"
+      end if
+      if element 5 of sMIDIPacketListData is 128 then
+         log "NoteOff Chan 1"
+      end if
    end unsafe
 end handler
 
