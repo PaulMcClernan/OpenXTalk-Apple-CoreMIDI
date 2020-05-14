@@ -1,0 +1,1347 @@
+/**
+This library contains bindings for macOS & iOS CoreMIDI, useful sending musical performance data to other applications or communicating with external musical devices.
+
+OS:
+macOS, iOS (untested)
+
+Edition: Community
+Description:
+This library is a (currently incomplete) wrapper for Apple's CoreMIDI API.
+
+>*Note:* This library is MIT licensed (permissive).
+> Please share and share a like.
+*/
+library community.coremidi.paulmcclernan
+
+use com.livecode.engine
+use com.livecode.foreign
+use com.livecode.objc
+use com.livecode.array
+use com.livecode.list
+use com.livecode.byte
+use com.livecode.binary
+use com.livecode.assert
+
+metadata version is "0.6"
+metadata author is "Paul McClernan"
+metadata title is "CoreMIDI library"
+metadata svgicon is "M541.208,278.627c5.155-6.229,7.713-15.661,5.716-24.663c-7.97,0.751-16.543,7.303-21.699,13.533c-4.019,6.122-7.714,15.661-5.717,24.662C528.724,292.439,537.297,285.888,541.208,278.627z M591.706,363.468c-0.924,2.385-22.17-3.654-24.424-27.565c-1.824-19.356,13.151-31.106,14.29-31.213c-10.397-12.805-25.306-12.548-29.969-13.258c-12.633,0.042-23.267,9.085-28.961,9.622c-5.692,0.537-16.583-5.329-26.831-4.363c-13.663,1.288-24.3,10.331-30.058,22.361c-10.393,22.954-0.053,53.481,13.578,72.396h-42.334c0,0,14.162-11.127,20.231-19.22c-2.022-2.023-4.046-4.046-7.081-7.081c-4.046,4.046-8.092,6.07-11.127,8.093s-11.988,5.855-22.255,5.058s-20.645-9.355-25.289-21.243s-3.978-31.36-3.978-31.36l67.707-0.022c0,0-2.707-22.839-10.116-35.382c-2.572-4.354-16.947-20.4-38.744-19.069c-13.13,0.802-21.95,6.931-27.008,11.988c-5.058,4.046-10.116,11.127-14.162,19.22c-1.2,1.8-10.365,16.995-9.427,44.57c1.083,31.833,26.624,45.459,26.624,45.459h-39.452v-1.012c0-2.023,0-3.035-1.011-4.046c-1.012-1.012-3.035-1.012-7.081-2.023c-4.047,0-6.069-1.011-8.093-1.011c-1.012-1.012-3.035-2.023-4.046-3.035c-4.047-7.081-3.035-64.74-3.035-64.74s0-7.081,3.035-12.139c1.011-3.035,3.034-5.058,5.058-5.058h1.012c1.011,0,3.034,1.012,5.058,3.035c4.046,3.035,7.081,5.058,11.127,5.058c4.047,0,7.081-2.023,9.104-5.058c2.022-4.046,4.046-8.092,4.046-12.139c0-5.058-2.023-9.104-5.058-12.139c-3.035-3.035-7.081-5.058-11.127-5.058c-3.035,0-12.882,6.543-15.174,11.127s-7.081,14.162-7.081,14.162v-30.347h-8.093c-1.012,1.012-2.022,3.035-3.034,5.058c-2.023,4.046-6.07,8.092-11.127,12.139c-5.058,4.046-10.116,6.07-16.185,7.081v5.058c0,2.023,1.011,3.035,3.035,3.035c3.035,1.011,6.069,2.023,8.092,3.035c1.012,1.012,2.023,4.046,2.023,4.046s2.023,70.81,0,73.844c-1.012,2.023-8.093,5.058-12.139,6.07c-2.023,1.011-3.035,1.011-4.046,2.023c0,1.012,0,3.035,0,3.035h-28.324c1.012-1.012,2.023-1.012,3.035-1.012c8.093-6.069,15.173-15.173,20.231-27.312c3.035-8.093,5.058-18.208,5.058-31.359c0-7.081-1.011-14.162-4.046-22.254c-3.035-8.093-6.07-15.174-11.127-21.243c-9.104-12.139-22.254-18.208-39.451-18.208c-8.093,0-14.162,1.011-20.231,3.035c-5.058,2.023-11.127,5.058-16.185,10.116c-4.046,3.035-7.081,7.081-10.116,12.139s-5.058,11.127-7.081,17.197c-2.023,7.081-3.035,13.15-3.035,19.22c0,13.15,2.023,23.266,6.069,32.37s10.116,16.185,19.22,23.266c1.012,1.012,4.046,3.035,4.046,3.035h-52.602l11.127-7.081l7.081-41.474l-12.139,1.012c0,0-15.173,23.266-24.278,30.347c-8.092,7.081-17.196,10.116-25.289,10.116s-15.174-2.023-22.254-7.081c-5.058-3.035-10.116-7.081-13.15-13.15c-21.243-36.417-19.22-104.192,2.023-129.481c9.104-11.127,18.208-18.208,30.347-18.208c10.116,0,19.22,3.035,27.312,9.104c8.092,6.069,24.277,28.324,24.277,28.324h11.127l-9.104-44.509c0,0-16.185-4.046-24.278-5.058c-9.104-1.012-18.208-2.023-28.324-2.023c-24.278,0-44.509,9.104-60.694,28.324S13.15,274.106,13.15,302.43c0,12.139,1.012,23.266,4.046,32.37c3.035,10.116,6.069,18.208,12.139,27.312c5.058,8.093,12.139,15.174,21.243,22.255c4.046,3.035,8.092,5.058,13.15,7.081H5.058v199.28h54.625V438.992h27.312v151.735h54.625V438.992h27.312v151.735h53.613v-180.06c0-5.058-2.023-9.104-5.058-12.139c2.023,0,3.035,0,5.058,0c7.081,0,14.162-2.023,20.231-4.047v196.245h54.625V394.482h21.243v45.521h126.446v103.181H373.27v-75.868h-54.625v124.424h160.84c10.115,0,19.22-8.093,19.22,19.221V411.68c0-0.222-0.024-0.441-0.032-0.663c3.684,2.274,7.56,3.47,11.61,2.63c4.063-0.384,6.949-1.743,9.665-3.309v180.39h54.625V400.033c3.299-3.847,6.128-8.77,8.926-13.965C590.396,373.93,591.706,363.468,591.706,363.468z M394.513,289.279c4.046-6.069,9.104-9.104,14.162-9.104c4.046,0,7.081,1.012,11.127,4.046s6.069,7.081,8.093,12.139c2.022,5.058,3.034,10.116,3.034,16.185c-1.012,0-3.034,0-3.034,0c-1.012,0-3.035,0-5.059,0c-3.034,0-6.069,0-7.08,0h-27.312C387.432,302.43,390.466,294.337,394.513,289.279z M221,385.5c-12,0-25.307-25.195-25.54-51.053s15.464-52.987,28.002-52.217s23.243,30.316,23.361,47.512C247,355.5,233,385.5,221,385.5z"
+
+-------------------------------------------------------- Types & Structs ------------------------------------
+-- public foreign type MIDIPacket binds to "MCAggregateTypeInfo:kihhh" --kihhhhhhhh... k=UInt64  i=UInt16 h=3 x UInt8 -- MIDIPacket (timeStamp: MIDITimeStamp, length: UInt16, data: Data: ARRAY OF Bytes(256) x UInt8 )  -- UInt64,UInt16,Data(256))
+public foreign type MIDIPacket binds to "MCAggregateTypeInfo:kihhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh"
+public foreign type MIDIMsg binds to "MCAggregateTypeInfo:hhh" -- h=3 x UInt8
+public foreign type MIDIPacketList binds to "MCAggregateTypeInfo:jr" -- Declaration (numPackets: UInt32, *packet(MIDIPacket)) -- j = UInt32
+
+public foreign type TimeBaseInfo binds to "MCAggregateTypeInfo:jj"
+public type MIDITimeStamp is UInt64
+public type MIDIObjRef is UInt32
+
+private foreign handler NSApplicationSharedApplication() returns ObjcId binds to "objc:NSApplication.+sharedApplication"
+------------------------------------------------ MIDI Clients------------------------------------------------
+private foreign handler c_MIDIClientCreate(in pClientNameCFStrngRef as ObjcId, in pMIDINotifyProc as optional ObjcBlockPointer, in pNotifyRefCon as optional Pointer, \
+                                            out rMIDIClientRef as MIDIObjRef) returns CSInt binds to "c:CoreMIDI.framework>MIDIClientCreate"
+
+private foreign handler c_MIDIClientCreateWithBlock(in pClientNameCFStrngRef as ObjcId, out rMIDIClientRef as MIDIObjRef, in pMIDINotifyProc as optional ObjcBlockPointer) \
+                                          returns CSInt binds to "c:CoreMIDI.framework>MIDIClientCreateWithBlock"
+
+private foreign handler c_MIDIClientDispose(in pMIDIClientRef as ObjcId) returns CSInt binds to "c:CoreMIDI.framework>MIDIClientDispose"
+------------------------------------------------  MIDI Ports ------------------------------------------------------------
+private foreign handler c_MIDIInputPortCreate(in pMIDIClientRef as MIDIObjRef, in pInputPortNameCFStrngRef as ObjCId, out rMIDIInputPortRef as MIDIObjRef) returns CSInt binds to "c:CoreMIDI.framework>MIDIInputPortCreate"
+private foreign handler c_MIDIOutputPortCreate(in pMIDIClientRef as MIDIObjRef, in pOutPortNameCFStrngRef as ObjCId, out rMIDIOutPortRef as MIDIObjRef) returns CSInt binds to "c:CoreMIDI.framework>MIDIOutputPortCreate"
+private foreign handler c_MIDIPortDispose( in pMIDIPortRef as MIDIObjRef) returns CSInt binds to "c:CoreMIDI.framework>MIDIPortDispose"
+private foreign handler c_MIDIPortConnectSource(in pMIDIPortToConnectRef as MIDIObjRef, in MIDISourceEndpointToConnectRef as ObjcId, in connRefCon as optional any) returns CSInt binds to "c:CoreMIDI.framework>MIDIPortConnectSource"
+private foreign handler c_MIDIPortDisonnectSource( in pMIDIPortRef as MIDIObjRef,in pMIDIEndpointRef as ObjCId) returns CSInt binds to "c:CoreMIDI.framework>MIDIPortDisonnectSource"
+------------------------------------------------  MIDI Sources ------------------------------------------------------------
+private foreign handler c_MIDISourceCreate(in pMIDIClientRef as MIDIObjRef, in pSourceNameStrRef as ObjCId, out rMIDISourceEndPointRef as MIDIObjRef) \
+                                                                                 returns CSInt binds to "c:CoreMIDI.framework>MIDISourceCreate"
+private foreign handler c_MIDIGetNumberOfSources() returns CInt binds to "c:CoreMIDI.framework>MIDIGetNumberOfSources"
+private foreign handler c_MIDIGetSource( in pSourceIndexNum as optional UInt32) returns optional MIDIObjRef binds to "c:CoreMIDI.framework>MIDIGetSource" -- Returns a reference to a source, or NULL if an error occurred.
+------------------------------------------------  MIDI Destinations ------------------------------------------------------------
+-- OSStatus MIDIDestinationCreateWithBlock(MIDIClientRef client, CFStringRef name, MIDIEndpointRef *outDest, MIDIReadBlock readBlock);
+private foreign handler c_MIDIDestinationCreateWithBlock(in pMIDIClientRef as MIDIObjRef, in pMIDIDestinationNameStrRef as ObjcId, \
+                                                   out rMIDIDestEndpointRef as MIDIObjRef, in pMIDIReadProc as optional ObjcBlockPointer) returns CSInt binds to "c:CoreMIDI.framework>MIDIDestinationCreateWithBlock"
+-- OSStatus MIDIDestinationCreate(MIDIClientRef client, CFStringRef name, MIDIReadProc readProc, void *refCon, MIDIEndpointRef *outDest); Creates a virtual destination in a client.
+private foreign handler c_MIDIDestinationCreate(in pMIDIClientRef as MIDIObjRef, in pMIDIDestinationNameStrRef as ObjcId, in pMIDIReadProc as optional ObjcBlockPointer, in pRefConst as optional ObjcId, \
+                                                   out rMIDIDestEndpointRef as MIDIObjRef) returns CSInt binds to "c:CoreMIDI.framework>MIDIDestinationCreate"
+private foreign handler c_MIDIGetNumberOfDestinations() returns CInt binds to "c:CoreMIDI.framework>MIDIGetNumberOfDestinations"
+private foreign handler c_MIDIGetDestination(in pSourceIndexNum as optional UInt32) returns MIDIObjRef binds to "c:CoreMIDI.framework>MIDIGetDestination"
+------------------------------------------------  MIDI Endpoints------------------------------------------------------------
+-- OSStatus MIDIEndpointDispose(MIDIEndpointRef endpt); -- Disposes a virtual source or destination your client created.
+-- endpt = The endpoint to be disposed, returns a result code.
+private foreign handler c_MIDIEndpointDispose(in pMIDIEndpointRef as MIDIObjRef) returns CSInt binds to "c:CoreMIDI.framework>MIDIEndpointDispose"
+-- OSStatus MIDIEndpointGetEntity(MIDIEndpointRef inEndpoint, MIDIEntityRef *outEntity);
+-- inEndpoint = The endpoint being queried. outEntity = On exit, the endpoint's owning entity, or NULL if none.
+private foreign handler c_MIDIEndpointGetEntity(in pMIDIEndpointRef as MIDIObjRef, out pEntityRef as optional MIDIObjRef) returns CSInt binds to "c:CoreMIDI.framework>MIDIEndpointGetEntity"
+-- OSStatus MIDIEntityGetDevice(MIDIEntityRef inEntity, MIDIDeviceRef *outDevice);
+-- inEntity = The entity being queried. outDevice = On successful return, the entity's owning device.
+------------------------------------------------  MIDI Entities ------------------------------------------------------------
+private foreign handler c_MIDIEntityGetDevice(in pMIDIEntitytRef as MIDIObjRef, out rDeviceRef as optional MIDIObjRef) returns CSInt binds to "c:CoreMIDI.framework>MIDIEntityGetDevice"
+-- ItemCount MIDIEntityGetNumberOfSources(MIDIEntityRef entity);
+private foreign handler c_MIDIEntityGetNumberOfSources(in pMIDIEntityRef as MIDIObjRef) returns CInt binds to "c:CoreMIDI.framework>MIDIEntityGetNumberOfSources"
+-- MIDIEndpointRef MIDIEntityGetSource(MIDIEntityRef entity, ItemCount sourceIndex0);
+-- entity = entity being queried, sourceIndex0 = index (0...MIDIEntityGetNumberOfSources(entity)-1) of the source to return. Return Value is reference to a source, or NULL if an error occurred.
+private foreign handler c_MIDIEntityGetSource(in pMIDIEntitytRef as MIDIObjRef, in pSourceIndex as Cint) returns MIDIObjRef binds to "c:CoreMIDI.framework>MIDIEntityGetSource"
+-- ItemCount MIDIEntityGetNumberOfDestinations(MIDIEntityRef entity);
+private foreign handler c_MIDIEntityGetNumberOfDestinations(in pMIDIEntityRef as MIDIObjRef) returns CInt binds to "c:CoreMIDI.framework>MIDIEntityGetNumberOfDestinations"
+-- MIDIEndpointRef MIDIEntityGetDestination(MIDIEntityRef entity, ItemCount destIndex0);
+-- entity = entity being queried, sourceIndex0 = index (0...MIDIEntityGetNumberOfDestinations(entity)-1) of the source to return. Return Value is reference to a source, or NULL if an error occurred.
+private foreign handler c_MIDIEntityGetDestination(in pMIDIEntitytRef as MIDIObjRef, in pDestIndex as Cint) returns MIDIObjRef binds to "c:CoreMIDI.framework>MIDIEntityGetDestination"
+----------------------------------------------------------------- MIDI Devices ------------------------------------------------------------
+private foreign handler c_MIDIGetNumberOfDevices() returns CInt binds to "c:CoreMIDI.framework>MIDIGetNumberOfDevices"
+private foreign handler c_MIDIGetNumberOfExternalDevices() returns CInt binds to "c:CoreMIDI.framework>MIDIGetNumberOfExternalDevices"
+private foreign handler c_MIDIGetExternalDevice(in pSourceIndexNum as optional UInt32) returns MIDIObjRef binds to "c:CoreMIDI.framework>MIDIGetExternalDevice"
+private foreign handler c_MIDIGetDevice(in pSourceIndexNum as optional UInt32) returns MIDIObjRef binds to "c:CoreMIDI.framework>MIDIGetDevice"
+private foreign handler c_MIDIDeviceGetNumberOfEntities(in pMIDIDeviceRef as MIDIObjRef) returns CInt binds to "c:CoreMIDI.framework>MIDIDeviceGetNumberOfEntities"
+private foreign handler c_MIDIDeviceGetEntity(in pDeviceRef as MIDIObjRef, in pSourceIndexNum as UInt32) returns MIDIObjRef binds to "c:CoreMIDI.framework>MIDIDeviceGetEntity"
+----------------------------------------------------------------- MIDI IO --------------------------------------------------------------------------
+private foreign handler c_MIDIReceived(in pMIDIEndpointRef as MIDIObjRef, in pMIDIPacketListPtr as Pointer) returns CSInt binds to "c:CoreMIDI.framework>MIDIReceived" -- OSStatus MIDIReceived(MIDIEndpointRef src, const MIDIPacketList *pktlist);ai -- Use for SENDING Notes To Virstual Source (not MIDISend)
+private foreign handler c_MIDISend(in pMIDIPortRef as MIDIObjRef, in pMIDIEndpointRef as ObjCId, in pMIDIPacketList as Pointer) returns CSInt binds to "c:CoreMIDI.framework>MIDISend"
+private foreign handler c_MIDIPacketListInit(in pMIDIPacketListByteBuffer as Pointer) returns Pointer binds to "c:CoreMIDI.framework>MIDIPacketListInit"
+private foreign handler c_MIDIPacketNext(in pMIDIPacketListByteBuffer as Pointer) returns Pointer binds to "c:CoreMIDI.framework>MIDIPacketNext"
+private foreign handler c_MIDIPacketListAdd(in pMIDIPacketListByteBuffer as Pointer, in pPacketsCnt as UInt32, in pMIDIPacket as Pointer, in pMIDITimeStamp as UInt64, pPcktByteCnt as UInt16, in pPacket as Pointer) returns Pointer binds to "c:CoreMIDI.framework>MIDIPacketListAdd"
+private foreign handler c_MIDIRestart() returns CSInt binds to  "c:CoreMIDI.framework>MIDIRestart" -- OSStatus MIDIRestart(void); This is useful for forcing CoreMIDI to ask its drivers to rescan for hardware.
+private foreign handler c_MIDIFlushOutput(in MIDIEndpointRef as optional MIDIObjRef) returns CSInt binds to  "c:CoreMIDI.framework>MIDIFlushOutput" -- OSStatus MIDIFlushOutput(MIDIEndpointRef dest); -- Parameters dest, All pending events scheduled to be sent to this destination are unscheduled. If NULL, the operation applies to all destinations.
+----------------------------------------------------------------- MIDI Object Properties ------------------------------------------------------------
+-- OSStatus = MIDIObjectFindByUniqueID(MIDIUniqueID inUniqueID, MIDIObjectRef *outObject, MIDIObjectType *outObjectType);
+-- inUniqueID of object to search for (This should be the result of an earlier call to MIDIObjectGetIntegerProperty "UniqueID")
+-- outObject returned object, or NULL if the object was not found or an error occurred. This should be cast to the appropriate type (MIDIDeviceRef, MIDIEntityRef, MIDIEndpointRef), according to *outObjectType.
+-- outObjectType on exit, the type of object which was found; undefined if none found.
+-- Return Value is sn OSStatus error code, including kMIDIObjectNotFound if there is no object with the specified uniqueID.
+private foreign handler c_MIDIObjectFindByUniqueID(in pMIDIObjectUID as SInt32, out rMIDIObjectRef as optional MIDIObjRef, out rMIDIObjectType as optional SInt32) returns CSInt binds to "c:CoreMIDI.framework>MIDIObjectFindByUniqueID"
+-- OSStatus MIDIObjectGetIntegerProperty(MIDIObjectRef obj, CFStringRef propertyID, SInt32 *outValue);
+private foreign handler c_MIDIObjectGetIntegerProperty(in pMIDIObjectRef as optional MIDIObjRef, in rPropertyIDCFStrRef as ObjCId, out rPropertyVal as optional SInt32) returns CSInt binds to "c:CoreMIDI.framework>MIDIObjectGetIntegerProperty"
+--OSStatus MIDIObjectSetIntegerProperty(MIDIObjectRef obj, CFStringRef propertyID, SInt32 newvalue);
+private foreign handler c_MIDIObjectSetIntegerProperty(in pMIDIObjectRef as MIDIObjRef, in rPropertyIDCFStrRef as ObjCId, in rPropertyVal as optional SInt32) returns CSInt binds to "c:CoreMIDI.framework>MIDIObjectSetIntegerProperty"
+-- OSStatus MIDIObjectGetStringProperty(MIDIObjectRef obj, CFStringRef propertyID, CFStringRef  _Nullable *str);
+-- obj = object whose property is to be returned, propertyID = Name of the property to return, str = on success the value of the property, Returns result code.
+private foreign handler c_MIDIObjectGetStringProperty(in pMIDIObjectRef as MIDIObjRef, in rPropertyIDCFStrRef as ObjCId, out rPropertyValCFStrRef as optional ObjCId) returns CSInt binds to "c:CoreMIDI.framework>MIDIObjectGetStringProperty"
+-- MIDIObjectGetProperties -- Gets all of an object's properties.
+-- OSStatus MIDIObjectGetProperties(MIDIObjectRef obj, CFPropertyListRef  _Nullable *outProperties, Boolean deep);
+private foreign handler c_MIDIObjectGetProperties(in pMIDIObjectRef as MIDIObjRef, out rCFPropertyListRef as ObjCId, in pDeep as Boolean) returns CSInt binds to "c:CoreMIDI.framework>MIDIObjectGetProperties"
+--CFDataRef CFPropertyListCreateData(CFAllocatorRef allocator, CFPropertyListRef propertyList, CFPropertyListFormat format, CFOptionFlags options, CFErrorRef *error); -- CFOptionFlags parameter is currently unused and should be set to 0.
+private foreign handler c_CFPropertyListCreateData(in pCFAllocatorRef as optional ObjCId, in pCFPropertyListRef as ObjCId, in pFormat as CInt, in pOptionFlags as CUInt, out rCFErrorRef as optional any) returns ObjCId binds to "c:CFPropertyListCreateData"
+-- pFormat kCFPropertyListXMLFormat_v1_0 = 100 or kCFPropertyListBinaryFormat_v1_0 = 200 or kCFPropertyListOpenStepFormat = 1 (discouraged)
+----------------------------------------------------------------- Data Buffer ------------------------------------------------------------
+private foreign handler objC_NSMutableDataWithLength(in pDataLength as ObjcId) returns ObjcId binds to "objc:NSMutableData.+dataWithLength:" -- Creates and returns an mutable data object containing a given number of zeroed bytes. Toll free bridges to CFMutableDataRef for Foundation C APIs
+private foreign handler objC_NSMutableDataWithCapacity(in pDataLength as ObjcId) returns ObjcId binds to "objc:NSMutableData.+dataWithCapacity:"
+private foreign handler objC_NSMutableDataBytesPtr(in pMutableDataRef as ObjcId) returns Pointer binds to "objc:NSMutableData.mutableBytes"
+private foreign handler objC_NSMutableDataSetData(in pMutableDataRef as ObjcId, in pNSDataToSet as ObjcId) returns nothing binds to "objc:NSMutableData.-setData:"
+private foreign handler objC_NSDataBytesPtr(inout pMutableDataRef as ObjcId) returns Pointer binds to "objc:NSData.bytes"
+----------------------------------------------------------------- Time Stamping ------------------------------------------------------------
+-- https://developer.apple.com/documentation/kernel/1462446-mach_absolute_time?language=objc
+-- private foreign handler c_mach_absolute_time() returns MIDITimeStamp binds to "c:Kernel.framework>mach_absolute_time"
+private foreign handler c_mach_absolute_time() returns UInt64 binds to "c:mach_absolute_time"
+private foreign handler c_mach_timebase_info(inout pTimeBaseInfo as TimeBaseInfo) returns nothing binds to "c:mach_timebase_info"
+----------------------------------------------------------------- Constants ------------------------------------------------------------
+----------------------------------------------------------------- MIDIObjectTypes Constants ------------------------------------------------------------
+constant kMIDIObjectType_ExternalDestination is 0x10 --- 0x10 is just a temporary bitfield place holder
+constant kMIDIObjectType_ExternalSource is 0x10 --- 0x10 is just a temporary bitfield place holder
+constant kMIDIObjectType_ExternalEntity is 0x10 --- 0x10 is just a temporary bitfield place holder
+constant kMIDIObjectType_ExternalDevice is 0x10 --- 0x10 is just a temporary bitfield place holder
+constant kMIDIObjectType_Destination is 3
+constant kMIDIObjectType_Source is 2
+constant kMIDIObjectType_Entity is 1
+constant kMIDIObjectType_Device is 0
+constant kMIDIObjectType_Other is -1
+public handler CoreMIDIObjectTypeToString(in pMIDIObjTypeEnum as optional Number) returns optional String
+   if pMIDIObjTypeEnum is -1 then
+      return "Other"
+      -- post "CoreMIDIPropertyChanged Other"
+   end if
+   if pMIDIObjTypeEnum is 0 then
+      return "Device"
+      -- post "CoreMIDIPropertyChanged Device"
+   end if
+   if pMIDIObjTypeEnum is 1 then
+      return "Entity"
+      -- post "CoreMIDIPropertyChanged Entity"
+   end if
+   if pMIDIObjTypeEnum is 2 then
+      return "Source"
+      --post "CoreMIDIPropertyChanged Source"
+   end if
+   if pMIDIObjTypeEnum is 3 then
+      return "Destination"
+      -- post "CoreMIDIPropertyChanged Destination"
+   else
+      return "External" -- temporary, bitfield holds additonal information
+   end if
+   -- post "CoreMIDIPropertyChanged " && tString
+end handler
+----------------------------------------------------------------- Variables ------------------------------------------------------------
+private variable sNSAppSharedApp as ObjcId
+private variable sMIDIClientRef as MIDIObjRef
+private variable sMIDIOutPortRef as MIDIObjRef
+private variable sMIDIInputPortRef as MIDIObjRef
+private variable sMIDIDestEndpointRef as MIDIObjRef
+private variable sMIDISourceEndpointRef as MIDIObjRef
+private variable sMIDIPacketPtr as Pointer
+private variable sMIDIPacketListPtr as Pointer
+private variable sMIDIPacketByteBufferNSMutableDataRef as ObjcId
+private variable sMIDIPacketByteBufferPtr as Pointer
+private variable sCoreMIDISetupChangedHandler as optional ObjcBlockPointer
+private variable sTarget as ScriptObject
+
+public foreign type MIDINotificationIDnSize binds to "MCAggregateTypeInfo:Jj" -- message ID, message size
+public foreign type MIDIObjectAddRemoveNotification binds to "MCAggregateTypeInfo:JjjJjJ" -- message ID, message size, ...
+public foreign type MIDIObjectPropertyChangeNotification binds to "MCAggregateTypeInfo:JjjJr" -- message ID, message size
+--public foreign type MIDINotifyStructPtr binds to "MCAggregateTypeInfo:r" -- pointer to notification struct
+-------------------------- UTIL ----------------------------
+foreign handler PointerToMIDINotificationIDnSize(out rAggregate as MIDINotificationIDnSize, in pPointer as Pointer, in pSize as UIntSize) returns nothing binds to "c:memcpy"
+foreign handler PointerToMIDIObjectAddRemoveNotification(out rAggregate as MIDIObjectAddRemoveNotification, in pPointer as Pointer, in pSize as UIntSize) returns nothing binds to "c:memcpy"
+foreign handler PointerToMIDIObjectPropertyChangeNotification(out rAggregate as MIDIObjectPropertyChangeNotification, in pPointer as Pointer, in pSize as UIntSize) returns nothing binds to "c:memcpy"
+private foreign handler c_CFStringCreateCopy(in pCFAllocatorRef as optional Pointer, in pCFStringRef as optional ObjCId) returns optional ObjCId binds to "c:Foundation.framework>CFStringCreateCopy"
+private foreign handler c_CFBridgingRelease(in pCFStringRef as optional Pointer) returns optional ObjCId binds to "c:Foundation.framework>CFBridgingRelease"
+foreign handler MCStringCreateWithCString(in pString as Pointer, out rString as String) returns CBool binds to "<builtin>"
+
+-- public handler CoreMIDISetupChangedCallbackProc(in pContext as optional ObjcBlockPointer,in pMIDINotification as MIDINotification, in pRefCon as optional Pointer)
+public handler CoreMIDISetupChangedCallbackProc( in pContext as optional ObjcBlockPointer,in pMIDINotifyStructPtr as Pointer)
+   -- public handler CoreMIDISetupChangedCallbackProc(in pContext as optional ObjcBlockPointer,in pMIDINotification as Data)
+   -- MIDINotification is a structure passed to a MIDINotifyProc, when CoreMIDI wishes to inform a client of a change in the state of the system
+   -- const MIDINotification *message, void *refCon
+   -- *message = MIDINotificationMessageID : SInt32  and  messageSize : UInt32
+   -- post "CoreMIDISetupChanged" to sTarget
+   -- variable tSize as Integer
+   variable tOSStatus as optional CSInt
+   variable tCFError as optional ObjCId
+   variable tPropertyValSInt32 as optional SInt32
+   variable tMIDINotificationIDnSize as optional MIDINotificationIDnSize
+   -- variable tCFStringRef as Pointer
+   variable tCFStringRef as ObjcObject
+   -- variable tNSStringObj as optional ObjcRetainedId
+   -- variable tNSStringObj as ObjcObject
+   variable tNSStringObj as optional ObjcObject
+
+   variable tString as optional String
+   variable tMIDIObjectAddRemoveNotification as optional MIDIObjectAddRemoveNotification
+   variable tMIDIObjectPropertyChangeNotification as optional MIDIObjectPropertyChangeNotification
+   unsafe
+   PointerToMIDINotificationIDnSize(tMIDINotificationIDnSize,pMIDINotifyStructPtr,8)
+   if element 1 of tMIDINotificationIDnSize = 1 then
+      log "CoreMIDISetupChanged"
+      -- post "CoreMIDISetupChanged" to sTarget --- basic notification,  -- can ignore if 2-6 are handled
+      -- no other data follows so size is always 8 Bytes
+   end if
+   if element 1 of tMIDINotificationIDnSize = 2 then
+      PointerToMIDIObjectAddRemoveNotification(tMIDIObjectAddRemoveNotification,pMIDINotifyStructPtr,24)
+      log "CoreMIDIObjectAdded"
+      put CoreMIDIObjectTypeToString(element 6 of tMIDIObjectAddRemoveNotification) into tString
+      log tString
+      log tMIDIObjectAddRemoveNotification
+      -- Child_MIDIObjRef
+      post "CoreMIDIObjectAdded" to sTarget
+      -- get element 5 of tMIDIObjectAddRemoveNotification
+      put c_MIDIObjectGetIntegerProperty( element 5 of tMIDIObjectAddRemoveNotification, StringToNSString("uniqueID"), tPropertyValSInt32) into tOSStatus
+      if tPropertyValSInt32 is not nothing then
+         log tPropertyValSInt32
+      end if
+      put c_MIDIObjectGetStringProperty( element 5 of tMIDIObjectAddRemoveNotification, StringToNSString("name"),tNSStringObj) into tOSStatus
+      if tNSStringObj is not nothing then
+         put StringFromNSString(tNSStringObj) into tString
+         log tString
+      end if
+      -- ID SInt32, Size UInt32, Parrent_MIDIObjRef UInt32, Parrent_MIDIObjectType SInt32, Child_MIDIObjRef UInt32, Child_MIDIObjectType SInt32
+      --- 24 Bytes
+   end if
+   if element 1 of tMIDINotificationIDnSize = 3 then
+      PointerToMIDIObjectAddRemoveNotification(tMIDIObjectAddRemoveNotification,pMIDINotifyStructPtr,24)
+      log "CoreMIDIObjectRemoved"
+      put CoreMIDIObjectTypeToString(element 4 of tMIDIObjectAddRemoveNotification) into tString
+      log tString
+      log tMIDIObjectAddRemoveNotification
+      post "CoreMIDIObjectRemoved" to sTarget
+      -- put c_MIDIObjectGetIntegerProperty( element 3 of tMIDIObjectAddRemoveNotification, StringToNSString("uniqueID"), tPropertyValSInt32) into tOSStatus
+      -- log tPropertyValSInt32
+      put c_MIDIObjectGetStringProperty( element 3 of tMIDIObjectAddRemoveNotification, StringToNSString("name"),tNSStringObj) into tOSStatus
+      if tNSStringObj is not nothing then
+         put StringFromNSString(tNSStringObj) into tString
+         log tString
+      end if
+      -- MIDIObjectAddRemoveNotification
+      -- ID SInt32, Size UInt32, Parrent_MIDIObjRef UInt32, Parrent_MIDIObjectType SInt32, Child_MIDIObjRef UInt32, Child_MIDIObjectType SInt32
+      --- 24 Bytes
+   end if
+   if element 1 of tMIDINotificationIDnSize = 4 then
+      log "CoreMIDIPropertyChanged"
+      PointerToMIDIObjectPropertyChangeNotification(tMIDIObjectPropertyChangeNotification,pMIDINotifyStructPtr, element 2 of tMIDINotificationIDnSize )
+      log tMIDIObjectPropertyChangeNotification
+
+      put element 5 of tMIDIObjectPropertyChangeNotification into tCFStringRef
+      log tCFStringRef
+
+      put PointerToObjcObject(nothing) into tNSStringObj
+
+      -- put PointerToObjcObject(tCFStringRef) into tNSStringObj
+      -- if tNSStringObj is not nothing then
+         --put StringFromNSString(tNSStringObj) into tString
+      --   log tString
+      -- end if
+      -- CFStringRef CFStringCreateCopy(CFAllocatorRef alloc, CFStringRef theString);
+      -- put PointerToObjcObject(tCFStringRef) into tNSStringObj
+      -- put StringFromNSString(tNSStringObj) into tString
+      -- put StringFromNSString(tCFStringRef) into tString
+      -- log tString
+      -- put c_CFStringCreateCopy(nothing,element 5 of tMIDIObjectPropertyChangeNotification) into tNSStringObj
+      -- put StringFromNSString(tCFStringRef) into tCFStringRefString
+      -- if MCStringCreateWithCString(element 5 of tMIDIObjectPropertyChangeNotification, tCFStringRefString) then
+         -- log element 5 of tMIDIObjectPropertyChangeNotification
+      -- log tCFStringRef
+      put CoreMIDIObjectTypeToString(element 4 of tMIDIObjectPropertyChangeNotification) into tString
+      log tString
+      -- execute script "CoreMIDIPropertyChanged " && tString in sTarget
+      -- post "CoreMIDIPropertyChanged " && tString
+      put c_MIDIObjectGetStringProperty(element 3 of tMIDIObjectPropertyChangeNotification,StringToNSString("name"),tNSStringObj) into tOSStatus
+      if tNSStringObj is not nothing then
+         put StringFromNSString(tNSStringObj) into tString
+         log tString
+      end if
+      put c_MIDIObjectGetIntegerProperty( element 3 of tMIDIObjectPropertyChangeNotification, StringToNSString("uniqueID"), tPropertyValSInt32) into tOSStatus
+      log tPropertyValSInt32
+      -- MIDIObjectPropertyChangeNotification: A message describing the addition or removal of an object.
+      -- ID SInt32, Size UInt32, MIDIObjRef UInt32, MIDIObjectType SInt32, propertyName CFStringRef (or CFString? (length?)
+      --- 4 to 18? 20? N Bytes
+   end if
+   if element 1 of tMIDINotificationIDnSize = 5 then
+      log "CoreMIDIThruConnectionsChanged"
+      -- post "CoreMIDIThruConnectionsChanged" to sTarget
+      --- basic notification, no other data follows so size is always 8 Bytes
+   end if
+   if element 1 of tMIDINotificationIDnSize = 6 then
+      log "CoreMIDISerialPortOwnerChanged"
+      --post "CoreMIDISerialPortOwnerChanged" to sTarget
+      --- basic notification, no other data follows so size is always 8 Bytes
+   end if
+   if element 1 of tMIDINotificationIDnSize = 7 then
+      log "CoreMIDIIOErrorOccured"
+      --post "CoreMIDIIOErrorOccured" to sTarget
+      --  ID SInt32, Size UInt32, Driver MIDIDeviceRef UInt32, OSStatus CSInt (2 or 4 bytes?)
+      -- 14 or 16 Bytes?
+   end if
+      -- log tMIDINotificationIDnSize
+   end unsafe
+   -- execute script "CoreMIDISetupChanged"
+   -- send "CoreMIDISetupChanged" to sTarget with NotificationID
+   -- variable sMIDINotificationObj as ObjcObject
+   -- put PointerToObjcObject(pMIDINotification) into sMIDINotificationObj
+end handler
+
+/**
+Creates a MIDI Client and asigns it a name.
+
+Example:
+CoreMIDIClientCreate("My LiveCode CoreMIDI Client")
+
+Parameters:
+clientName (String): The text string to use as the MIDI Client's name
+
+Description:
+Creates a MIDI Client named with string provided (client name is not generally visible to other applications)
+*/
+public handler CoreMIDIClientCreate(in clientName as String) returns nothing
+   variable tClientNameStrRef as ObjcObject
+   variable tOSStatus as optional CSInt
+   -- variable tMIDINotifyProc as optional any
+   -- variable tNotifyRefCon as optional Pointer
+
+   if not CreateObjcBlockPointerFromHandler(CoreMIDISetupChangedCallbackProc, sCoreMIDISetupChangedHandler) then
+      put nothing into sCoreMIDISetupChangedHandler
+   end if
+   -- put nothing into tNotifyRefCon
+   put StringToNSString(clientName) into tClientNameStrRef
+   unsafe
+      -- put NSApplicationSharedApplication() into sNSAppSharedApp
+   -- put c_MIDIClientCreate(tClientNameStrRef,sCoreMIDISetupChangedHandler,CoreMIDIClientCreate,sMIDIClientRef) into tOSStatus
+
+   -- OSStatus MIDIClientCreateWithBlock(CFStringRef name, MIDIClientRef *outClient, MIDINotifyBlock notifyBlock);
+   -- put c_MIDIClientCreate(tClientNameStrRef,sCoreMIDISetupChangedHandler,tNotifyRefCon,sMIDIClientRef) into tOSStatus
+      put c_MIDIClientCreateWithBlock(tClientNameStrRef,sMIDIClientRef,sCoreMIDISetupChangedHandler) into tOSStatus
+   end unsafe
+   resolve script object "this stack"
+   put the result into sTarget
+   log sTarget
+end handler
+
+/**
+Sends arbitrary bytes to the MIDI Client.
+
+Type: command
+
+Example:
+CoreMIDISendMIDIbytesNow <pMIDIMsgData>
+
+Parameters:
+pMIDIMsgData: arbitrary bytes, does not check for the bytes for validity as MIDI messages
+
+Description:
+Sends arbitrary bytes to the MIDI Client immediately (as fast as possible).
+A MIDI Client must be created first using CoreMIDIClientCreate.
+*/
+public handler CoreMIDISendMIDIbytesNow(in pMIDIMsgData as Data) returns nothing
+   variable tOSStatus as optional CSInt
+   variable tTimeStamp as MIDITimeStamp
+   variable tMIDIPacket as MIDIPacket
+   variable tMIDIPacketList as MIDIPacketList
+   variable tBufferSize  as Number
+   variable tCnt as Number
+   variable tMIDIMsgBytesNSDataRef as ObjCId
+   variable tMIDIMsgBytesPtr as Pointer
+   put the number of bytes in pMIDIMsgData into tCnt
+   put 256 into tBufferSize
+   put 0 into tTimeStamp
+   unsafe
+      put objC_NSMutableDataWithLength(NumberToNSNumber(tBufferSize)) into sMIDIPacketByteBufferNSMutableDataRef
+      put objC_NSMutableDataBytesPtr(sMIDIPacketByteBufferNSMutableDataRef) into sMIDIPacketByteBufferPtr
+
+      put c_MIDIPacketListInit(sMIDIPacketByteBufferPtr) into sMIDIPacketPtr
+
+      put objC_NSMutableDataWithLength(NumberToNSNumber(tCnt)) into tMIDIMsgBytesNSDataRef
+      objC_NSMutableDataSetData(tMIDIMsgBytesNSDataRef, DataToNSData(pMIDIMsgData))
+      put objC_NSMutableDataBytesPtr(tMIDIMsgBytesNSDataRef) into tMIDIMsgBytesPtr
+
+      put c_MIDIPacketListAdd(sMIDIPacketByteBufferPtr,tBufferSize,sMIDIPacketPtr,tTimeStamp,tCnt,tMIDIMsgBytesPtr) into sMIDIPacketPtr
+      put c_MIDIReceived(sMIDISourceEndpointRef,sMIDIPacketByteBufferPtr) into tOSStatus
+   end unsafe
+end handler
+
+/**
+Immediately sends a MIDI Note On message with the given pitch and velocity on the given channel.
+
+Type: command
+
+Syntax: CoreMIDINoteOn <MIDINoteNumber>,pMIDIVelocityNumber,<pMIDIChannelNumber>
+
+Example:
+CoreMIDINoteOn 60,127,1 -- 60=Middle C, 127=Full velocity, 1=MIDI channel 1
+
+Parameters:
+pMIDINoteNum: The number of the pitch to turn on, 0 to 127, 60 = Middle C
+pMIDIVeloNum: The velocity to play the given pitch at, 0 to 127
+pMIDIChanNum: The MIDI Channel to play the note on, 1 to 16
+
+Description: Immediately sends a MIDI Note On message with the given pitch and velocity on the given channel.
+*/
+public handler CoreMIDINoteOn(in pMIDINoteNum as UInt8,in pMIDIVeloNum as UInt8,in pMIDIChanNum as UInt8) returns nothing
+   expect that (pMIDINoteNum >= 0 and pMIDINoteNum <= 127 ) because "MIDI pitch values must be in the range of 0 to 127"
+   expect that (pMIDIVeloNum >= 0 and pMIDIVeloNum <= 127 ) because "MIDI veloctiy values must be in the range of 0 to 127"
+   expect that (pMIDIChanNum >= 1 and pMIDIChanNum <= 16 ) because "MIDI channel values must be in the range of 1 to 16"
+   variable tMIDIMsgData as Data
+   add 143 to pMIDIChanNum -- 143 instead of 144 so that channel numbers can be passed with 1 to 16 range instead of 0 to 15
+   put the byte with code pMIDIChanNum into tMIDIMsgData
+   put the byte with code pMIDINoteNum after tMIDIMsgData
+   put the byte with code pMIDIVeloNum after tMIDIMsgData
+   CoreMIDISendMIDIbytesNow(tMIDIMsgData)
+end handler
+
+/**
+Name: CoreMIDINoteOff
+
+Type: command
+
+Syntax: CoreMIDINoteOff <MIDINoteNumber>,<MIDIChannelNumber>
+
+Summary:
+Immediately sends a MIDI Note Off message with the given pitch and velocity on the given channel.
+
+Example:
+CoreMIDINoteOff 60,1 -- Turns off Middle C on MIDI channel 1
+
+Parameters:
+pMIDINoteNum: The number of the pitch to turn off, 0 to 127, 60 = Middle C
+pMIDIChanNum: The MIDI Channel to send the message to, 0 to 15, 0 = Channel 1
+
+Description:
+Immediately sends a MIDI Note Off message with the given pitch on the given channel.
+*/
+public handler CoreMIDINoteOff(in pMIDINoteNum as UInt8,in pMIDIChanNum as UInt8) returns nothing
+   expect that (pMIDINoteNum >= 0 and pMIDINoteNum <= 127 ) because "MIDI pitch values must be in the range of 0 to 127"
+   expect that (pMIDIChanNum >= 1 and pMIDIChanNum <= 16 ) because "MIDI channel values must be in the range of 1 to 16"
+   variable tMIDIMsgData as Data
+   add 127 to pMIDIChanNum -- 127 instead of 128 for Channel range of 1 to 16 (instead of 0 to 15)
+   put the byte with code pMIDIChanNum into tMIDIMsgData
+   put the byte with code pMIDINoteNum after tMIDIMsgData
+   put the byte with code 0 after tMIDIMsgData
+   CoreMIDISendMIDIbytesNow(tMIDIMsgData)
+end handler
+
+/**
+Name: CoreMIDIController
+
+Type: command
+
+Syntax: CoreMIDIController(<pController>,<pControllerVal><pMIDIChanNum>)
+
+Summary:
+The send a controller with a single data byte value to on a given channel
+
+Example:
+CoreMIDIController 7,127,1 -- 7 = Volume Controller, Data Byte 1, channel 1
+
+Parameters:
+pController: The number of the MIDI Controller to set values for
+pControllerVal: The value byte one
+pMIDIChanNum: MIDI Channel to send the controller value on, 1 to 16
+
+Description:
+The send a controller with a single data byte value to on a given channel
+*/
+public handler CoreMIDIController(in pController as UInt8,in pControllerVal as UInt8,in pMIDIChanNum as UInt8) returns nothing
+   expect that (pController >= 0 and pController <= 127 ) because "MIDI controller selection must be in the range of 0 to 127"
+   expect that (pControllerVal >= 0 and pControllerVal <= 127 ) because "MIDI controller values must be in the range of 0 to 127"
+   expect that (pMIDIChanNum >= 1 and pMIDIChanNum <= 16 ) because "MIDI channel values must be in the range of 1 to 16"
+   variable tMIDIMsgData as Data
+   add 175 to pMIDIChanNum -- 176 is MIDI CC
+   put the byte with code pMIDIChanNum into tMIDIMsgData
+   put the byte with code pController after tMIDIMsgData
+   put the byte with code pControllerVal after tMIDIMsgData
+   CoreMIDISendMIDIbytesNow(tMIDIMsgData)
+end handler
+
+/**
+The send pitchbend with fine range from 0 to 16384, 8192 is centered (no bend)
+
+Type: command
+
+Syntax: CoreMIDIPitchbendFine <pPitchBendCoarseNFine>,<pMIDIChanNum>
+
+Example:
+CoreMIDIPitchbendFine 0,1 -- Pitchbend Maximum Down, channel 1
+CoreMIDIPitchbendFine 16384,1 -- Pitchbend Maximum Up, channel 1
+CoreMIDIPitchbendFine 8192,1 -- Centered / No Bend, channel 1
+
+Parameters:
+pPitchBendCoarseNFine\: The number of the pitch bend 'position'
+pMIDIChanNum: MIDI Channel to send the bend value on, 1 to 16
+
+Description:
+The send pitchbend with fine range from 0 to 16384, 8192 is centered (no bend)
+*/
+public handler CoreMIDIPitchbendFine(in pPitchBendCoarseNFine as Number,in pMIDIChanNum as UInt8) returns nothing
+   expect that (pPitchBendCoarseNFine >= 0 and pPitchBendCoarseNFine <= 16384 ) because "MIDI controller selection must be in the range of 0 to 127"
+   expect that (pMIDIChanNum >= 1 and pMIDIChanNum <= 16 ) because "MIDI channel values must be in the range of 1 to 16"
+   variable tMIDIMsgData as Data
+   variable tNum as Number
+   variable pPitchBendCoarse as UInt8
+   variable pPitchBendFine as UInt8
+   add 224 to pMIDIChanNum -- 0xEx Pitchbend + channel
+   put pPitchBendCoarseNFine into tNum
+   divide tNum by 128
+   round tNum
+   put tNum into pPitchBendCoarse
+   put pPitchBendCoarseNFine into tNum
+   put tNum mod 128 into tNum
+   round tNum
+   put tNum into pPitchBendFine
+   put the byte with code pMIDIChanNum into tMIDIMsgData
+   put the byte with code pPitchBendFine after tMIDIMsgData
+   put the byte with code pPitchBendCoarse after tMIDIMsgData
+   CoreMIDISendMIDIbytesNow(tMIDIMsgData)
+end handler
+
+/**
+The send pitchbend with coarse range from 0 to 127, 64 is centered (no bend)
+
+Type: command
+
+Syntax: CoreMIDIPitchbend <pPitchBendCoarse>,<pMIDIChannelNum>
+
+Example:
+CoreMIDIPitchbendFine 0,1 -- Pitchbend Maximum Down, channel 1
+CoreMIDIPitchbendFine 127,1 -- Pitchbend Maximum Up, channel 1
+CoreMIDIPitchbendFine 64,1 -- Centered No Bend, channel 1
+
+Parameters:
+pPitchBendCoarse: The number of the pitch bend 'position'
+pMIDIChanNum: MIDI Channel to send the bend value on, 1 to 16
+
+Description:
+The send a controller with a single data byte value to on a given channel
+*/
+public handler CoreMIDIPitchbend(in pPitchBendCoarse as UInt8,in pMIDIChanNum as UInt8) returns nothing
+   expect that (pPitchBendCoarse >= 0 and pPitchBendCoarse <= 127 ) because "MIDI controller selection must be in the range of 0 to 127"
+   expect that (pMIDIChanNum >= 1 and pMIDIChanNum <= 16 ) because "MIDI channel values must be in the range of 1 to 16"
+
+   variable tMIDIMsgData as Data
+   add 224 to pMIDIChanNum
+   put the byte with code pMIDIChanNum into tMIDIMsgData
+   put the byte with code 0 after tMIDIMsgData -- no "fine" steps, just 128 "coarse" steps
+   put the byte with code pPitchBendCoarse after tMIDIMsgData
+   CoreMIDISendMIDIbytesNow(tMIDIMsgData)
+end handler
+
+/**
+The send Aftertouch (key pressure) for specified note on the given channel
+
+Type: command
+
+Example:
+CoreMIDIAftertouch 60,127,1 -- Middle C=60, 127=Maximum Pressure, channel 1
+
+Parameters:
+pNoteNum (Integer): The number of the pitch/key to apply pressure value to
+pKeyPressure (Integer): The pitch/key pressure value, range 0 to 127
+pMIDIChanNum (Integer): MIDI Channel to send the value on, 1 to 16
+
+Description:
+The send Aftertouch (key pressure) for specified note on the given channel. MIDI Controllers can have pressure sensors under each key that can transmit this value for each note.
+*/
+public handler CoreMIDIAftertouch(in pNoteNum as UInt8,in pKeyPressure as UInt8,in pMIDIChanNum as UInt8) returns nothing
+   expect that (pNoteNum >= 0 and pNoteNum <= 127 ) because "MIDI controller selection must be in the range of 0 to 127"
+   expect that (pKeyPressure >= 0 and pKeyPressure <= 127 ) because "MIDI controller values must be in the range of 0 to 127"
+   expect that (pMIDIChanNum >= 1 and pMIDIChanNum <= 16 ) because "MIDI channel values must be in the range of 1 to 16"
+
+   variable tMIDIMsgData as Data
+   add 160 to pMIDIChanNum
+   put the byte with code pMIDIChanNum into tMIDIMsgData
+   put the byte with code pNoteNum after tMIDIMsgData
+   put the byte with code pKeyPressure after tMIDIMsgData
+   CoreMIDISendMIDIbytesNow(tMIDIMsgData)
+end handler
+
+/**
+The send Channel Pressure on the given channel
+
+Type: command
+
+Example:
+CoreMIDIChannelPressure 127,1 -- 127=Maximum Pressure, channel 1
+
+Parameters:
+pChannelPressure (Integer): The channel pressure value, range 0 to 127
+pMIDIChanNum (Integer): MIDI Channel to send the value on, 1 to 16
+
+Description:
+Send Channel Pressure on the given channel. MIDI Controllers can have a single pressure sensor strip for the full range of keys.
+*/
+public handler CoreMIDIChannelPressure(in pChannelPressure as UInt8,in pMIDIChanNum as UInt8) returns nothing
+   expect that (pChannelPressure >= 0 and pChannelPressure <= 127 ) because "MIDI controller selection must be in the range of 0 to 127"
+   expect that (pMIDIChanNum >= 1 and pMIDIChanNum <= 16 ) because "MIDI channel values must be in the range of 1 to 16"
+   variable tMIDIMsgData as Data
+   add 208 to pMIDIChanNum
+   put the byte with code pMIDIChanNum into tMIDIMsgData
+   put the byte with code pChannelPressure after tMIDIMsgData
+   CoreMIDISendMIDIbytesNow(tMIDIMsgData)
+end handler
+
+/**
+Sends Program Change message on the given channel
+
+Type: command
+
+Example:
+CoreMIDIProgramChange 10,1 -- 10=, channel 1
+
+Parameters:
+pPatch (Integer): The patch number to change to, range 1 to 128
+pMIDIChanNum (Integer): MIDI Channel to send the value on, 1 to 16
+
+Description:
+Sends Program Change message on the given channel.
+*/
+public handler CoreMIDIProgramChange(in pPatch as UInt8,in pMIDIChanNum as UInt8) returns nothing
+   expect that (pPatch >= 1 and pPatch <= 128 ) because "MIDI controller selection must be in the range of 0 to 127"
+   expect that (pMIDIChanNum >= 1 and pMIDIChanNum <= 16 ) because "MIDI channel values must be in the range of 1 to 16"
+   variable tMIDIMsgData as Data
+   add 191 to pMIDIChanNum -- 192 is MIDI PatchChange
+   subtract 1 from pPatch -- change range from 1-128 to 0-127
+
+   put the byte with code pMIDIChanNum into tMIDIMsgData
+   put the byte with code pPatch after tMIDIMsgData
+   CoreMIDISendMIDIbytesNow(tMIDIMsgData)
+end handler
+
+/**
+Sends System Realtime Start message
+
+Type: command
+
+Example:
+CoreMIDIStart
+
+Description:
+Sends Start message for receivers such as Drum Machines that respond to System Realtime messages
+*/
+public handler CoreMIDIStart() returns nothing
+   variable tMIDIMsgData as Data
+   put the byte with code 249 into tMIDIMsgData
+   CoreMIDISendMIDIbytesNow(tMIDIMsgData)
+end handler
+
+/**
+Sends System Realtime Continue message
+
+Type: command
+
+Example:
+CoreMIDIContinue
+
+Description:
+Sends Continue message for receivers such as Drum Machines that respond to System Realtime messages
+*/
+public handler CoreMIDIContinue() returns nothing
+   variable tMIDIMsgData as Data
+   put the byte with code 251 into tMIDIMsgData -- 0xFB
+   CoreMIDISendMIDIbytesNow(tMIDIMsgData)
+end handler
+
+/**
+Sends System Realtime Stop message
+
+Type: command
+
+Example:
+CoreMIDIStop
+
+Description:
+Sends Stop message for receivers such as Drum Machines that respond to System Realtime messages
+*/
+public handler CoreMIDIStop() returns nothing
+   variable tMIDIMsgData as Data
+   put the byte with code 252 into tMIDIMsgData
+   CoreMIDISendMIDIbytesNow(tMIDIMsgData)
+end handler
+
+/**
+Sends System Realtime Reset message
+
+Type: command
+
+Example:
+CoreMIDISystemReset
+
+Description:
+Sends System Reset message for receivers such that respond to such messages.
+
+The receiver should be reset to the following states if available:
+- Omni on, Polyphonic
+- Local control on
+- All notes turned off
+- All controllers returned to their 'normal' settings
+- Any song playing stopped
+- Song Position Pointer = 0
+- Running Status is cleared
+- Reset to power-up conditions
+*/
+public handler CoreMIDISystemReset() returns nothing
+   variable tMIDIMsgData as Data
+   put the byte with code 255 into tMIDIMsgData
+   CoreMIDISendMIDIbytesNow(tMIDIMsgData)
+end handler
+
+-- 0xC0	Patch change	2	instrument #
+-- 0xF0	(non-musical commands) -- here is a basic table of them:
+-- 0xF0	start of system exclusive message	variable
+-- 0xF1	MIDI Time Code Quarter Frame (Sys Common)
+-- 0xF2	Song Position Pointer (Sys Common)
+-- 0xF3	Song Select (Sys Common)
+-- 0xF4	???
+-- 0xF5	???
+-- 0xF6	Tune Request (Sys Common)
+-- 0xF7	end of system exclusive message	0
+
+-- 0xFB	 (Sys Realtime)
+
+-- 0xFE	Active Sensing (Sys Realtime) -- Rarely Used, was used by Yamaha DX-7
+
+/**
+Sends arbitrary bytes to the MIDI Client's Queue in millisecond Offsets from now.
+
+Example:
+CoreMIDISendMIDIbytesInTime(0,pMIDIMsgData) -- sends pMIDIMsgData immediately
+CoreMIDISendMIDIbytesInTime(1000,pMIDIMsgData) -- sends pMIDIMsgData in 1 second
+
+Parameters:
+pTimeOffsetMillisecs (Integer): the millesecond offset from now to hold in queue
+pMIDIMsgData (Data): arbitrary bytes, does not check for the bytes for validity as MIDI messages
+
+Description:
+Sends arbitrary bytes to the MIDI Client's Queue in millisecond Offsets from now.
+A MIDI Client must be created first using CoreMIDIClientCreate.
+*/
+public handler CoreMIDISendMIDIbytesInTime(in pTimeOffsetMillisecs as optional Number, in pMIDIMsgData as Data) returns nothing
+   variable tOSStatus as optional CSInt
+   variable tAbsoluteTime as UInt64
+   variable tTBnumerator as UInt32
+   variable tTBdenominator as UInt32
+   variable tTimeStamp as MIDITimeStamp
+   variable tTimeBaseInfoRef as ObjCId
+   variable tTimeBaseInfoPtr as Pointer
+   variable tTimebaseInfo as TimeBaseInfo
+   variable tMIDIPacket as MIDIPacket
+   variable tMIDIPacketList as MIDIPacketList
+   variable tBufferSize  as Number
+   variable tCnt as Number
+   variable tMIDIMsgBytesNSDataRef as ObjCId
+   variable tMIDIMsgBytesPtr as Pointer
+   put the number of bytes in pMIDIMsgData into tCnt
+   put 256 into tBufferSize
+   put [0,0] into tTimeBaseInfo
+   unsafe
+      -- put objC_NSMutableDataWithLength(NumberToNSNumber(8)) into tTimeBaseInfoRef
+      -- put objC_NSMutableDataBytesPtr(tTimeBaseInfoRef) into tTimeBaseInfoPtr
+      put c_mach_absolute_time() into tAbsoluteTime
+      c_mach_timebase_info(tTimeBaseInfo) -- into tTimeBaseInfo
+      put element 1 of tTimeBaseInfo into tTBnumerator
+      put element 2 of tTimeBaseInfo into tTBdenominator
+      put tAbsoluteTime * tTBnumerator / tTBdenominator into tTimeStamp
+      -- log tTimeStamp
+      put tTimeStamp + (pTimeOffsetMillisecs * 1000000) into tTimeStamp
+
+      put objC_NSMutableDataWithLength(NumberToNSNumber(tBufferSize)) into sMIDIPacketByteBufferNSMutableDataRef
+      put objC_NSMutableDataBytesPtr(sMIDIPacketByteBufferNSMutableDataRef) into sMIDIPacketByteBufferPtr
+
+      put c_MIDIPacketListInit(sMIDIPacketByteBufferPtr) into sMIDIPacketPtr
+
+      put objC_NSMutableDataWithLength(NumberToNSNumber(tCnt)) into tMIDIMsgBytesNSDataRef
+      objC_NSMutableDataSetData(tMIDIMsgBytesNSDataRef, DataToNSData(pMIDIMsgData))
+      put objC_NSMutableDataBytesPtr(tMIDIMsgBytesNSDataRef) into tMIDIMsgBytesPtr
+
+      put c_MIDIPacketListAdd(sMIDIPacketByteBufferPtr,tBufferSize,sMIDIPacketPtr,tTimeStamp,tCnt,tMIDIMsgBytesPtr) into sMIDIPacketPtr
+      put c_MIDIReceived(sMIDISourceEndpointRef,sMIDIPacketByteBufferPtr) into tOSStatus
+   end unsafe
+end handler
+
+/**
+Creates a Virtual MIDI Source with the given name.
+
+Example:
+CoreMIDISourceCreate("MIDI Output from my LiveCode Stack")
+
+Parameters:
+sourceName (String): The name to use for the MIDI source
+uniqueIDnum (Integer): A number to use as the unique ID number for your source, if an
+empty value is passed an ID number will be generated by the system.
+
+Description:
+Creates a Virtual MIDI Source with the given name.
+The name will appear as a source of MIDI data in other applications (such as GarageBand or LogicPro)
+*/
+public handler CoreMIDISourceCreate(in sourceName as String,in uniqueIDnum as optional SInt32) returns Number -- Data
+   variable tSourceNameStrRef as ObjcObject
+   variable tOSStatus as optional CSInt
+   variable tCFError as optional ObjCId
+   variable tPropertyValSInt32 as optional SInt32
+		unsafe
+			put StringToNSString(sourceName) into tSourceNameStrRef
+         put c_MIDISourceCreate(sMIDIClientRef,tSourceNameStrRef,sMIDISourceEndpointRef) into tOSStatus
+         if uniqueIDnum is not nothing then
+               put c_MIDIObjectSetIntegerProperty(sMIDISourceEndpointRef,StringToNSString("uniqueID"),uniqueIDnum) into tOSStatus
+         end if
+         put c_MIDIObjectGetIntegerProperty(sMIDISourceEndpointRef,StringToNSString("uniqueID"),tPropertyValSInt32) into tOSStatus
+         if tPropertyValSInt32 is not nothing then
+            return tPropertyValSInt32
+         else
+            return tOSStatus
+         end if
+   end unsafe
+end handler
+
+private variable sCoreMIDIReadCallbackProcPtr as optional ObjcBlockPointer
+-- public foreign type MIDIPacket binds to "MCAggregateTypeInfo:kihhh" --kihhhhhhhh... k=UInt64  i=UInt16 h=3 x UInt8 -- MIDIPacket (timeStamp: MIDITimeStamp, length: UInt16, data: Data: ARRAY OF Bytes(256) x UInt8 )  -- UInt64,UInt16,Data(256))
+-- public foreign type MIDIMsg binds to "MCAggregateTypeInfo:hhh" -- h=3 x UInt8
+-- public foreign type MIDIPacketList binds to "MCAggregateTypeInfo:jr" -- Declaration (numPackets: UInt32, *packet(MIDIPacket)) -- j = UInt32
+-- public foreign type TimeBaseInfo binds to "MCAggregateTypeInfo:jj"
+-- public type MIDITimeStamp is UInt64
+-- public type MIDIObjRef is UInt32
+public foreign type MIDIPacketListData binds to "MCAggregateTypeInfo:ihhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh" -- Declaration (numPackets: UInt32, *packet(MIDIPacket)) -- j = UInt32
+
+foreign handler PointerToMIDIPacketList(out rAggregate as MIDIPacketListData, in pPointer as Pointer, in pSize as UIntSize) returns nothing binds to "c:memcpy"
+-- foreign handler PointerToMIDIPacket(out rAggregate as MIDIPacket, in pPointer as Pointer, in pSize as UIntSize) returns nothing binds to "c:memcpy"
+
+-- typedef void (*MIDIReadProc)(const MIDIPacketList *pktlist, void *readProcRefCon, void *srcConnRefCon);
+-- typedef void (^MIDIReadBlock)(const MIDIPacketList *pktlist, void *srcConnRefCon);
+-- public handler CoreMIDIReadCallbackProcedure( in pContext as optional ObjcBlockPointer, in pMIDIPacketListPtr as MIDIPacketList, in readProcRefCont as optional Pointer, in srcConnRefCont as optional Pointer)
+public handler CoreMIDIReadCallbackProcedure( in pContext as ObjcBlockPointer, in pMIDIPacketListPtr as Pointer, in pSourceRefCon as optional Pointer)
+   variable tMIDIPacketListData as MIDIPacketListData
+   unsafe
+      -- PointerToMIDIPacketList(tMIDIPacketList, pMIDIPacketListPtr, 270)
+      PointerToMIDIPacketList(tMIDIPacketListData, pMIDIPacketListPtr, 270)
+      log tMIDIPacketListData
+   end unsafe
+end handler
+
+public handler CoreMIDIDestinationCreate(in destinationName as String,in uniqueIDnum as optional SInt32) returns Number -- Data
+   variable tDestNameStrRef as ObjcObject
+   variable tOSStatus as optional CSInt
+   variable tCFError as optional ObjCId
+   variable tPropertyValSInt32 as optional SInt32
+		unsafe
+      if not CreateObjcBlockPointerFromHandler(CoreMIDIReadCallbackProcedure, sCoreMIDIReadCallbackProcPtr) then
+         put nothing into sCoreMIDIReadCallbackProcPtr
+      end if
+			put StringToNSString(destinationName) into tDestNameStrRef
+         put c_MIDIDestinationCreateWithBlock(sMIDIClientRef,tDestNameStrRef,sMIDIDestEndpointRef,sCoreMIDIReadCallbackProcPtr) into tOSStatus
+         -- put c_MIDIDestinationCreate(sMIDIClientRef,pMIDIDestinationNameCFStrRef,pMIDIReadProc,pRefConst,sMIDIDestEndpointRef) into tOSStatus
+         -- put c_MIDIDestinationCreate(sMIDIClientRef,tDestNameStrRef,sCoreMIDIReadCallbackProcPtr,nothing,sMIDIDestEndpointRef) into tOSStatus
+         if uniqueIDnum is not nothing then
+            put c_MIDIObjectSetIntegerProperty(sMIDIDestEndpointRef,StringToNSString("uniqueID"),uniqueIDnum) into tOSStatus
+         end if
+         put c_MIDIObjectGetIntegerProperty(sMIDIDestEndpointRef,StringToNSString("uniqueID"),tPropertyValSInt32) into tOSStatus
+         if tPropertyValSInt32 is not nothing then
+            return tPropertyValSInt32
+         else
+            return tOSStatus
+         end if
+   end unsafe
+end handler
+-- private foreign handler c_MIDIDestinationCreate(in pMIDIClientRef as MIDIObjRef, in pMIDIDestinationNameStrRef as ObjcId, in pMIDIReadProc as optional any, in pRefConst as optional any, \
+--                                                   out rMIDIDestEndpointRef as MIDIObjRef) returns CSInt binds to "c:CoreMIDI.framework>MIDIDestinationCreate"
+
+
+public handler CoreMIDIInputPortCreate(in portName as String,in uniqueIDnum as optional SInt32) returns Number -- Data
+   variable tPortNameStrRef as ObjcObject
+   variable tOSStatus as optional CSInt
+   variable tCFError as optional ObjCId
+   variable tPropertyValSInt32 as optional SInt32
+   -- if not CreateObjcBlockPointerFromHandler(CoreMIDISetupChangedCallbackProc, sCoreMIDISetupChangedHandler) then
+   --   put nothing into sCoreMIDISetupChangedHandler
+   -- end if
+		unsafe
+			put StringToNSString(portName) into tPortNameStrRef
+         --  c_MIDIInputPortCreate(pMIDIClientRef as MIDIObjRef, in pInputPortNameCFStrngRef as ObjCId, out rMIDIInputPortRef as MIDIObjRef) returns CSInt binds to "c:CoreMIDI.framework>MIDIInputPortCreate"
+         put c_MIDIInputPortCreate(sMIDIClientRef,tPortNameStrRef,sMIDIInputPortRef) into tOSStatus
+         if uniqueIDnum is not nothing then
+               put c_MIDIObjectSetIntegerProperty(sMIDIInputPortRef,StringToNSString("uniqueID"),uniqueIDnum) into tOSStatus
+         end if
+         put c_MIDIObjectGetIntegerProperty(sMIDIInputPortRef,StringToNSString("uniqueID"),tPropertyValSInt32) into tOSStatus
+         if tPropertyValSInt32 is not nothing then
+            return tPropertyValSInt32
+         else
+            return tOSStatus
+         end if
+      end unsafe
+end handler
+
+public handler CoreMIDIEndPointDispose(in uniqueIDnum as optional SInt32) returns optional any -- Data
+   -- private foreign handler c_MIDIEndpointDispose(in pMIDIEndpointRef as ObjcId) returns CSInt binds to "c:CoreMIDI.framework>MIDIEndpointDispose"
+   variable tOSStatus as optional CSInt
+   variable rMIDIObjectRef as optional MIDIObjRef
+   variable rMIDIObjectType as optional Number
+   variable rReturnString as String
+   variable tCFError as optional ObjCId
+   variable tPropertyValSInt32 as optional SInt32
+   unsafe
+   -- OSStatus = MIDIObjectFindByUniqueID(MIDIUniqueID inUniqueID, MIDIObjectRef *outObject, MIDIObjectType *outObjectType);
+   -- inUniqueID of object to search for (This should be the result of an earlier call to MIDIObjectGetIntegerProperty "UniqueID")
+   -- outObject returned object, or NULL if the object was not found or an error occurred. This should be cast to the appropriate type (MIDIDeviceRef, MIDIEntityRef, MIDIEndpointRef), according to *outObjectType.
+   -- outObjectType on exit, the type of object which was found; undefined if none found.
+   -- Return Value is sn OSStatus error code, including kMIDIObjectNotFound if there is no object with the specified uniqueID.
+   if uniqueIDnum is not nothing then
+      put c_MIDIObjectFindByUniqueID( uniqueIDnum, rMIDIObjectRef, rMIDIObjectType) into tOSStatus
+      put c_MIDIEndpointDispose(rMIDIObjectRef) into tOSStatus
+   else
+      put c_MIDIEndpointDispose(sMIDISourceEndpointRef) into tOSStatus
+   end if
+   return tOSStatus
+   end unsafe
+end handler
+
+/**
+Given the unique ID number of an object in the current MIDI setup returns the object's type.
+
+Example:
+CoreMIDIObjectTypeFromID( uniqueIDnum )
+
+Parameters:
+uniqueIDnum (Integer): Unique ID number of an object in the current MIDI setup
+
+Description:
+Given the unique ID number of an object in the current MIDI setup returns the object's type.
+(Source, Destination, Extenal Device, etc.)
+*/
+public handler CoreMIDIObjectTypeFromID(in uniqueIDnum as optional SInt32) returns String
+   variable tOSStatus as optional CSInt
+   variable rMIDIObjectRef as optional MIDIObjRef
+   variable rMIDIObjectType as optional Number
+   variable rReturnString as String
+   unsafe
+   -- OSStatus = MIDIObjectFindByUniqueID(MIDIUniqueID inUniqueID, MIDIObjectRef *outObject, MIDIObjectType *outObjectType);
+   -- inUniqueID of object to search for (This should be the result of an earlier call to MIDIObjectGetIntegerProperty "UniqueID")
+   -- outObject returned object, or NULL if the object was not found or an error occurred. This should be cast to the appropriate type (MIDIDeviceRef, MIDIEntityRef, MIDIEndpointRef), according to *outObjectType.
+   -- outObjectType on exit, the type of object which was found; undefined if none found.
+   -- Return Value is sn OSStatus error code, including kMIDIObjectNotFound if there is no object with the specified uniqueID.
+      put c_MIDIObjectFindByUniqueID( uniqueIDnum, rMIDIObjectRef, rMIDIObjectType) into tOSStatus -- rMIDIObjectType is an SInt32
+       if rMIDIObjectType is nothing then
+         put "MIDI Object not found" into rReturnString
+       end if
+       if rMIDIObjectType > 3 then
+         put "External Object, Mask=" & rMIDIObjectType formatted as string into rReturnString -- all external object constants are defined as 0x10
+       end if
+       if rMIDIObjectType = kMIDIObjectType_Destination then
+          put "Destination Object" into rReturnString ---  kMIDIObjectType_Destination = 3
+       end if
+       if rMIDIObjectType = kMIDIObjectType_Source then
+          put "Source Object" into rReturnString ---  kMIDIObjectType_Source = 2
+       end if
+       if rMIDIObjectType = kMIDIObjectType_Entity then
+          put "Entity Object" into rReturnString ---  kMIDIObjectType_Entity = 1
+       end if
+       if rMIDIObjectType = kMIDIObjectType_Device then
+          put "Device Object" into rReturnString ---  kMIDIObjectType_Device =
+       end if
+       if rMIDIObjectType = kMIDIObjectType_Other then
+          put "Other Type Object" into rReturnString --- kMIDIObjectType_Other = -1
+       end if
+   end unsafe
+   return rReturnString
+end handler
+
+/**
+Returns a count of MIDI Destinations in the MIDI Setup that are currently available.
+
+Example:
+put CoreMIDIGetNumberOfDestinations() into tDestinationsCount
+
+Description:
+Returns a count of MIDI Destinations in the MIDI Setup that are currently available.
+Destinations in the setup that are powered off or not connected will not be included in the count.
+*/
+public handler CoreMIDIGetNumberOfDestinations() returns Number
+   variable rSourceCnt as Number
+	unsafe
+			put c_MIDIGetNumberOfDestinations() into rSourceCnt
+   end unsafe
+   return rSourceCnt
+end handler
+
+/**
+Given an index number of a MIDI Destination returns Text of it's XML/Plist Data
+
+Example:
+put CoreMIDIGetDestinationInfo(1) into fld "Destination Plist Info" -- info for the 1st detination found
+
+Parameters:
+pIndex (Integer): Index number of a destination in the currently available to CoreMIDI.
+
+Description:
+Given an index number of a MIDI Destination returns Text of it's XML/Plist Data
+*/
+public handler CoreMIDIGetDestinationInfo(in pIndex as UInt32) returns Data
+   variable tDestinationRef as MIDIObjRef
+   variable tOSStatus as optional CSInt
+   variable tCFError as optional ObjCId
+   variable tCFPropertyListRef as ObjCId
+   variable tCFPropertyListDataRef as ObjCId
+   variable tCFPropertyListData as Data
+	unsafe
+			put c_MIDIGetDestination(pIndex -1) into tDestinationRef
+         put c_MIDIObjectGetProperties(tDestinationRef,tCFPropertyListRef,true) into tOSStatus
+         put c_CFPropertyListCreateData(nothing, tCFPropertyListRef, 100, 0, tCFError) into tCFPropertyListDataRef
+         put DataFromNSData(tCFPropertyListDataRef) into tCFPropertyListData
+   end unsafe
+   return tCFPropertyListData
+end handler
+
+/**
+Given an index number of a MIDI Destination returns Display Name and Unique ID Number.
+
+Example:
+put CoreMIDIGetDestinationNameAndID(1) into line 1 of button "Destinations"
+
+Parameters:
+pIndex (Integer): Index number of a destination in the currently available to CoreMIDI.
+
+Description:
+Given an index number of a MIDI Destination returns Display Name and Unique ID Number seperated by a comma.
+*/
+public handler CoreMIDIGetDestinationNameAndID(in pIndex as UInt32) returns String
+   variable tDestinationRef as MIDIObjRef
+   variable tOSStatus as optional CSInt
+   variable tCFError as optional ObjCId
+   variable tPropertyValCFStrRef as optional ObjCId
+   variable tPropertyValCFStr as optional String
+   variable tPropertyValSInt32 as optional SInt32
+   unsafe
+      put c_MIDIGetDestination(pIndex -1) into tDestinationRef
+         put c_MIDIObjectGetStringProperty(tDestinationRef,StringToNSString("displayName"),tPropertyValCFStrRef) into tOSStatus -- "displayName" gets Entity Name & the Endpoint's Name
+         -- put c_MIDIObjectGetStringProperty(tDestinationRef,StringToNSString("name"),tPropertyValCFStrRef) into tOSStatus -- "name" just gets the EndPoint's name
+         if tPropertyValCFStrRef is not nothing then
+            put StringFromNSString(tPropertyValCFStrRef) into tPropertyValCFStr
+         end if
+         put c_MIDIObjectGetIntegerProperty(tDestinationRef,StringToNSString("uniqueID"),tPropertyValSInt32) into tOSStatus
+      end unsafe
+   return tPropertyValCFStr &  "," & tPropertyValSInt32 formatted as string
+end handler
+
+/**
+Returns a count of MIDI Sources in the MIDI Setup that are currently available.
+
+Example:
+put CoreMIDIGetNumberOfSources() into tDestinationsCount
+
+Returns: Count of currently available MIDI Sources
+
+Description:
+Returns a count of MIDI Sources in the MIDI Setup that are currently available.
+Destinations in the setup that are powered off or not connected will not be included in the count.
+*/
+public handler CoreMIDIGetNumberOfSources() returns Number
+   variable rSourceCnt as Number
+	unsafe
+			put c_MIDIGetNumberOfSources() into rSourceCnt
+   end unsafe
+   return rSourceCnt
+end handler
+
+/**
+Given an index number of a MIDI Source returns Text of it's XML/Plist Data.
+
+Example:
+put CoreMIDIGetSourceInfo(1) into fld "Source Plist Info" -- info for the 1st detination found
+
+Parameters:
+pIndex (Integer): Index number of a source currently available to CoreMIDI.
+
+Description:
+Given an index number of a MIDI Source returns text of it's XML/Plist Data.
+*/
+public handler CoreMIDIGetSourceInfo(in pIndex as UInt32) returns Data
+   variable tSourceRef as optional MIDIObjRef
+   variable tOSStatus as optional CSInt
+   variable tCFError as optional ObjCId
+   variable tCFPropertyListRef as ObjCId
+   variable tCFPropertyListDataRef as ObjCId
+   variable tCFPropertyListData as Data
+	unsafe
+		put c_MIDIGetSource(pIndex-1) into tSourceRef
+      put c_MIDIObjectGetProperties(tSourceRef,tCFPropertyListRef,true) into tOSStatus
+      put c_CFPropertyListCreateData(nothing, tCFPropertyListRef, 100, 0, tCFError) into tCFPropertyListDataRef
+      put DataFromNSData(tCFPropertyListDataRef) into tCFPropertyListData
+   end unsafe
+   return tCFPropertyListData
+end handler
+
+/**
+Given an index number of a MIDI Source returns Display Name and Unique ID Number.
+
+Example:
+put CoreMIDIGetSourceNameAndID(1) into line 1 of button "Sources"
+
+Parameters:
+pIndex (Integer): Index number of a source currently available to CoreMIDI.
+
+Description:
+Given an index number of a MIDI Source returns Display Name and Unique ID Number seperated by a comma.
+*/
+public handler CoreMIDIGetSourceNameAndID(in pIndex as UInt32) returns String
+   variable tSourceRef as optional MIDIObjRef
+   variable tOSStatus as optional CSInt
+   variable tCFError as optional ObjCId
+   variable tPropertyValCFStrRef as optional ObjCId
+   variable tPropertyValCFStr as optional String
+   variable tPropertyValSInt32 as optional Number
+   unsafe
+         put c_MIDIGetSource(pIndex-1) into tSourceRef
+         put c_MIDIObjectGetStringProperty(tSourceRef,StringToNSString("displayName"),tPropertyValCFStrRef) into tOSStatus
+         -- put c_MIDIObjectGetStringProperty(tSourceRef,StringToNSString("name"),tPropertyValCFStrRef) into tOSStatus
+         if tPropertyValCFStrRef is not nothing then
+            put StringFromNSString(tPropertyValCFStrRef) into tPropertyValCFStr
+            -- log tPropertyValCFStr
+         end if
+         put c_MIDIObjectGetIntegerProperty(tSourceRef,StringToNSString("uniqueID"),tPropertyValSInt32) into tOSStatus
+         -- if tPropertyValSInt32 is not nothing then
+            -- log tPropertyValSInt32
+         -- end if
+   end unsafe
+   return tPropertyValCFStr &  "," & tPropertyValSInt32 formatted as string
+end handler
+
+/**
+Selects the MIDI Source of the corrisponding unique ID as the data output source.
+
+Example:
+ CoreMIDISelectSourceByID(uniqueIDnum)
+
+Description:
+Given an index number of a MIDI Source returns Display Name and Unique ID Number seperated by a comma.
+*/
+public handler CoreMIDISelectSourceByID(in uniqueIDnum as optional SInt32) returns String
+   variable tOSStatus as optional CSInt
+   variable rMIDIObjectRef as optional MIDIObjRef
+   variable rMIDIObjectType as optional Number
+   variable rReturnString as String
+   unsafe
+      put c_MIDIObjectFindByUniqueID( uniqueIDnum, rMIDIObjectRef, rMIDIObjectType) into tOSStatus -- rMIDIObjectType is an SInt32
+      -- if rMIDIObjectRef is not nothing then
+      --    put rMIDIObjectRef into sMIDISourceEndpointRef
+      -- end if
+         if rMIDIObjectType is kMIDIObjectType_Source then
+             put rMIDIObjectRef into sMIDISourceEndpointRef
+         else
+            put "No Source Object Found" into rReturnString
+       end if
+   end unsafe
+   return rReturnString
+end handler
+
+public handler CoreMIDISelectSourceByIndexAlt(in pIndex as UInt32) returns String
+   variable tSourceRef as optional MIDIObjRef
+   variable tOSStatus as optional CSInt
+   variable tPropertyValSInt32 as optional Number
+   unsafe
+      put c_MIDIGetSource(pIndex-1) into tSourceRef
+      if tSourceRef is not nothing then
+         put c_MIDIObjectGetIntegerProperty(tSourceRef,StringToNSString("uniqueID"),tPropertyValSInt32) into tOSStatus
+         if tOSStatus is 0 then
+            return tPropertyValSInt32 formatted as string
+            put tSourceRef into sMIDISourceEndpointRef
+         else
+            return "Error " & tOSStatus formatted as string
+         end if
+      end if
+   end unsafe
+end handler
+
+public handler CoreMIDISelectSourceByIndex(in pIndex as UInt32) returns String
+   variable tSourceRef as optional MIDIObjRef
+   variable tOSStatus as optional CSInt
+   variable tPropertyValSInt32 as optional Number
+   variable rMIDIObjectType as optional Number
+   unsafe
+      put c_MIDIGetSource(pIndex-1) into tSourceRef
+      put c_MIDIObjectGetIntegerProperty(tSourceRef,StringToNSString("uniqueID"),tPropertyValSInt32) into tOSStatus
+      if tOSStatus is 0 then
+        put c_MIDIObjectFindByUniqueID( tPropertyValSInt32, sMIDISourceEndpointRef, rMIDIObjectType) into tOSStatus -- rMIDIObjectType is an SInt32
+        return tPropertyValSInt32 formatted as string
+      else
+        return "Error " & tOSStatus formatted as string
+      end if
+   end unsafe
+end handler
+
+public handler CoreMIDIGetNumberOfDevices() returns Number
+   variable rSourceCnt as Number
+	unsafe
+			put c_MIDIGetNumberOfDevices() into rSourceCnt
+   end unsafe
+   return rSourceCnt
+end handler
+
+public handler CoreMIDIGetDeviceInfo(in pIndex as UInt32) returns Data
+   variable tDeviceRef as MIDIObjRef
+   variable tOSStatus as optional CSInt
+   variable tCFError as optional ObjCId
+   variable tPropertyValCFStrRef as optional ObjCId
+   variable tPropertyValCFStr as optional String
+   variable tPropertyValSInt32 as optional Number
+   variable tCFPropertyListRef as ObjCId
+   variable tCFPropertyListDataRef as ObjCId
+   variable tCFPropertyListData as Data
+	unsafe
+			put c_MIDIGetDevice(pIndex -1) into tDeviceRef
+         -- put c_MIDIObjectGetStringProperty(tDeviceRef,StringToNSString("displayName"),tPropertyValCFStrRef) into tOSStatus
+         put c_MIDIObjectGetStringProperty(tDeviceRef,StringToNSString("name"),tPropertyValCFStrRef) into tOSStatus
+         if tPropertyValCFStrRef is not nothing then
+            put StringFromNSString(tPropertyValCFStrRef) into tPropertyValCFStr
+            -- log tPropertyValCFStrRef
+            -- log tPropertyValCFStr
+         end if
+         put c_MIDIObjectGetIntegerProperty(tDeviceRef,StringToNSString("uniqueID"),tPropertyValSInt32) into tOSStatus
+         if tPropertyValSInt32 is not nothing then
+            -- put NumberFromNSNumber(tPropertyValCFStrRef) into tPropertyValCFStr
+            -- log tPropertyValCFStrRef
+            -- log tPropertyValSInt32
+         end if
+         put c_MIDIObjectGetProperties(tDeviceRef,tCFPropertyListRef,true) into tOSStatus
+         put c_CFPropertyListCreateData(nothing, tCFPropertyListRef, 100, 0, tCFError) into tCFPropertyListDataRef
+         put DataFromNSData(tCFPropertyListDataRef) into tCFPropertyListData
+   end unsafe
+   -- put tPropertyValSInt32 before tCFPropertyListData
+   -- put StringFromNSString(tPropertyValCFStr) before tCFPropertyListData
+   return tCFPropertyListData
+end handler
+
+public handler CoreMIDIGetNumberOfExternalDevices() returns Number
+   variable rSourceCnt as Number
+	unsafe
+			put c_MIDIGetNumberOfExternalDevices() into rSourceCnt
+   end unsafe
+   return rSourceCnt
+end handler
+
+public handler CoreMIDIGetExternalDeviceInfo(in pIndex as UInt32) returns Data
+   variable tDeviceRef as MIDIObjRef
+   variable tExternalDeviceRef as MIDIObjRef
+   variable tOSStatus as optional CSInt
+   variable tCFError as optional ObjCId
+   variable tCFPropertyListRef as ObjCId
+   variable tCFPropertyListDataRef as ObjCId
+   variable tCFPropertyListData as Data
+	unsafe
+			put c_MIDIGetDevice(pIndex -1) into tDeviceRef
+         put c_MIDIObjectGetProperties(tExternalDeviceRef,tCFPropertyListRef,true) into tOSStatus
+         put c_CFPropertyListCreateData(nothing, tCFPropertyListRef, 100, 0, tCFError) into tCFPropertyListDataRef
+         put DataFromNSData(tCFPropertyListDataRef) into tCFPropertyListData
+   end unsafe
+   return tCFPropertyListData
+end handler
+
+public handler CoreMIDIDeviceGetNumberOfEntities(in pDevIndex as UInt32) returns Number
+   variable tDeviceRef as MIDIObjRef
+   variable tDeviceEntityCount as CInt
+   variable tOSStatus as optional CSInt
+   variable rDeviceEntityCnt as UInt32
+   unsafe
+      put c_MIDIGetDevice(pDevIndex -1) into tDeviceRef
+      put c_MIDIDeviceGetNumberOfEntities(tDeviceRef) into rDeviceEntityCnt
+   end unsafe
+   return rDeviceEntityCnt
+end handler
+
+public handler CoreMIDIGetDeviceEntityInfo(in pDevIndex as UInt32, in pEntityIndex as UInt32) returns Data -- Number
+   variable tDeviceRef as MIDIObjRef
+   variable tDeviceEntityRef as MIDIObjRef
+
+   variable tOSStatus as optional CSInt
+   variable tCFError as optional ObjCId
+   variable tCFPropertyListRef as ObjCId
+   variable tCFPropertyListDataRef as ObjCId
+   variable tCFPropertyListData as Data
+   variable rData as Data
+	unsafe
+			put c_MIDIGetDevice(pDevIndex -1) into tDeviceRef
+         put c_MIDIDeviceGetEntity(tDeviceRef, pEntityIndex -1) into tDeviceEntityRef
+         put c_MIDIObjectGetProperties(tDeviceEntityRef,tCFPropertyListRef,true) into tOSStatus
+         put c_CFPropertyListCreateData(nothing, tCFPropertyListRef, 100, 0, tCFError) into tCFPropertyListDataRef
+         put DataFromNSData(tCFPropertyListDataRef) into tCFPropertyListData
+   end unsafe
+   return tCFPropertyListData
+end handler
+
+public handler CoreMIDIRestart()
+   unsafe
+      c_MIDIRestart()
+   end unsafe
+end handler
+
+public handler CoreMIDIFlushOutput()
+   unsafe
+      c_MIDIFlushOutput(sMIDISourceEndpointRef)
+   end unsafe
+end handler
+
+public handler CoreMIDIInit(in pClientName as String) returns Data
+   variable tOSStatus as optional CSInt
+   variable tCFError as optional ObjCId
+   variable tCFPropertyListRef as ObjCId
+   variable tCFPropertyListDataRef as ObjCId
+   variable tCFPropertyListData as Data
+
+   unsafe
+      CoreMIDIClientCreate(pClientName)
+      put c_MIDIObjectGetProperties(sMIDIClientRef,tCFPropertyListRef,true) into tOSStatus
+      -- put c_CFPropertyListCreateXMLData(nothing, tCFPropertyListRef) into tCFPropertyListDataRef <--- *** per Apple CFPropertyListCreateXMLData is DEPRECATED - don't use.
+      put c_CFPropertyListCreateData(nothing, tCFPropertyListRef, 100, 0, tCFError) into tCFPropertyListDataRef
+      put DataFromNSData(tCFPropertyListDataRef) into tCFPropertyListData
+   end unsafe
+   return tCFPropertyListData
+end handler
+
+public handler CoreMIDIDestroy() returns nothing
+   variable tOSStatus as optional CSInt
+   unsafe
+      put c_MIDIClientDispose(sMIDIClientRef) into tOSStatus
+   end unsafe
+end handler
+
+end library
