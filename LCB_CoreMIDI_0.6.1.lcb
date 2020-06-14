@@ -122,6 +122,10 @@ private foreign handler c_MIDIObjectGetProperties(in pMIDIObjectRef as MIDIObjRe
 --CFDataRef CFPropertyListCreateData(CFAllocatorRef allocator, CFPropertyListRef propertyList, CFPropertyListFormat format, CFOptionFlags options, CFErrorRef *error); -- CFOptionFlags parameter is currently unused and should be set to 0.
 private foreign handler c_CFPropertyListCreateData(in pCFAllocatorRef as optional ObjCId, in pCFPropertyListRef as ObjCId, in pFormat as CInt, in pOptionFlags as CUInt, out rCFErrorRef as optional any) returns ObjCId binds to "c:CFPropertyListCreateData"
 -- pFormat kCFPropertyListXMLFormat_v1_0 = 100 or kCFPropertyListBinaryFormat_v1_0 = 200 or kCFPropertyListOpenStepFormat = 1 (discouraged)
+----------------------------------------------------------------- AudioToolbox MusicPlayer MusicSequence stuff ------------------------------------------------------------
+private foreign handler c_ATNewMusicSequence(out rMusicSequence as ObjCId ) returns CSInt binds to "c:AudioToolbox.framework>NewMusicSequence"
+private foreign handler c_ATMusicSequenceNewTrack(in pMusicSequence as ObjCId, out rMusicSequenceTrack as ObjCId ) returns CSInt binds to "c:AudioToolbox.framework>MusicSequenceNewTrack"
+private foreign handler c_ATMusicSequenceNewTrack(in pMusicSequenceTrack as ObjCId, in pMusicTrackBeat as ObjCId, in pMIDIMsg as ObjCId) returns CSInt binds to "c:AudioToolbox.framework>MusicTrackNewMIDINoteEvent"
 ----------------------------------------------------------------- Data Buffer ------------------------------------------------------------
 private foreign handler objC_NSMutableDataWithLength(in pDataLength as ObjcId) returns ObjcId binds to "objc:NSMutableData.+dataWithLength:" -- Creates and returns an mutable data object containing a given number of zeroed bytes. Toll free bridges to CFMutableDataRef for Foundation C APIs
 private foreign handler objC_NSMutableDataWithCapacity(in pDataLength as ObjcId) returns ObjcId binds to "objc:NSMutableData.+dataWithCapacity:"
@@ -994,8 +998,8 @@ foreign handler PointerToMIDIPacketList(out rMemChunk as MIDIPacketListData, in 
 -- foreign handler PointerToMIDIPacket(out rAggregate as MIDIPacket, in pPointer as Pointer, in pSize as UIntSize) returns nothing binds to "c:memcpy"
 -- typedef void (*MIDIReadProc)(const MIDIPacketList *pktlist, void *readProcRefCon, void *srcConnRefCon);
 -- typedef void (^MIDIReadBlock)(const MIDIPacketList *pktlist, void *srcConnRefCon);
--- public handler CoreMIDIReadCallbackProcedure( in pContext as optional ObjcBlockPointer, in pMIDIPacketListPtr as MIDIPacketList, in readProcRefCont as optional Pointer, in srcConnRefCont as optional Pointer)
-public handler CoreMIDIReadCallbackProcedure( in pContext as optional ObjcBlockPointer, in pMIDIPacketListPtr as Pointer, in pSourceRefCon as optional Pointer) returns nothing
+public handler CoreMIDIReadCallbackProcedure( in pContext as optional ObjcBlockPointer, in pMIDIPacketListPtr as MIDIPacketList, in pReadProcRefCont as optional Pointer, in pSrcConnRefCont as optional Pointer)
+-- public handler CoreMIDIReadCallbackProcedure( in pContext as optional ObjcBlockPointer, in pMIDIPacketListPtr as Pointer, in pSourceRefCon as optional Pointer) returns nothing
     -- CoreMIDISendMIDIbytesNow(in pMIDIMsgData as Data) returns nothing
       -- variable tOSStatus as optional CSInt
       variable tOSStatus as optional CSInt
@@ -1013,8 +1017,8 @@ public handler CoreMIDIReadCallbackProcedure( in pContext as optional ObjcBlockP
       variable tMIDIPacketCount as Number
       variable tMIDIPacketIterator as Number
       variable tPacketListArray as Array
-
-      -- variable tObj as ObjCId
+      variable tMIDIPacketListPtr as Pointer
+      variable tObj as ObjCId
       variable tMIDIPacketList as MIDIPacketList
       variable tBufferSize as Number
       variable tMIDIMsgLength as Number
@@ -1033,6 +1037,11 @@ public handler CoreMIDIReadCallbackProcedure( in pContext as optional ObjcBlockP
       put the empty array into sMIDIinPacketBuffer
       put [0,0] into tTimeBaseInfo
       unsafe
+       -- put c_MIDIPacketNext(pMIDIPacketListPtr) into tMIDIPacketListPtr
+       -- log tMIDIPacketListPtr
+       -- put objC_NSDataGetLength(tMIDIPacketListPtr) into tObj
+       -- put NumberFromNSNumber(tObj) into tNum
+       -- log tNum
          -- put objC_NSMutableDataWithLength(NumberToNSNumber(8)) into tTimeBaseInfoRef
          -- put objC_NSMutableDataBytesPtr(tTimeBaseInfoRef) into tTimeBaseInfoPtr
          put c_mach_absolute_time() into tAbsoluteTime
@@ -1136,9 +1145,9 @@ public handler CoreMIDIDestinationCreate(in destinationName as String,in uniqueI
          return "Error Intitializing Read Procedure"
       else
 			put StringToNSString(destinationName) into tDestNameStrRef
-         put c_MIDIDestinationCreateWithBlock(sMIDIClientRef,tDestNameStrRef,sMIDIDestEndpointRef,sCoreMIDIReadCallbackProcPtr) into tOSStatus
-         -- put c_MIDIDestinationCreate(sMIDIClientRef,pMIDIDestinationNameCFStrRef,pMIDIReadProc,pRefConst,sMIDIDestEndpointRef) into tOSStatus
-         -- put c_MIDIDestinationCreate(sMIDIClientRef,tDestNameStrRef,sCoreMIDIReadCallbackProcPtr,nothing,sMIDIDestEndpointRef) into tOSStatus
+         -- put c_MIDIDestinationCreateWithBlock(sMIDIClientRef,tDestNameStrRef,sMIDIDestEndpointRef,sCoreMIDIReadCallbackProcPtr) into tOSStatus
+         --put c_MIDIDestinationCreate(sMIDIClientRef,pMIDIDestinationNameCFStrRef,pMIDIReadProc,pRefConst,sMIDIDestEndpointRef) into tOSStatus
+         put c_MIDIDestinationCreate(sMIDIClientRef,tDestNameStrRef,sCoreMIDIReadCallbackProcPtr,nothing,sMIDIDestEndpointRef) into tOSStatus
          if uniqueIDnum is not nothing then
             put c_MIDIObjectSetIntegerProperty(sMIDIDestEndpointRef,StringToNSString("uniqueID"),uniqueIDnum) into tOSStatus
          end if
