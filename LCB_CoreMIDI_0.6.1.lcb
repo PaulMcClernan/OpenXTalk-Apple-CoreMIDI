@@ -19,6 +19,7 @@ use com.livecode.objc
 use com.livecode.array
 use com.livecode.list
 use com.livecode.byte
+use com.livecode.char
 use com.livecode.binary
 use com.livecode.assert
 
@@ -36,6 +37,8 @@ public foreign type MIDIPacketList binds to "MCAggregateTypeInfo:jr" -- Declarat
 public foreign type TimeBaseInfo binds to "MCAggregateTypeInfo:jj"
 public type MIDITimeStamp is UInt64
 public type MIDIObjRef is UInt32
+public foreign type FourCharCode binds to "MCAggregateTypeInfo:bbbb" -- message ID, message size
+-- foreign handler Uint32To4CharCode(out rMemChunk as FourCharCode, in pPointer as Pointer, in pSize as UIntSize) returns nothing binds to "c:memcpy"
 
 private foreign handler NSApplicationSharedApplication() returns ObjcId binds to "objc:NSApplication.+sharedApplication"
 ------------------------------------------------ MIDI Clients------------------------------------------------
@@ -125,7 +128,11 @@ private foreign handler c_CFPropertyListCreateData(in pCFAllocatorRef as optiona
 ----------------------------------------------------------------- AudioToolbox MusicPlayer MusicSequence stuff ------------------------------------------------------------
 private foreign handler c_ATNewMusicSequence(out rMusicSequence as ObjCId ) returns CSInt binds to "c:AudioToolbox.framework>NewMusicSequence"
 private foreign handler c_ATMusicSequenceNewTrack(in pMusicSequence as ObjCId, out rMusicSequenceTrack as ObjCId ) returns CSInt binds to "c:AudioToolbox.framework>MusicSequenceNewTrack"
-private foreign handler c_ATMusicSequenceNewTrack(in pMusicSequenceTrack as ObjCId, in pMusicTrackBeat as ObjCId, in pMIDIMsg as ObjCId) returns CSInt binds to "c:AudioToolbox.framework>MusicTrackNewMIDINoteEvent"
+private foreign handler c_ATMusicTrackNewMIDINoteEvent(in pMusicSequenceTrack as ObjCId, in pMusicTrackBeat as ObjCId, in pMIDIMsg as ObjCId) returns CSInt binds to "c:AudioToolbox.framework>MusicTrackNewMIDINoteEvent"
+private foreign handler c_ATNewMusicSequenceGetInfoDict(in pMusicSequence as ObjCId ) returns ObjCId binds to "c:AudioToolbox.framework>MusicSequenceGetInfoDictionary"
+private foreign handler c_ATMusicSequenceGetSequenceType(in pMusicSequence as ObjCId, out rMusicSequenceType as FourCharCode ) returns CSInt binds to "c:AudioToolbox.framework>MusicSequenceGetSequenceType"
+--put c_ATMusicSequenceGetSequenceType(sMusicSequence, rMusicSequenceTypeUint32 ) into tOSStatus
+
 ----------------------------------------------------------------- Data Buffer ------------------------------------------------------------
 private foreign handler objC_NSMutableDataWithLength(in pDataLength as ObjcId) returns ObjcId binds to "objc:NSMutableData.+dataWithLength:" -- Creates and returns an mutable data object containing a given number of zeroed bytes. Toll free bridges to CFMutableDataRef for Foundation C APIs
 private foreign handler objC_NSMutableDataWithCapacity(in pDataLength as ObjcId) returns ObjcId binds to "objc:NSMutableData.+dataWithCapacity:"
@@ -156,6 +163,55 @@ constant kMIDIObjectType_Source is 2
 constant kMIDIObjectType_Entity is 1
 constant kMIDIObjectType_Device is 0
 constant kMIDIObjectType_Other is -1
+
+private variable sMusicSequence as ObjcId
+private variable sMusicSequenceTrack as ObjcId
+
+public handler AudioToolboxCreateSequence() returns optional any
+   variable tCFError as optional ObjCId
+   variable tOSStatus as optional CSInt
+   variable tOBJ as optional ObjCId
+   variable tSeqInfoDictArray as optional Array
+   variable rMusicSequenceTypeUint32 as optional UInt32
+   variable rMusicSequenceTypeCode as FourCharCode
+   variable tElement as optional any
+   variable tStr as String
+   unsafe
+      put c_ATNewMusicSequence(sMusicSequence) into tOSStatus
+      put c_ATNewMusicSequenceGetInfoDict(sMusicSequence) into tOBJ
+      put ArrayFromNSDictionary(tOBJ) into tSeqInfoDictArray
+      log tSeqInfoDictArray
+      put c_ATMusicSequenceGetSequenceType(sMusicSequence, rMusicSequenceTypeCode ) into tOSStatus
+      -- Uint32To4CharCode(rMusicSequenceTypeCode,rMusicSequenceTypeUint32,4)
+      repeat for each element tElement in rMusicSequenceTypeCode
+            put the char with code tElement after tStr
+      end repeat
+      log tStr
+      -- log rMusicSequenceTypeCode
+      --log element 1 of rMusicSequenceTypeCode
+      --log element 2 of rMusicSequenceTypeCode
+      --log element 3 of rMusicSequenceTypeCode
+      --log element 4 of rMusicSequenceTypeCode
+   end unsafe
+end handler
+
+public handler AudioToolboxSequenceNewTrack() returns optional any
+   variable tCFError as optional ObjCId
+   variable tOSStatus as optional CSInt
+   unsafe
+      put c_ATMusicSequenceNewTrack(sMusicSequence,sMusicSequenceTrack) into tOSStatus
+   end unsafe
+end handler
+
+public handler AudioToolboxcTrackNewMIDINoteEvent() returns optional any
+   variable tCFError as optional ObjCId
+   variable tOSStatus as optional CSInt
+   variable tMIDINoteEvent as optional any
+   unsafe
+      put c_ATMusicTrackNewMIDINoteEvent(sMusicSequence,sMusicSequenceTrack,tMIDINoteEvent) into tOSStatus
+   end unsafe
+end handler
+
 public handler CoreMIDIObjectTypeToString(in pMIDIObjTypeEnum as optional Number) returns optional String
    if pMIDIObjTypeEnum is -1 then
       return "Other"
