@@ -28,6 +28,34 @@ metadata author is "Paul McClernan"
 metadata title is "CoreMIDI library"
 metadata svgicon is "M541.208,278.627c5.155-6.229,7.713-15.661,5.716-24.663c-7.97,0.751-16.543,7.303-21.699,13.533c-4.019,6.122-7.714,15.661-5.717,24.662C528.724,292.439,537.297,285.888,541.208,278.627z M591.706,363.468c-0.924,2.385-22.17-3.654-24.424-27.565c-1.824-19.356,13.151-31.106,14.29-31.213c-10.397-12.805-25.306-12.548-29.969-13.258c-12.633,0.042-23.267,9.085-28.961,9.622c-5.692,0.537-16.583-5.329-26.831-4.363c-13.663,1.288-24.3,10.331-30.058,22.361c-10.393,22.954-0.053,53.481,13.578,72.396h-42.334c0,0,14.162-11.127,20.231-19.22c-2.022-2.023-4.046-4.046-7.081-7.081c-4.046,4.046-8.092,6.07-11.127,8.093s-11.988,5.855-22.255,5.058s-20.645-9.355-25.289-21.243s-3.978-31.36-3.978-31.36l67.707-0.022c0,0-2.707-22.839-10.116-35.382c-2.572-4.354-16.947-20.4-38.744-19.069c-13.13,0.802-21.95,6.931-27.008,11.988c-5.058,4.046-10.116,11.127-14.162,19.22c-1.2,1.8-10.365,16.995-9.427,44.57c1.083,31.833,26.624,45.459,26.624,45.459h-39.452v-1.012c0-2.023,0-3.035-1.011-4.046c-1.012-1.012-3.035-1.012-7.081-2.023c-4.047,0-6.069-1.011-8.093-1.011c-1.012-1.012-3.035-2.023-4.046-3.035c-4.047-7.081-3.035-64.74-3.035-64.74s0-7.081,3.035-12.139c1.011-3.035,3.034-5.058,5.058-5.058h1.012c1.011,0,3.034,1.012,5.058,3.035c4.046,3.035,7.081,5.058,11.127,5.058c4.047,0,7.081-2.023,9.104-5.058c2.022-4.046,4.046-8.092,4.046-12.139c0-5.058-2.023-9.104-5.058-12.139c-3.035-3.035-7.081-5.058-11.127-5.058c-3.035,0-12.882,6.543-15.174,11.127s-7.081,14.162-7.081,14.162v-30.347h-8.093c-1.012,1.012-2.022,3.035-3.034,5.058c-2.023,4.046-6.07,8.092-11.127,12.139c-5.058,4.046-10.116,6.07-16.185,7.081v5.058c0,2.023,1.011,3.035,3.035,3.035c3.035,1.011,6.069,2.023,8.092,3.035c1.012,1.012,2.023,4.046,2.023,4.046s2.023,70.81,0,73.844c-1.012,2.023-8.093,5.058-12.139,6.07c-2.023,1.011-3.035,1.011-4.046,2.023c0,1.012,0,3.035,0,3.035h-28.324c1.012-1.012,2.023-1.012,3.035-1.012c8.093-6.069,15.173-15.173,20.231-27.312c3.035-8.093,5.058-18.208,5.058-31.359c0-7.081-1.011-14.162-4.046-22.254c-3.035-8.093-6.07-15.174-11.127-21.243c-9.104-12.139-22.254-18.208-39.451-18.208c-8.093,0-14.162,1.011-20.231,3.035c-5.058,2.023-11.127,5.058-16.185,10.116c-4.046,3.035-7.081,7.081-10.116,12.139s-5.058,11.127-7.081,17.197c-2.023,7.081-3.035,13.15-3.035,19.22c0,13.15,2.023,23.266,6.069,32.37s10.116,16.185,19.22,23.266c1.012,1.012,4.046,3.035,4.046,3.035h-52.602l11.127-7.081l7.081-41.474l-12.139,1.012c0,0-15.173,23.266-24.278,30.347c-8.092,7.081-17.196,10.116-25.289,10.116s-15.174-2.023-22.254-7.081c-5.058-3.035-10.116-7.081-13.15-13.15c-21.243-36.417-19.22-104.192,2.023-129.481c9.104-11.127,18.208-18.208,30.347-18.208c10.116,0,19.22,3.035,27.312,9.104c8.092,6.069,24.277,28.324,24.277,28.324h11.127l-9.104-44.509c0,0-16.185-4.046-24.278-5.058c-9.104-1.012-18.208-2.023-28.324-2.023c-24.278,0-44.509,9.104-60.694,28.324S13.15,274.106,13.15,302.43c0,12.139,1.012,23.266,4.046,32.37c3.035,10.116,6.069,18.208,12.139,27.312c5.058,8.093,12.139,15.174,21.243,22.255c4.046,3.035,8.092,5.058,13.15,7.081H5.058v199.28h54.625V438.992h27.312v151.735h54.625V438.992h27.312v151.735h53.613v-180.06c0-5.058-2.023-9.104-5.058-12.139c2.023,0,3.035,0,5.058,0c7.081,0,14.162-2.023,20.231-4.047v196.245h54.625V394.482h21.243v45.521h126.446v103.181H373.27v-75.868h-54.625v124.424h160.84c10.115,0,19.22-8.093,19.22,19.221V411.68c0-0.222-0.024-0.441-0.032-0.663c3.684,2.274,7.56,3.47,11.61,2.63c4.063-0.384,6.949-1.743,9.665-3.309v180.39h54.625V400.033c3.299-3.847,6.128-8.77,8.926-13.965C590.396,373.93,591.706,363.468,591.706,363.468z M394.513,289.279c4.046-6.069,9.104-9.104,14.162-9.104c4.046,0,7.081,1.012,11.127,4.046s6.069,7.081,8.093,12.139c2.022,5.058,3.034,10.116,3.034,16.185c-1.012,0-3.034,0-3.034,0c-1.012,0-3.035,0-5.059,0c-3.034,0-6.069,0-7.08,0h-27.312C387.432,302.43,390.466,294.337,394.513,289.279z M221,385.5c-12,0-25.307-25.195-25.54-51.053s15.464-52.987,28.002-52.217s23.243,30.316,23.361,47.512C247,355.5,233,385.5,221,385.5z"
 
+
+------------------------------------------------------------------------- Core Foundation / Objective C utility bindings --------------------
+private foreign handler objC_NSURLfileURLWithPath(in pPathString as ObjcId) returns ObjcId binds to "objc:NSURL.+fileURLWithPath:"
+private foreign handler objC_NSApplicationSharedApplication() returns ObjcId binds to "objc:NSApplication.+sharedApplication"
+private foreign handler objC_NSURLURLWithString(in pURLString as ObjcId) returns ObjcId binds to "objc:NSURL.+URLWithString:"
+private foreign handler objC_NSURLfileOrDirURLWithPath(in pPathString as ObjcId, in pIsDir as CBool) returns ObjcId binds to "objc:.NSURL.+fileURLWithPath:isDirectory:"
+private foreign handler objC_NSURLfileURLWithPath(in pPathString as ObjcId) returns ObjcId binds to "objc:NSURL.+fileURLWithPath:"
+private foreign handler objC_NSErrorAlloc() returns ObjcId binds to "objc:NSError.+alloc"
+private foreign handler objC_NSMutableArrayAlloc() returns ObjcRetainedId binds to "objc:NSMutableArray.+alloc"
+private foreign handler objC_NSMutableArrayInitWithCapacity(in pNSMutableArray as ObjcId, in pCapacity as NaturalFloat) returns ObjcId binds to "objc:NSMutableArray.-initWithCapacity:"
+private foreign handler objC_NSMutableArrayInitWithNSArray(in pNSMutableArray as ObjcId, in pNSArray as ObjcId) returns ObjcId binds to "objc:NSMutableArray.-initWithArray:"
+private foreign handler objC_NSObjectRetain(in pNSObj as ObjcId) returns ObjcId binds to "objc:NSObject.-retain"
+private foreign handler objC_NSObjectAutoRealease(in pNSObj as ObjcId) returns ObjcId binds to "objc:NSObject.-autorelease"
+private foreign handler objC_NSObjectRelease(in pNSObj as ObjcId) returns nothing binds to "objc:NSObject.-release"
+private foreign handler c_CFErrorCopyDescription(in pCFErrorRef as ObjcId) returns ObjcId binds to "c:CFErrorCopyDescription"
+----------------------------------------------------------------- Data Buffer ------------------------------------------------------------
+private foreign handler objC_NSMutableDataWithLength(in pDataLength as ObjcId) returns ObjcId binds to "objc:NSMutableData.+dataWithLength:" -- Creates and returns an mutable data object containing a given number of zeroed bytes. Toll free bridges to CFMutableDataRef for Foundation C APIs
+private foreign handler objC_NSMutableDataWithCapacity(in pDataLength as ObjcId) returns ObjcId binds to "objc:NSMutableData.+dataWithCapacity:"
+private foreign handler objC_NSMutableDataBytesPtr(in pMutableDataRef as ObjcId) returns Pointer binds to "objc:NSMutableData.mutableBytes"
+private foreign handler objC_NSDataGetLength(in pMutableDataRef as ObjcId) returns ObjCId binds to "objc:NSData.length"
+private foreign handler objC_NSMutableDataSetData(in pMutableDataRef as ObjcId, in pNSDataToSet as ObjcId) returns nothing binds to "objc:NSMutableData.-setData:"
+private foreign handler objC_NSDataBytesPtr(inout pMutableDataRef as ObjcId) returns Pointer binds to "objc:NSData.bytes"
+private foreign handler c_CFArrayGetCount(in pCFArrayRef as Pointer) returns LCUInt binds to "c:CFArrayGetCount"
+private foreign handler objC_NSArrayCount(in pNSArray as ObjcId) returns LCUInt binds to "objc:NSArray.count"
+private foreign handler objC_NSMutableDataWithBytes(in pDataRef as ObjcId, in pReadLengthNSNum as ObjcId ) returns ObjcId binds to "objc:NSMutableData.+dataWithBytes:length:"
+private foreign handler objC_NSDataWithBytes(in pDataRef as ObjcId, in pReadLengthNSNum as ObjcId ) returns ObjcId binds to "objc:NSData.+dataWithBytes:length:"
+private foreign handler objC_NSMutableDataWithBytesNoCopy(in pDataRef as ObjcId, in pReadLengthNSNum as ObjcId ) returns ObjcId binds to "objc:NSMutableData.+dataWithBytesNoCopy:length:"
+private foreign handler objC_NSMutableDataWithBytesNoCopyFreeWhenDone(in pDataRef as ObjcId, in pReadLengthNSNum as ObjcId, in pFreeWhenDone as CBool) returns ObjcId binds to "objc:NSMutableData.+dataWithBytesNoCopy:length:freeWhenDone:"
 -------------------------------------------------------- Types & Structs ------------------------------------
 -- public foreign type MIDIPacket binds to "MCAggregateTypeInfo:kihhh" --kihhhhhhhh... k=UInt64  i=UInt16 h=3 x UInt8 -- MIDIPacket (timeStamp: MIDITimeStamp, length: UInt16, data: Data: ARRAY OF Bytes(256) x UInt8 )  -- UInt64,UInt16,Data(256))
 public foreign type MIDIPacket binds to "MCAggregateTypeInfo:kihhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh"
@@ -40,7 +68,6 @@ public type MIDIObjRef is UInt32
 public foreign type FourCharCode binds to "MCAggregateTypeInfo:bbbb" -- message ID, message size
 -- foreign handler Uint32To4CharCode(out rMemChunk as FourCharCode, in pPointer as Pointer, in pSize as UIntSize) returns nothing binds to "c:memcpy"
 
-private foreign handler NSApplicationSharedApplication() returns ObjcId binds to "objc:NSApplication.+sharedApplication"
 ------------------------------------------------ MIDI Clients------------------------------------------------
 private foreign handler c_MIDIClientCreate(in pClientNameCFStrngRef as ObjcId, in pMIDINotifyProc as optional ObjcBlockPointer, in pNotifyRefCon as optional Pointer, \
                                             out rMIDIClientRef as MIDIObjRef) returns CSInt binds to "c:CoreMIDI.framework>MIDIClientCreate"
@@ -135,21 +162,6 @@ private foreign handler c_ATMusicSequenceGetTrackCount(in pMusicSequence as ObjC
 private foreign handler c_ATMusicSequenceGetTempoTrack(in pMusicSequence as ObjCId, out rMusicSequenceTempoTrack as ObjCId) returns CSInt binds to "c:AudioToolbox.framework>MusicSequenceGetTempoTrack"
 private foreign handler c_ATMusicTrackGetProperty(in pMusicSequenceTrack as ObjCId, in pPropertyIDenum as Uint32, out rDataPointer as optional Pointer, out rDataLength as optional Uint32) returns CSInt binds to "c:AudioToolbox.framework>MusicTrackGetProperty"
 -- OSStatus MusicTrackGetProperty(MusicTrack inTrack, UInt32 inPropertyID, void *outData, UInt32 *ioLength);
-
------------------------------------------------------------------ Data Buffer ------------------------------------------------------------
-private foreign handler objC_NSMutableDataWithLength(in pDataLength as ObjcId) returns ObjcId binds to "objc:NSMutableData.+dataWithLength:" -- Creates and returns an mutable data object containing a given number of zeroed bytes. Toll free bridges to CFMutableDataRef for Foundation C APIs
-private foreign handler objC_NSMutableDataWithCapacity(in pDataLength as ObjcId) returns ObjcId binds to "objc:NSMutableData.+dataWithCapacity:"
-private foreign handler objC_NSMutableDataBytesPtr(in pMutableDataRef as ObjcId) returns Pointer binds to "objc:NSMutableData.mutableBytes"
-private foreign handler objC_NSDataGetLength(in pMutableDataRef as ObjcId) returns ObjCId binds to "objc:NSData.length"
-private foreign handler objC_NSMutableDataSetData(in pMutableDataRef as ObjcId, in pNSDataToSet as ObjcId) returns nothing binds to "objc:NSMutableData.-setData:"
-private foreign handler objC_NSDataBytesPtr(inout pMutableDataRef as ObjcId) returns Pointer binds to "objc:NSData.bytes"
-private foreign handler c_CFArrayGetCount(in pCFArrayRef as Pointer) returns LCUInt binds to "c:CFArrayGetCount"
-private foreign handler objC_NSArrayCount(in pNSArray as ObjcId) returns LCUInt binds to "objc:NSArray.count"
-private foreign handler objC_NSMutableDataWithBytes(in pDataRef as ObjcId, in pReadLengthNSNum as ObjcId ) returns ObjcId binds to "objc:NSMutableData.+dataWithBytes:length:"
-private foreign handler objC_NSDataWithBytes(in pDataRef as ObjcId, in pReadLengthNSNum as ObjcId ) returns ObjcId binds to "objc:NSData.+dataWithBytes:length:"
-private foreign handler objC_NSMutableDataWithBytesNoCopy(in pDataRef as ObjcId, in pReadLengthNSNum as ObjcId ) returns ObjcId binds to "objc:NSMutableData.+dataWithBytesNoCopy:length:"
-private foreign handler objC_NSMutableDataWithBytesNoCopyFreeWhenDone(in pDataRef as ObjcId, in pReadLengthNSNum as ObjcId, in pFreeWhenDone as CBool) returns ObjcId binds to "objc:NSMutableData.+dataWithBytesNoCopy:length:freeWhenDone:"
-
 ----------------------------------------------------------------- Time Stamping ------------------------------------------------------------
 -- https://developer.apple.com/documentation/kernel/1462446-mach_absolute_time?language=objc
 -- private foreign handler c_mach_absolute_time() returns MIDITimeStamp binds to "c:Kernel.framework>mach_absolute_time"
@@ -167,8 +179,59 @@ constant kMIDIObjectType_Entity is 1
 constant kMIDIObjectType_Device is 0
 constant kMIDIObjectType_Other is -1
 
-private variable sMusicSequence as ObjcId
-private variable sMusicSequenceTrack as ObjcId
+private variable sMusicSequence as optional ObjcId
+private variable sMusicSequenceTrack as optional ObjcId
+
+public handler AudioToolboxCreateSequenceFromSMF(in pMIDIfilePath as String) returns optional any
+   variable tCFError as optional ObjCId
+   variable tOSStatus as optional CSInt
+   variable tOBJ as optional ObjCId
+   variable tMIDIfilePathNSURL as optional tSoundFontNSURL
+   variable tSeqInfoDictArray as optional Array
+   variable rMusicSequenceTypeUint32 as optional UInt32
+   variable rMusicSequenceTypeCode as FourCharCode
+   variable rTrackCountUint32 as optional UInt32
+   variable rMusicSequenceTempoTrack as optional ObjCId
+   variable tElement as optional any
+   variable tStr as String
+   variable tNum as Number
+   variable tData as any
+   variable rTrackPropertyData as Pointer
+   variable tTrackPropertyEnum as optional UInt32
+   unsafe
+      put objC_NSURLfileURLWithPath(StringToNSString(pMIDIfilePath)) into tMIDIfilePathNSURL
+      put c_ATNewMusicSequence(sMusicSequence) into tOSStatus
+      -- put c_ATMusicSequenceNewTrack(sMusicSequence,rMusicSequenceTrack) into tOSStatus
+      put c_ATMusicSequenceFileLoad(musicSequence, midiFileURL, 1835623529 , 0) into tOSStatus
+      -- kMusicSequenceFile (type Uint32) _AnyType = 0 _iMelodyType = 1768777068 _midiType = 1835623529-- kMusicSequenceLoadSMF_PreserveTracks = 0 (type UInt32)
+
+      put c_ATNewMusicSequenceGetInfoDict(sMusicSequence) into tOBJ
+      put ArrayFromNSDictionary(tOBJ) into tSeqInfoDictArray
+      log tSeqInfoDictArray
+      put c_ATMusicSequenceGetSequenceType(sMusicSequence, rMusicSequenceTypeCode ) into tOSStatus
+      -- Uint32To4CharCode(rMusicSequenceTypeCode,rMusicSequenceTypeUint32,4)
+      repeat for each element tElement in rMusicSequenceTypeCode
+            put the char with code tElement before tStr
+      end repeat
+      log tStr -- this string should be one of the following: "beat","secs","samp"
+
+      put c_ATMusicSequenceGetTrackCount(sMusicSequence, rTrackCountUint32) into tOSStatus
+      log "TrackCount:"
+      log rTrackCountUint32
+
+      put c_ATMusicSequenceGetTempoTrack(sMusicSequence,rMusicSequenceTempoTrack) into tOSStatus
+      -- log rMusicSequenceTempoTrack
+
+      -- put 6 into tTrackPropertyEnum -- kSequenceTrackProperty_TimeResolution = 6
+      -- put c_ATMusicTrackGetProperty(rMusicSequenceTempoTrack,tTrackPropertyEnum,nothing,tNum) into tOSStatus
+      -- log rTrackPropertyData
+      --log tNum
+      put 2 into tTrackPropertyEnum -- kSequenceTrackProperty_MuteStatus = 2
+      put c_ATMusicTrackGetProperty(rMusicSequenceTempoTrack,tTrackPropertyEnum,tData,tNum) into tOSStatus
+      log tData
+      log tNum
+   end unsafe
+end handler
 
 public handler AudioToolboxCreateSequence() returns optional any
    variable tCFError as optional ObjCId
