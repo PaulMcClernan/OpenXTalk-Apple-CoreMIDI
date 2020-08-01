@@ -30,11 +30,10 @@ metadata svgicon is "M541.208,278.627c5.155-6.229,7.713-15.661,5.716-24.663c-7.9
 
 
 ------------------------------------------------------------------------- Core Foundation / Objective C utility bindings --------------------
-private foreign handler objC_NSURLfileURLWithPath(in pPathString as ObjcId) returns ObjcId binds to "objc:NSURL.+fileURLWithPath:"
 private foreign handler objC_NSApplicationSharedApplication() returns ObjcId binds to "objc:NSApplication.+sharedApplication"
+private foreign handler objC_NSURLfileURLWithPath(in pPathString as ObjcId) returns ObjcId binds to "objc:NSURL.+fileURLWithPath:"
 private foreign handler objC_NSURLURLWithString(in pURLString as ObjcId) returns ObjcId binds to "objc:NSURL.+URLWithString:"
 private foreign handler objC_NSURLfileOrDirURLWithPath(in pPathString as ObjcId, in pIsDir as CBool) returns ObjcId binds to "objc:.NSURL.+fileURLWithPath:isDirectory:"
-private foreign handler objC_NSURLfileURLWithPath(in pPathString as ObjcId) returns ObjcId binds to "objc:NSURL.+fileURLWithPath:"
 private foreign handler objC_NSErrorAlloc() returns ObjcId binds to "objc:NSError.+alloc"
 private foreign handler objC_NSMutableArrayAlloc() returns ObjcRetainedId binds to "objc:NSMutableArray.+alloc"
 private foreign handler objC_NSMutableArrayInitWithCapacity(in pNSMutableArray as ObjcId, in pCapacity as NaturalFloat) returns ObjcId binds to "objc:NSMutableArray.-initWithCapacity:"
@@ -155,6 +154,7 @@ private foreign handler c_CFPropertyListCreateData(in pCFAllocatorRef as optiona
 ----------------------------------------------------------------- AudioToolbox MusicPlayer MusicSequence stuff ------------------------------------------------------------
 private foreign handler c_ATNewMusicSequence(out rMusicSequence as ObjCId ) returns CSInt binds to "c:AudioToolbox.framework>NewMusicSequence"
 private foreign handler c_ATMusicSequenceNewTrack(in pMusicSequence as ObjCId, out rMusicSequenceTrack as ObjCId ) returns CSInt binds to "c:AudioToolbox.framework>MusicSequenceNewTrack"
+private foreign handler c_ATMusicSequenceFileLoad(in pMusicSequence as ObjCId, in pFileURL as ObjCId, in pFileTypeFlag as UInt32, in pFileParsingFlag as UInt32) returns CSInt binds to "c:AudioToolbox.framework>MusicSequenceFileLoad"
 private foreign handler c_ATMusicTrackNewMIDINoteEvent(in pMusicSequenceTrack as ObjCId, in pMusicTrackBeat as ObjCId, in pMIDIMsg as ObjCId) returns CSInt binds to "c:AudioToolbox.framework>MusicTrackNewMIDINoteEvent"
 private foreign handler c_ATNewMusicSequenceGetInfoDict(in pMusicSequence as ObjCId ) returns ObjCId binds to "c:AudioToolbox.framework>MusicSequenceGetInfoDictionary"
 private foreign handler c_ATMusicSequenceGetSequenceType(in pMusicSequence as ObjCId, out rMusicSequenceType as FourCharCode ) returns CSInt binds to "c:AudioToolbox.framework>MusicSequenceGetSequenceType"
@@ -186,7 +186,7 @@ public handler AudioToolboxCreateSequenceFromSMF(in pMIDIfilePath as String) ret
    variable tCFError as optional ObjCId
    variable tOSStatus as optional CSInt
    variable tOBJ as optional ObjCId
-   variable tMIDIfilePathNSURL as optional tSoundFontNSURL
+   variable tMIDIfilePathNSURL as optional ObjCId
    variable tSeqInfoDictArray as optional Array
    variable rMusicSequenceTypeUint32 as optional UInt32
    variable rMusicSequenceTypeCode as FourCharCode
@@ -202,7 +202,7 @@ public handler AudioToolboxCreateSequenceFromSMF(in pMIDIfilePath as String) ret
       put objC_NSURLfileURLWithPath(StringToNSString(pMIDIfilePath)) into tMIDIfilePathNSURL
       put c_ATNewMusicSequence(sMusicSequence) into tOSStatus
       -- put c_ATMusicSequenceNewTrack(sMusicSequence,rMusicSequenceTrack) into tOSStatus
-      put c_ATMusicSequenceFileLoad(musicSequence, midiFileURL, 1835623529 , 0) into tOSStatus
+      put c_ATMusicSequenceFileLoad(sMusicSequence, tMIDIfilePathNSURL, 1835623529 , 0) into tOSStatus
       -- kMusicSequenceFile (type Uint32) _AnyType = 0 _iMelodyType = 1768777068 _midiType = 1835623529-- kMusicSequenceLoadSMF_PreserveTracks = 0 (type UInt32)
 
       put c_ATNewMusicSequenceGetInfoDict(sMusicSequence) into tOBJ
@@ -233,7 +233,7 @@ public handler AudioToolboxCreateSequenceFromSMF(in pMIDIfilePath as String) ret
    end unsafe
 end handler
 
-public handler AudioToolboxCreateSequence() returns optional any
+public handler AudioToolboxCreateNewSequence() returns optional any
    variable tCFError as optional ObjCId
    variable tOSStatus as optional CSInt
    variable tOBJ as optional ObjCId
@@ -242,6 +242,7 @@ public handler AudioToolboxCreateSequence() returns optional any
    variable rMusicSequenceTypeCode as FourCharCode
    variable rTrackCountUint32 as optional UInt32
    variable rMusicSequenceTempoTrack as optional ObjCId
+   variable rTrack as optional ObjCId
    variable tElement as optional any
    variable tStr as String
    variable tNum as Number
@@ -250,6 +251,7 @@ public handler AudioToolboxCreateSequence() returns optional any
    variable tTrackPropertyEnum as optional UInt32
    unsafe
       put c_ATNewMusicSequence(sMusicSequence) into tOSStatus
+      put c_ATMusicSequenceNewTrack(sMusicSequence, rTrack) into tOSStatus
       put c_ATNewMusicSequenceGetInfoDict(sMusicSequence) into tOBJ
       put ArrayFromNSDictionary(tOBJ) into tSeqInfoDictArray
       log tSeqInfoDictArray
@@ -266,7 +268,6 @@ public handler AudioToolboxCreateSequence() returns optional any
 
       put c_ATMusicSequenceGetTempoTrack(sMusicSequence,rMusicSequenceTempoTrack) into tOSStatus
       -- log rMusicSequenceTempoTrack
-
       -- put 6 into tTrackPropertyEnum -- kSequenceTrackProperty_TimeResolution = 6
       -- put c_ATMusicTrackGetProperty(rMusicSequenceTempoTrack,tTrackPropertyEnum,nothing,tNum) into tOSStatus
       -- log rTrackPropertyData
