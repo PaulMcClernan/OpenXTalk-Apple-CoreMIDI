@@ -46,6 +46,7 @@ private foreign handler c_CFErrorCopyDescription(in pCFErrorRef as ObjcId) retur
 private foreign handler objC_NSMutableDataWithLength(in pDataLength as ObjcId) returns ObjcId binds to "objc:NSMutableData.+dataWithLength:" -- Creates and returns an mutable data object containing a given number of zeroed bytes. Toll free bridges to CFMutableDataRef for Foundation C APIs
 private foreign handler objC_NSMutableDataWithCapacity(in pDataLength as ObjcId) returns ObjcId binds to "objc:NSMutableData.+dataWithCapacity:"
 private foreign handler objC_NSMutableDataBytesPtr(in pMutableDataRef as ObjcId) returns Pointer binds to "objc:NSMutableData.mutableBytes"
+private foreign handler objC_NSMutableDataWithBytes(in pRawDataPointer as Pointer, in pDataLength as ObjcId) returns ObjcId binds to "objc:NSMutableData.+dataWithBytes:length:"
 private foreign handler objC_NSDataGetLength(in pMutableDataRef as ObjcId) returns ObjCId binds to "objc:NSData.length"
 private foreign handler objC_NSMutableDataSetData(in pMutableDataRef as ObjcId, in pNSDataToSet as ObjcId) returns nothing binds to "objc:NSMutableData.-setData:"
 private foreign handler objC_NSDataBytesPtr(inout pMutableDataRef as ObjcId) returns Pointer binds to "objc:NSData.bytes"
@@ -162,7 +163,7 @@ private foreign handler c_ATMusicSequenceGetTrackCount(in pMusicSequence as ObjC
 private foreign handler c_ATMusicSequenceGetTempoTrack(in pMusicSequence as ObjCId, out rMusicSequenceTempoTrack as ObjCId) returns CSInt binds to "c:AudioToolbox.framework>MusicSequenceGetTempoTrack"
 private foreign handler c_ATMusicSequenceGetIndTrack(in pMusicSequence as ObjCId, in pIndex as UInt32, out rMusicSequenceTrack as optional Pointer) returns CSInt binds to "c:AudioToolbox.framework>MusicSequenceGetIndTrack"
 -- OSStatus MusicSequenceGetIndTrack(MusicSequence inSequence, UInt32 inTrackIndex, MusicTrack  _Nullable *outTrack);
-private foreign handler c_ATMusicTrackGetProperty(in pMusicSequenceTrack as optional Pointer, in pPropertyIDenum as Uint32, inout rData as optional Data, inout rDataLength as optional Uint32) returns CSInt binds to "c:AudioToolbox.framework>MusicTrackGetProperty"
+private foreign handler c_ATMusicTrackGetProperty(in pMusicSequenceTrack as optional Pointer, in pPropertyIDenum as Uint32, out rData as optional any, out rDataLength as optional Uint32) returns CSInt binds to "c:AudioToolbox.framework>MusicTrackGetProperty"
 -- OSStatus MusicTrackGetProperty(MusicTrack inTrack, UInt32 inPropertyID, void *outData, UInt32 *ioLength);
 ----------------------------------------------------------------- Time Stamping ------------------------------------------------------------
 -- https://developer.apple.com/documentation/kernel/1462446-mach_absolute_time?language=objc
@@ -221,9 +222,8 @@ public handler AudioToolboxCreateSequenceFromSMF(in pMIDIfilePath as String) ret
       log "TrackCount:"
       log rTrackCountUint32
 
-      put c_ATMusicSequenceGetTempoTrack(sMusicSequence,rMusicSequenceTempoTrack) into tOSStatus
+      -- put c_ATMusicSequenceGetTempoTrack(sMusicSequence,rMusicSequenceTempoTrack) into tOSStatus
       -- log rMusicSequenceTempoTrack
-
       -- put 6 into tTrackPropertyEnum -- kSequenceTrackProperty_TimeResolution = 6
       -- put c_ATMusicTrackGetProperty(rMusicSequenceTempoTrack,tTrackPropertyEnum,nothing,tNum) into tOSStatus
       -- log rTrackPropertyData
@@ -233,7 +233,6 @@ public handler AudioToolboxCreateSequenceFromSMF(in pMIDIfilePath as String) ret
       -- log tOSStatus
       -- log tData
       -- log tNum
-
       put c_ATMusicSequenceGetIndTrack(sMusicSequence, 1, sMusicSequenceTrack) into tOSStatus
       log tOSStatus
    end unsafe
@@ -253,7 +252,7 @@ public handler AudioToolboxCreateNewSequence() returns optional any
    variable tStr as String
    variable tNum as UInt32
    variable tData as Data
-   variable rTrackPropertyData as optional Data
+   variable rTrackPropertyData as Pointer
    variable tTrackPropertyEnum as optional UInt32
    unsafe
       put c_ATNewMusicSequence(sMusicSequence) into tOSStatus
@@ -278,7 +277,7 @@ public handler AudioToolboxCreateNewSequence() returns optional any
       -- put c_ATMusicTrackGetProperty(rMusicSequenceTempoTrack,tTrackPropertyEnum,nothing,tNum) into tOSStatus
       -- log rTrackPropertyData
       --log tNum
-      put 0 into rTrackPropertyData
+      put nothing into rTrackPropertyData
       put 0 into tNum
       put 2 into tTrackPropertyEnum -- kSequenceTrackProperty_MuteStatus = 2
       put c_ATMusicTrackGetProperty(rMusicSequenceTempoTrack,tTrackPropertyEnum,rTrackPropertyData,tNum) into tOSStatus
@@ -296,6 +295,10 @@ public handler AudioToolboxSequenceGetTrackCount() returns Number
    return rTrackCountUint32
 end handler
 
+public foreign type MusicTimeStamp binds to "MCAggregateTypeInfo:jj" -- Declaration (numPackets: UInt32, *packet(MIDIPacket)) -- j = UInt32
+-- public type MusicTimeStamp is optional any -- message ID, message size
+foreign handler PointerToTimeStamp(out rMusicTimeStamp as optional any, in pPointer as Pointer, in pSize as UIntSize) returns nothing binds to "c:memcpy"
+
 public handler AudioToolboxSequenceGetTrackLength() -- returns Number
    -- // Get length of track so that we know how long to kill time for
    -- MusicTrack t;
@@ -303,23 +306,52 @@ public handler AudioToolboxSequenceGetTrackLength() -- returns Number
    -- UInt32 sz = sizeof(MusicTimeStamp);
    -- MusicSequenceGetIndTrack(s, 1, &t);
    -- MusicTrackGetProperty(t, kSequenceTrackProperty_TrackLength, &len, &sz);
-   -- public type MIDITimeStamp is UInt64
-   variable tMIDITimeStamp as optional MIDITimeStamp
+   variable tMusicTimeStamp as optional MusicTimeStamp
+   -- variable tMIDITimeStamp as optional MusicTimeStamp
    variable tCFError as optional ObjCId
    variable tOSStatus as optional CSInt
    variable tOBJ as optional ObjCId
+   variable tNum as optional Number
    variable rLengthUint32 as optional UInt32
    variable tData as optional any
-   variable rTrackPropertyData as Data
+   variable tMusicTimeStampPtr as optional Pointer
+   variable rTrackPropertyData as optional any
    variable tTrackPropertyEnum as optional UInt32
-   put 0 into rTrackPropertyData
-   put 0 into rLengthUint32
+   variable tBufferSize  as Number
+   variable tCnt as Number
+   variable tNSDataRef as ObjCId
+   variable tDataBytesPtr as Pointer
+   put 8 into tBufferSize
+   unsafe
+      put objC_NSMutableDataWithLength(NumberToNSNumber(tBufferSize)) into tNSDataRef
+      put objC_NSMutableDataBytesPtr(tNSDataRef) into tDataBytesPtr
+   -- put nothing into rTrackPropertyData
+   --put 0 into rLengthUint32
+   --put 0 into tMusicTimeStamp
+   --put 8 into rLengthUint32
    unsafe
       put 5 into tTrackPropertyEnum -- kSequenceTrackProperty_TrackLength = 5
-      put c_ATMusicTrackGetProperty(sMusicSequenceTrack,tTrackPropertyEnum,rTrackPropertyData,rLengthUint32) into tOSStatus
+      put c_ATMusicTrackGetProperty(sMusicSequenceTrack,tTrackPropertyEnum,tDataBytesPtr,rLengthUint32) into tOSStatus
+      put objC_NSMutableDataWithBytes(tDataBytesPtr. NumberFromNSNumber(8)) into tOBJ
+      log "Status"
       log tOSStatus
-      log rTrackPropertyData
+      log "Track"
+      log sMusicSequenceTrack
+      log "Data"
+      log tMusicTimeStampPtr
+      log "Length"
       log rLengthUint32
+      log "NSData"
+      log tOBJ
+      if tOSStatus = 0 then
+      --   put PointerToObjcObject(tMusicTimeStampPtr) into tOBJ
+      --   log tOBJ
+      --   put NumberFromNSNumber(tOBJ) into tNum
+      --   log tNum
+       -- PointerToTimeStamp( tMusicTimeStamp, tMusicTimeStampPtr, 8 )
+       -- log tMusicTimeStamp
+       -- log element 2 of tMusicTimeStamp
+      end if
    end unsafe
    return rLengthUint32
 end handler
@@ -328,10 +360,20 @@ end handler
  public handler AudioToolboxMusicSequenceGetIndTrack(in pIndex as UInt32) returns optional any
     variable tCFError as optional ObjCId
     variable tOSStatus as optional CSInt
+    variable tOBJ as optional ObjCId
+    variable tNum as optional Number
+    variable rLengthUint32 as optional UInt32
+    variable tData as optional any
+    variable tMusicTimeStampPtr as any
+    variable rTrackPropertyData as optional any
+    variable tTrackPropertyEnum as optional UInt32
     unsafe
        put c_ATMusicSequenceGetIndTrack(sMusicSequence,pIndex,sMusicSequenceTrack) into tOSStatus
        log tOSStatus
        log sMusicSequenceTrack
+       put 2 into tTrackPropertyEnum -- kSequenceTrackProperty_MuteStatus = 2
+       put c_ATMusicTrackGetProperty(sMusicSequenceTrack,tTrackPropertyEnum,tData,rLengthUint32) into tOSStatus
+       log tData
     end unsafe
  end handler
 
@@ -399,8 +441,8 @@ public foreign type MIDIObjectPropertyChangeNotification binds to "MCAggregateTy
 foreign handler PointerToMIDINotificationIDnSize(out rAggregate as MIDINotificationIDnSize, in pPointer as Pointer, in pSize as UIntSize) returns nothing binds to "c:memcpy"
 foreign handler PointerToMIDIObjectAddRemoveNotification(out rAggregate as MIDIObjectAddRemoveNotification, in pPointer as Pointer, in pSize as UIntSize) returns nothing binds to "c:memcpy"
 foreign handler PointerToMIDIObjectPropertyChangeNotification(out rAggregate as MIDIObjectPropertyChangeNotification, in pPointer as Pointer, in pSize as UIntSize) returns nothing binds to "c:memcpy"
-private foreign handler c_CFStringCreateCopy(in pCFAllocatorRef as optional Pointer, in pCFStringRef as optional ObjCId) returns optional ObjCId binds to "c:Foundation.framework>CFStringCreateCopy"
-private foreign handler c_CFBridgingRelease(in pCFStringRef as optional Pointer) returns optional ObjCId binds to "c:Foundation.framework>CFBridgingRelease"
+private foreign handler c_CFStringCreateCopy(in pCFAllocatorRef as Pointer, in pCFStringRef as optional ObjCId) returns optional ObjCId binds to "c:Foundation.framework>CFStringCreateCopy"
+private foreign handler c_CFBridgingRelease(in pCFStringRef as Pointer) returns optional ObjCId binds to "c:Foundation.framework>CFBridgingRelease"
 foreign handler MCStringCreateWithCString(in pString as Pointer, out rString as String) returns CBool binds to "<builtin>"
 
 -- public handler CoreMIDISetupChangedCallbackProc(in pContext as optional ObjcBlockPointer,in pMIDINotification as MIDINotification, in pRefCon as optional Pointer)
