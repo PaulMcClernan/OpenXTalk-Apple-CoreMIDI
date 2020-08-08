@@ -52,7 +52,6 @@ private foreign handler objC_NSMutableDataSetData(in pMutableDataRef as ObjcId, 
 private foreign handler objC_NSDataBytesPtr(inout pMutableDataRef as ObjcId) returns Pointer binds to "objc:NSData.bytes"
 private foreign handler c_CFArrayGetCount(in pCFArrayRef as Pointer) returns LCUInt binds to "c:CFArrayGetCount"
 private foreign handler objC_NSArrayCount(in pNSArray as ObjcId) returns LCUInt binds to "objc:NSArray.count"
-private foreign handler objC_NSMutableDataWithBytes(in pDataRef as ObjcId, in pReadLengthNSNum as ObjcId ) returns ObjcId binds to "objc:NSMutableData.+dataWithBytes:length:"
 private foreign handler objC_NSDataWithBytes(in pDataRef as ObjcId, in pReadLengthNSNum as ObjcId ) returns ObjcId binds to "objc:NSData.+dataWithBytes:length:"
 private foreign handler objC_NSMutableDataWithBytesNoCopy(in pDataRef as ObjcId, in pReadLengthNSNum as ObjcId ) returns ObjcId binds to "objc:NSMutableData.+dataWithBytesNoCopy:length:"
 private foreign handler objC_NSMutableDataWithBytesNoCopyFreeWhenDone(in pDataRef as ObjcId, in pReadLengthNSNum as ObjcId, in pFreeWhenDone as CBool) returns ObjcId binds to "objc:NSMutableData.+dataWithBytesNoCopy:length:freeWhenDone:"
@@ -163,7 +162,7 @@ private foreign handler c_ATMusicSequenceGetTrackCount(in pMusicSequence as ObjC
 private foreign handler c_ATMusicSequenceGetTempoTrack(in pMusicSequence as ObjCId, out rMusicSequenceTempoTrack as ObjCId) returns CSInt binds to "c:AudioToolbox.framework>MusicSequenceGetTempoTrack"
 private foreign handler c_ATMusicSequenceGetIndTrack(in pMusicSequence as ObjCId, in pIndex as UInt32, out rMusicSequenceTrack as optional Pointer) returns CSInt binds to "c:AudioToolbox.framework>MusicSequenceGetIndTrack"
 -- OSStatus MusicSequenceGetIndTrack(MusicSequence inSequence, UInt32 inTrackIndex, MusicTrack  _Nullable *outTrack);
-private foreign handler c_ATMusicTrackGetProperty(in pMusicSequenceTrack as optional Pointer, in pPropertyIDenum as Uint32, out rData as optional any, out rDataLength as optional Uint32) returns CSInt binds to "c:AudioToolbox.framework>MusicTrackGetProperty"
+private foreign handler c_ATMusicTrackGetProperty(in pMusicSequenceTrack as optional Pointer, in pPropertyIDenum as Uint32, out rData as optional Pointer, out rDataLength as optional Uint32) returns CSInt binds to "c:AudioToolbox.framework>MusicTrackGetProperty"
 -- OSStatus MusicTrackGetProperty(MusicTrack inTrack, UInt32 inPropertyID, void *outData, UInt32 *ioLength);
 ----------------------------------------------------------------- Time Stamping ------------------------------------------------------------
 -- https://developer.apple.com/documentation/kernel/1462446-mach_absolute_time?language=objc
@@ -295,9 +294,10 @@ public handler AudioToolboxSequenceGetTrackCount() returns Number
    return rTrackCountUint32
 end handler
 
-public foreign type MusicTimeStamp binds to "MCAggregateTypeInfo:jj" -- Declaration (numPackets: UInt32, *packet(MIDIPacket)) -- j = UInt32
+-- public foreign type MusicTimeStamp binds to "MCAggregateTypeInfo:q" -- Declaration (numPackets: UInt32, *packet(MIDIPacket)) -- j = UInt32
 -- public type MusicTimeStamp is optional any -- message ID, message size
-foreign handler PointerToTimeStamp(out rMusicTimeStamp as optional any, in pPointer as Pointer, in pSize as UIntSize) returns nothing binds to "c:memcpy"
+public type MusicTimeStamp is optional UInt64 -- message ID, message size
+foreign handler PointerToTimeStamp(out rMusicTimeStamp as optional MusicTimeStamp, in pPointer as Pointer, in pSize as UIntSize) returns nothing binds to "c:memcpy"
 
 public handler AudioToolboxSequenceGetTrackLength() -- returns Number
    -- // Get length of track so that we know how long to kill time for
@@ -307,49 +307,54 @@ public handler AudioToolboxSequenceGetTrackLength() -- returns Number
    -- MusicSequenceGetIndTrack(s, 1, &t);
    -- MusicTrackGetProperty(t, kSequenceTrackProperty_TrackLength, &len, &sz);
    variable tMusicTimeStamp as optional MusicTimeStamp
+   -- variable tMusicTimeStamp as optional Number
    -- variable tMIDITimeStamp as optional MusicTimeStamp
    variable tCFError as optional ObjCId
    variable tOSStatus as optional CSInt
    variable tOBJ as optional ObjCId
    variable tNum as optional Number
    variable rLengthUint32 as optional UInt32
-   variable tData as optional any
+   variable tData as optional Data
    variable tMusicTimeStampPtr as optional Pointer
    variable rTrackPropertyData as optional any
    variable tTrackPropertyEnum as optional UInt32
-   variable tBufferSize  as Number
+   variable tBufferSize as Number
    variable tCnt as Number
    variable tNSDataRef as ObjCId
-   variable tDataBytesPtr as Pointer
+   variable tDataBytesPtr as optional Pointer
    put 8 into tBufferSize
    unsafe
-      put objC_NSMutableDataWithLength(NumberToNSNumber(tBufferSize)) into tNSDataRef
-      put objC_NSMutableDataBytesPtr(tNSDataRef) into tDataBytesPtr
-   -- put nothing into rTrackPropertyData
-   --put 0 into rLengthUint32
-   --put 0 into tMusicTimeStamp
-   --put 8 into rLengthUint32
-   unsafe
+      -- put objC_NSMutableDataWithLength(NumberToNSNumber(tBufferSize)) into tNSDataRef
+      -- put objC_NSMutableDataBytesPtr(tNSDataRef) into tDataBytesPtr
+      put nothing into tDataBytesPtr
+      put 0 into rLengthUint32
+      --put 0 into tMusicTimeStamp=
+      -- put 2 into tTrackPropertyEnum -- kSequenceTrackProperty_MuteStatus = 2
       put 5 into tTrackPropertyEnum -- kSequenceTrackProperty_TrackLength = 5
-      put c_ATMusicTrackGetProperty(sMusicSequenceTrack,tTrackPropertyEnum,tDataBytesPtr,rLengthUint32) into tOSStatus
-      put objC_NSMutableDataWithBytes(tDataBytesPtr. NumberFromNSNumber(8)) into tOBJ
-      log "Status"
+      put c_ATMusicTrackGetProperty(sMusicSequenceTrack,tTrackPropertyEnum,tMusicTimeStampPtr,rLengthUint32) into tOSStatus
+      log "Status:"
       log tOSStatus
-      log "Track"
+      log "Track Object:"
       log sMusicSequenceTrack
-      log "Data"
+      log "Data Pointer:"
       log tMusicTimeStampPtr
-      log "Length"
+      log "Length:"
       log rLengthUint32
-      log "NSData"
-      log tOBJ
+      -- log "TimeStamp"
+      -- log tMusicTimeStamp
+      -- log "NSData"
+      --log tNSDataRef
+      -- log tOBJ
       if tOSStatus = 0 then
-      --   put PointerToObjcObject(tMusicTimeStampPtr) into tOBJ
-      --   log tOBJ
+         --  put objC_NSMutableDataWithBytes(tDataBytesPtr,NumberToNSNumber(rLengthUint32)) into tOBJ
+      -- put PointerToObjcObject(tDataBytesPtr) into tOBJ
+      --log tOBJ
       --   put NumberFromNSNumber(tOBJ) into tNum
       --   log tNum
-       -- PointerToTimeStamp( tMusicTimeStamp, tMusicTimeStampPtr, 8 )
-       -- log tMusicTimeStamp
+      -- put DataFromNSData(tDataBytesPtr) into tData
+      --log tData
+      -- PointerToTimeStamp( tMusicTimeStamp, tDataBytesPtr, 8 )
+      --log tMusicTimeStamp
        -- log element 2 of tMusicTimeStamp
       end if
    end unsafe
