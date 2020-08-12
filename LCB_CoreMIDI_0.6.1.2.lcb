@@ -161,6 +161,8 @@ private foreign handler c_ATMusicSequenceGetSequenceType(in pMusicSequence as Ob
 private foreign handler c_ATMusicSequenceGetTrackCount(in pMusicSequence as ObjCId, out rTrackCount as Uint32) returns CSInt binds to "c:AudioToolbox.framework>MusicSequenceGetTrackCount"
 private foreign handler c_ATMusicSequenceGetTempoTrack(in pMusicSequence as ObjCId, out rMusicSequenceTempoTrack as ObjCId) returns CSInt binds to "c:AudioToolbox.framework>MusicSequenceGetTempoTrack"
 private foreign handler c_ATMusicSequenceGetIndTrack(in pMusicSequence as ObjCId, in pIndex as UInt32, out rMusicSequenceTrack as optional Pointer) returns CSInt binds to "c:AudioToolbox.framework>MusicSequenceGetIndTrack"
+private foreign handler c_ATMusicSequenceGetTrackIndex(in pMusicSequence as ObjCId, in rMusicSequenceTrack as Pointer, out in pIndex as UInt32) returns CSInt binds to "c:AudioToolbox.framework>MusicSequenceGetTrackIndex"
+private foreign handler c_ATMusicSequenceDisposeTrack(in pMusicSequence as ObjCId, in rMusicSequenceTempoTrack as ObjCId) returns CSInt binds to "c:AudioToolbox.framework>MusicSequenceDisposeTrack"
 -- OSStatus MusicSequenceGetIndTrack(MusicSequence inSequence, UInt32 inTrackIndex, MusicTrack  _Nullable *outTrack);
 private foreign handler c_ATMusicTrackGetProperty(in pMusicSequenceTrack as optional Pointer, in pPropertyIDenum as Uint32, out rData as optional Pointer, out rDataLength as optional Uint32) returns CSInt binds to "c:AudioToolbox.framework>MusicTrackGetProperty"
 -- OSStatus MusicTrackGetProperty(MusicTrack inTrack, UInt32 inPropertyID, void *outData, UInt32 *ioLength);
@@ -387,6 +389,15 @@ public handler AudioToolboxSequenceNewTrack() returns optional any
    variable tOSStatus as optional CSInt
    unsafe
       put c_ATMusicSequenceNewTrack(sMusicSequence,sMusicSequenceTrack) into tOSStatus
+   end unsafe
+end handler
+
+public handler AudioToolboxSequenceDisposeTrack(in pTrackIndexNum as UInt32) returns optional any
+   variable tCFError as optional ObjCId
+   variable tOSStatus as optional CSInt
+   unsafe
+      put c_ATMusicSequenceGetIndTrack(sMusicSequence,pIndex,sMusicSequenceTrack) into tOSStatus
+      put c_ATMusicSequenceDisposeTrack(sMusicSequence,sMusicSequenceTrack) into tOSStatus
    end unsafe
 end handler
 
