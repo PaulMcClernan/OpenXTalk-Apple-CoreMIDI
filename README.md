@@ -22,13 +22,14 @@ https://www.youtube.com/watch?v=s_knX8mJg1c
 - Some more Error Checking and Reporting in the LCB end to return descriptive information about any errors that may occur.
 - MIDI Setup changed notifications to alert LiveCode of changes to the current setup (a MIDI Instrument gets turned off for example)
 
+### Work in Progress:
+- MIDI In with callbacks to tell LiveCode engine that new incoming MIDI Data is available for receiving / processing and routines related to receiving MIDI events (Core MIDI nanoseconds to milliseconds for LC, adding events to AudioToolbox MusicSequence MusicTrack, etc.) currently these callbacks crash the engine after recieving a random amount of MIDI messages.
+
+- Add handlers & functions for using Apple's Music Player Sequencing Services to create and record tracks in multi-track sequences, associate endpoints with tracks, right data out to Standard Files, etc. - currently working on these.
+
+- Add handlers & functions for connecting to/from Destinations, Ports, Entities and Endpoints that are available on the current system, and for determining whether an Device / object is offline or not. Some of this is done already.
+
 ### To Do:
-
-- MIDI In with callbacks to tell LiveCode engine that new incoming MIDI Data is available for receiving and processing any related TimeStamp info for received MIDI events (Core MIDI nanoseconds to milliseconds for LC)
-
-- Add handlers & functions for connecting to/from Destinations, Ports, Entities and Endpoints that are available on the current system, and for determining whether an Device / object is offline or not.
-
-- Add handlers & functions for using Apple's Music Player Sequencing Services to create and record tracks in multi-track sequences, associate endpoints with tracks, right data out to Standard Files, etc.
 
 - Add transport function (AppleEvent) Messages for Stop, Start, Pause, Play, Record (See demo stack for transport control of GarageBand via AppleSCript).
 
