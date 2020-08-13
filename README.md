@@ -31,7 +31,7 @@ https://www.youtube.com/watch?v=s_knX8mJg1c
 
 ### To Do:
 
-- Add transport function (AppleEvent) Messages for Stop, Start, Pause, Play, Record (See demo stack for transport control of GarageBand via AppleSCript).
+- Add transport function (AppleEvent) Messages for Stop, Start, Pause, Play, Record (See demo stack for transport control of GarageBand via AppleScript).
 
 - Add bindings for MIDI Thru Connection, a part of Core MIDI that facilitates realtime manipulation of MIDI Data as it passes though the MIDI Setup.
 
