@@ -161,7 +161,7 @@ private foreign handler c_ATMusicSequenceGetSequenceType(in pMusicSequence as Ob
 private foreign handler c_ATMusicSequenceGetTrackCount(in pMusicSequence as ObjCId, out rTrackCount as Uint32) returns CSInt binds to "c:AudioToolbox.framework>MusicSequenceGetTrackCount"
 private foreign handler c_ATMusicSequenceGetTempoTrack(in pMusicSequence as ObjCId, out rMusicSequenceTempoTrack as optional Pointer) returns CSInt binds to "c:AudioToolbox.framework>MusicSequenceGetTempoTrack"
 private foreign handler c_ATMusicSequenceGetIndTrack(in pMusicSequence as ObjCId, in pIndex as UInt32, out rMusicSequenceTrack as optional Pointer) returns CSInt binds to "c:AudioToolbox.framework>MusicSequenceGetIndTrack"
-private foreign handler c_ATMusicSequenceGetTrackIndex(in pMusicSequence as ObjCId, in pMusicSequenceTrack as optional Pointer, out rIndex as optional UInt32) returns CSInt binds to "c:AudioToolbox.framework>MusicSequenceGetTrackIndex"
+private foreign handler c_ATMusicSequenceGetTrackIndex(in pMusicSequence as ObjCId, in pMusicSequenceTrack as Pointer, out rIndex as UInt32) returns CSInt binds to "c:AudioToolbox.framework>MusicSequenceGetTrackIndex"
 private foreign handler c_ATMusicSequenceDisposeTrack(in pMusicSequence as ObjCId, in pMusicSequenceTrack as optional Pointer) returns CSInt binds to "c:AudioToolbox.framework>MusicSequenceDisposeTrack"
 -- OSStatus MusicSequenceGetIndTrack(MusicSequence inSequence, UInt32 inTrackIndex, MusicTrack  _Nullable *outTrack);
 private foreign handler c_ATMusicTrackGetProperty(in pMusicSequenceTrack as optional Pointer, in pPropertyIDenum as Uint32, out rData as optional Pointer, out rDataLength as optional Uint32) returns CSInt binds to "c:AudioToolbox.framework>MusicTrackGetProperty"
@@ -184,8 +184,8 @@ constant kMIDIObjectType_Device is 0
 constant kMIDIObjectType_Other is -1
 
 private variable sMusicSequence as optional ObjcId
-private variable sMusicSequenceTrack as optional Pointer
-private variable sMusicSequenceTempoTrack as optional Pointer
+private variable sMusicSequenceTrack as Pointer
+private variable sMusicSequenceTempoTrack as Pointer
 
 public handler AudioToolboxCreateSequenceFromSMF(in pMIDIfilePath as String) returns optional any
    variable tCFError as optional ObjCId
@@ -209,22 +209,20 @@ public handler AudioToolboxCreateSequenceFromSMF(in pMIDIfilePath as String) ret
       -- put c_ATMusicSequenceNewTrack(sMusicSequence,rMusicSequenceTrack) into tOSStatus
       put c_ATMusicSequenceFileLoad(sMusicSequence, tMIDIfilePathNSURL, 1835623529 , 0) into tOSStatus
       -- kMusicSequenceFile (type Uint32) _AnyType = 0 _iMelodyType = 1768777068 _midiType = 1835623529-- kMusicSequenceLoadSMF_PreserveTracks = 0 (type UInt32)
-
       put c_ATNewMusicSequenceGetInfoDict(sMusicSequence) into tOBJ
       put ArrayFromNSDictionary(tOBJ) into tSeqInfoDictArray
       log tSeqInfoDictArray
       put c_ATMusicSequenceGetSequenceType(sMusicSequence, rMusicSequenceTypeCode ) into tOSStatus
-      -- Uint32To4CharCode(rMusicSequenceTypeCode,rMusicSequenceTypeUint32,4)
       repeat for each element tElement in rMusicSequenceTypeCode
             put the char with code tElement before tStr
       end repeat
       log tStr -- this string should be one of the following: "beat","secs","samp"
       put c_ATMusicSequenceGetTempoTrack(sMusicSequence,sMusicSequenceTempoTrack) into tOSStatus
+      log "Tempo Track:"
       log sMusicSequenceTempoTrack
       put c_ATMusicSequenceGetTrackCount(sMusicSequence, rTrackCountUint32) into tOSStatus
       log "TrackCount:"
       log rTrackCountUint32
-
       -- put c_ATMusicSequenceGetTempoTrack(sMusicSequence,rMusicSequenceTempoTrack) into tOSStatus
       -- log rMusicSequenceTempoTrack
       -- put 6 into tTrackPropertyEnum -- kSequenceTrackProperty_TimeResolution = 6
@@ -236,7 +234,7 @@ public handler AudioToolboxCreateSequenceFromSMF(in pMIDIfilePath as String) ret
       -- log tOSStatus
       -- log tData
       -- log tNum
-      put c_ATMusicSequenceGetIndTrack(sMusicSequence, 1, sMusicSequenceTrack) into tOSStatus
+      put c_ATMusicSequenceGetIndTrack(sMusicSequence, 0, sMusicSequenceTrack) into tOSStatus
       log tOSStatus
    end unsafe
 end handler
@@ -306,12 +304,14 @@ public handler AudioToolboxSequenceSelectedTrackIndex() returns optional any
       if sMusicSequence is nothing then
          return "Error: Current Sequence is null"
       else
-      -- if sMusicSequenceTrack is nothing then
-      --   return "Error: Current Track is null"
+      -- if sMusicSequenceTrack is nothing then -- This seems to crash the LC engine if sMusicSequenceTrack is undefined or null for some reason
+      --   return "Error: Current Track is not selected"
       -- end if
          put c_ATMusicSequenceGetTrackIndex(sMusicSequence, sMusicSequenceTrack, tTrackIndex) into tOSStatus
          if tOSStatus is 0 then
-            return tTrackIndex
+            if tTrackIndex is not nothing then
+               return tTrackIndex parsed as number
+            end if
          else
             return "Error: " & ( tOSStatus formatted as string )
          end if
@@ -387,7 +387,7 @@ public handler AudioToolboxSequenceGetTrackLength() -- returns Number
 end handler
 
  -- c_AudioToolboxMusicSequenceGetIndTrack(MusicSequence inSequence, UInt32 inTrackIndex, MusicTrack  _Nullable *outTrack) into OSStatus
- public handler AudioToolboxMusicSequenceGetIndTrack(in pIndex as UInt32) returns optional any
+ public handler AudioToolboxMusicSequenceGetIndTrack(in pIndex as UInt32) -- returns optional any
     variable tCFError as optional ObjCId
     variable tOSStatus as optional CSInt
     variable tOBJ as optional ObjCId
@@ -401,9 +401,9 @@ end handler
        put c_ATMusicSequenceGetIndTrack(sMusicSequence,pIndex,sMusicSequenceTrack) into tOSStatus
        log tOSStatus
        log sMusicSequenceTrack
-       put 2 into tTrackPropertyEnum -- kSequenceTrackProperty_MuteStatus = 2
-       put c_ATMusicTrackGetProperty(sMusicSequenceTrack,tTrackPropertyEnum,tData,rLengthUint32) into tOSStatus
-       log tData
+       -- put 2 into tTrackPropertyEnum -- kSequenceTrackProperty_MuteStatus = 2
+       -- put c_ATMusicTrackGetProperty(sMusicSequenceTrack,tTrackPropertyEnum,tData,rLengthUint32) into tOSStatus
+       -- log tData
     end unsafe
  end handler
 
@@ -420,7 +420,9 @@ public handler AudioToolboxSequenceDisposeTrack(in pTrackIndexNum as UInt32) ret
    variable tOSStatus as optional CSInt
    unsafe
       put c_ATMusicSequenceGetIndTrack(sMusicSequence,pTrackIndexNum,sMusicSequenceTrack) into tOSStatus
-      put c_ATMusicSequenceDisposeTrack(sMusicSequence,sMusicSequenceTrack) into tOSStatus
+      if tOSStatus is 0 then
+         put c_ATMusicSequenceDisposeTrack(sMusicSequence,sMusicSequenceTrack) into tOSStatus
+      end if
    end unsafe
 end handler
 
@@ -432,6 +434,8 @@ public handler AudioToolboxTrackNewMIDINoteEvent() returns optional any
       put c_ATMusicTrackNewMIDINoteEvent(sMusicSequence,sMusicSequenceTrack,tMIDINoteEvent) into tOSStatus
    end unsafe
 end handler
+
+-----------------------------------------------------------------------------------------------------------------------------
 
 public handler CoreMIDIObjectTypeToString(in pMIDIObjTypeEnum as optional Number) returns optional String
    if pMIDIObjTypeEnum is -1 then
