@@ -1350,15 +1350,17 @@ public foreign type MIDIPacketListData binds to "MCAggregateTypeInfo:jhhhhhhhhih
 -- foreign handler PointerToMIDIPacketList(out rAggregate as MIDIPacketListData, in pPointer as Pointer, in pSize as UIntSize) returns nothing binds to "c:memcpy"
 foreign handler PointerToMIDIPacketList(out rMemChunk as MIDIPacketListData, in pPointer as Pointer, in pSize as UIntSize) returns nothing binds to "c:memcpy"
 
+public variable sMIDIDataBuffer as optional Data
+public handler CoreMIDIReadBuffer (in pMIDIPacketListPtr as Pointer)
+end handler
 -- foreign handler PointerToMIDIPacket(out rAggregate as MIDIPacket, in pPointer as Pointer, in pSize as UIntSize) returns nothing binds to "c:memcpy"
 -- typedef void (*MIDIReadProc)(const MIDIPacketList *pktlist, void *readProcRefCon, void *srcConnRefCon);
 -- typedef void (^MIDIReadBlock)(const MIDIPacketList *pktlist, void *srcConnRefCon);
-public handler CoreMIDIReadCallbackProcedure( in pContext as optional ObjcBlockPointer, in pMIDIPacketListPtr as MIDIPacketList, in pReadProcRefCont as optional Pointer, in pSrcConnRefCont as optional Pointer)
--- public handler CoreMIDIReadCallbackProcedure( in pContext as optional ObjcBlockPointer, in pMIDIPacketListPtr as Pointer, in pSourceRefCon as optional Pointer) returns nothing
-    -- CoreMIDISendMIDIbytesNow(in pMIDIMsgData as Data) returns nothing
-      -- variable tOSStatus as optional CSInt
+-- public handler CoreMIDIReadCallbackProcedure( in pContext as optional ObjcBlockPointer, in pMIDIPacketListPtr as MIDIPacketList, in pReadProcRefCont as optional ObjCId, in pSrcConnRefCont as optional ObjCId)
+-- public handler CoreMIDIReadCallbackProcedure( in pContext as optional ObjcBlockPointer, in pMIDIPacketListPtr as MIDIPacketList, in pReadProcRefCont as optional Pointer, in pSrcConnRefCont as optional Pointer)
+public handler CoreMIDIReadCallbackProcedure( in pContext as optional ObjcBlockPointer, in pMIDIPacketListPtr as optional Pointer, in pSourceRefCon as optional Pointer)
+      -- log pMIDIPacketListPtr
       variable tOSStatus as optional CSInt
-
       variable tAbsoluteTime as UInt64
       variable tTBnumerator as UInt32
       variable tTBdenominator as UInt32
@@ -1382,115 +1384,25 @@ public handler CoreMIDIReadCallbackProcedure( in pContext as optional ObjcBlockP
       variable tCounter as Integer
       variable tNum as Number
       variable tString as String
-      --variable tMIDIMsgBytesNSDataRef as ObjCId
-      -- variable tMIDIMsgBytesPtr as Pointer
-      -- put the number of bytes in pMIDIMsgData into tCnt
-      -- put 256 into tBufferSize
-      -- put 0 into tTimeStamp
-      -- put the empty string into tMIDIMsg
-      put the empty list into tMIDIMsgList
-      put the empty array into sMIDIinPacketBuffer
-      put [0,0] into tTimeBaseInfo
       unsafe
-       -- put c_MIDIPacketNext(pMIDIPacketListPtr) into tMIDIPacketListPtr
-       -- log tMIDIPacketListPtr
-       -- put objC_NSDataGetLength(tMIDIPacketListPtr) into tObj
-       -- put NumberFromNSNumber(tObj) into tNum
-       -- log tNum
-         -- put objC_NSMutableDataWithLength(NumberToNSNumber(8)) into tTimeBaseInfoRef
-         -- put objC_NSMutableDataBytesPtr(tTimeBaseInfoRef) into tTimeBaseInfoPtr
-         put c_mach_absolute_time() into tAbsoluteTime
-         c_mach_timebase_info(tTimeBaseInfo) -- into tTimeBaseInfo
-         put element 1 of tTimeBaseInfo into tTBnumerator
-         put element 2 of tTimeBaseInfo into tTBdenominator
-         put tAbsoluteTime * tTBnumerator / tTBdenominator into tTimeStamp
-         put tTimeStamp / 1000000000 into tTimeStamp
-         log tTimeStamp
-         -- put tTimeStamp * 1000 * 1000 into tTimeStamp
-      -- format tTimeStamp as string into tTimeStampStr
-      -- put tTimeStampStr
-      -- put objC_NSMutableDataWithLength(NumberToNSNumber(1024) into sMIDIinPacketBuffer
-      -- objC_NSMutableDataSetData(tMIDIMsgBytesNSDataRef, DataToNSData(pMIDIMsgData))
-
-         -- put the empty string into sMIDIPacketListBufferString
-
-         -- put objC_NSDataGetLength(pMIDIPacketListPtr) into tObj
-         -- put NumberFromNSNumber(tObj) into tCnt
-         -- log tCnt
-
-         -- https://developer.apple.com/documentation/foundation/nsdata/1547231-datawithbytes?language=objc
-         -- PointerToMIDIPacketList(tMIDIPacketListData, pMIDIPacketListPtr,256)
-
-         -- log tObj
-         -- put DataFobjC_NSDataWithBytesromNSData(tObj) into tMIDIPacketListData
-         -- put objC_NSDataGetLength(tObj) into tObj
-         -- put NumberFromNSNumber(tObj) into tCnt
          PointerToMIDIPacketList(tMIDIPacketListData, pMIDIPacketListPtr, 270)
-         -- put objC_NSMutableDataWithBytesNoCopy(pMIDIPacketListPtr,NumberToNSNumber(270)) into tObj
-         -- put objC_NSMutableDataWithBytesNoCopyFreeWhenDone(pMIDIPacketListPtr,NumberToNSNumber(270),true) into tObj
-         -- logThing(tObj)
+         put tMIDIPacketListData after sMIDIDataBuffer
          -- log tMIDIPacketListData
-         -- put element 1 of tMIDIPacketList into tCnt
-         put element 1 of tMIDIPacketListData into tMIDIPacketCount
-         put 11 into tCounter
-         put element 10 of tMIDIPacketListData into tMIDIMsgLength
-         repeat tMIDIMsgLength times
-            push element tCounter of tMIDIPacketListData onto tMIDIMsgList
-            add 1 to tCounter
-         end repeat
-         put tTimeStamp formatted as string into tTimeStampStr
-         -- combine tMIDIMsgList with " " into tString
-         put tMIDIMsgList into tPacketListArray[tTimeStampStr]
-         log tPacketListArray[tTimeStampStr]
-         -- push  onto sMIDIinPacketBuffer tPacketListArray[tTimeStampStr]
-         -- log sMIDIinPacketBuffer
-         --AddToMIDIMsgBytesToBufferString(tMIDIMsgList)
-         -- AddToMIDIMsgList(tMIDIMsgList)
+      end unsafe
+end handler
 
-         -- if tMIDIPacketCount > 1 then -- more MIDI messages in packet
-         --    put pMIDIPacketListPtr into tMIDIMsgBytesPtr
-         --   repeat with tMIDIPacketIterator from 2 up to tMIDIPacketCount
-         --   put c_MIDIPacketNext(tMIDIMsgBytesPtr) into tMIDIMsgBytesPtr
-         --      log [tMIDIMsgBytesPtr]
-         --   end repeat
-         -- end if
+public handler GetMIDIDataBuffer() returns optional any
+   -- log sMIDIDataBuffer
+   return sMIDIDataBuffer
+end handler
 
-         -- put objC_NSMutableDataWithBytesNoCopyFreeWhenDone(pMIDIPacketListPtr,NumberToNSNumber(270),true) into tObj
-         -- AddToMIDIMsgBufferString( element 11 of sMIDIPacketListData, element 12 of sMIDIPacketListData, element 13 of sMIDIPacketListData)
-
-         -- put objC_NSMutableDataWithLength(NumberToNSNumber(tBufferSize)) into sMIDIPacketByteBufferNSMutableDataRef
-         -- put objC_NSMutableDataBytesPtr(sMIDIPacketByteBufferNSMutableDataRef) into sMIDIPacketByteBufferPtr
-
-         -- put c_MIDIPacketListInit(sMIDIPacketByteBufferPtr) into sMIDIPacketPtr
-
-         -- put objC_NSMutableDataWithLength(NumberToNSNumber(tCnt)) into tMIDIMsgBytesNSDataRef
-         -- put objC_NSMutableDataBytesPtr(tMIDIMsgBytesNSDataRef) into tMIDIMsgBytesPtr
-
-         -- put c_MIDIPacketListAdd(sMIDIPacketByteBufferPtr,tBufferSize,sMIDIPacketPtr,tTimeStamp,tCnt,tMIDIMsgBytesPtr) into sMIDIPacketPtr
-         -- put c_MIDIReceived(sMIDISourceEndpointRef,sMIDIPacketByteBufferPtr) into tOSStatus
-   -- variable tMIDIPacketListData as MIDIPacketListData
-   -- put tMIDIPacketListData into sMIDIPacketListData
-      -- log sMIDIPacketListData
-      --resolve script object "this stack"
-      --put the result into sTarget
-      -- --PostMIDIMsg(element 11 of sMIDIPacketListData, element 12 of sMIDIPacketListData, element 13 of sMIDIPacketListData)
-      -- post "MIDIin " & element 11 of sMIDIPacketListData &","& element 12 of sMIDIPacketListData  &","& elemen t 13 of sMIDIPacketListData
-       -- PostMIDIMsg()
-      -- if element 11 of tMIDIPacketListData is 144 then
-      --PostNoteOnMIDIMsg()
-      --   log "NoteOn Chan 1"
-      -- end if
-      -- PostMIDIMsg( element 11 of tMIDIPacketListData, element 12 of tMIDIPacketListData, element 13 of tMIDIPacketListData)
-      -- if element 11 of tMIDIPacketListData is 128 then
-      --   log "NoteOff Chan 1"
-      -- end if
-      -- log tMIDIPacketListData
-      -- log sTarget
-   end unsafe
+public handler FlushMIDIDataBuffer()
+   put nothing into sMIDIDataBuffer
 end handler
 
 public handler CoreMIDIDestinationCreate(in destinationName as String,in uniqueIDnum as optional SInt32) returns any -- Data
-   variable tDestNameStrRef as ObjcObject
+   variable tDestNameStrRef as ObjCId
+   variable tRefConStrRef as ObjCId
    variable tOSStatus as optional CSInt
    variable tCFError as optional ObjCId
    variable tPropertyValSInt32 as optional SInt32
@@ -1500,9 +1412,10 @@ public handler CoreMIDIDestinationCreate(in destinationName as String,in uniqueI
          return "Error Intitializing Read Procedure"
       else
 			put StringToNSString(destinationName) into tDestNameStrRef
-         -- put c_MIDIDestinationCreateWithBlock(sMIDIClientRef,tDestNameStrRef,sMIDIDestEndpointRef,sCoreMIDIReadCallbackProcPtr) into tOSStatus
+         -- OSStatus MIDIDestinationCreateWithBlock(MIDIClientRef client, CFStringRef name, MIDIEndpointRef *outDest, MIDIReadBlock readBlock);
+         put c_MIDIDestinationCreateWithBlock(sMIDIClientRef,tDestNameStrRef,sMIDIDestEndpointRef,sCoreMIDIReadCallbackProcPtr) into tOSStatus
          --put c_MIDIDestinationCreate(sMIDIClientRef,pMIDIDestinationNameCFStrRef,pMIDIReadProc,pRefConst,sMIDIDestEndpointRef) into tOSStatus
-         put c_MIDIDestinationCreate(sMIDIClientRef,tDestNameStrRef,sCoreMIDIReadCallbackProcPtr,nothing,sMIDIDestEndpointRef) into tOSStatus
+         -- put c_MIDIDestinationCreate(sMIDIClientRef,tDestNameStrRef,sCoreMIDIReadCallbackProcPtr,tRefConStrRef,sMIDIDestEndpointRef) into tOSStatus
          if uniqueIDnum is not nothing then
             put c_MIDIObjectSetIntegerProperty(sMIDIDestEndpointRef,StringToNSString("uniqueID"),uniqueIDnum) into tOSStatus
          end if
@@ -1514,7 +1427,6 @@ public handler CoreMIDIDestinationCreate(in destinationName as String,in uniqueI
          end if
          -- put objC_NSMutableDataWithLength(NumberToNSNumber(1024)) into sMIDIinPacketBuffer
       end if
-
    end unsafe
 end handler
 -- private foreign handler c_MIDIDestinationCreate(in pMIDIClientRef as MIDIObjRef, in pMIDIDestinationNameStrRef as ObjcId, in pMIDIReadProc as optional any, in pRefConst as optional any, \
