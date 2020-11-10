@@ -1203,7 +1203,7 @@ public handler CoreMIDISourceCreate(in sourceName as String,in uniqueIDnum as op
    end unsafe
 end handler
 
-private variable sMIDIPacketListData as List
+public variable sMIDIPacketListData as List
 public variable sMIDIPacketListBufferString as String
 public variable sMIDIMsgList as String
 public variable sMIDIinPacketBuffer as Array
@@ -1346,52 +1346,59 @@ public variable sCoreMIDIReadCallbackProcPtr as optional ObjcBlockPointer
 -- public foreign type MIDIPacketListData binds to "MCAggregateTypeInfo:jhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh" -- Declaration (numPackets: UInt32, *packet(MIDIPacket)) -- j = UInt32
 public foreign type MIDIPacketListData binds to "MCAggregateTypeInfo:jhhhhhhhhihhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh" -- Declaration (numPackets: UInt32, *packet(MIDIPacket)) -- j = UInt32
 -- public foreign type MIDIPacketListData binds to "MCAggregateTypeInfo:hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh" -- Declaration (numPackets: UInt32, *packet(MIDIPacket)) -- j = UInt32
-
+-- public foreign type MIDIPacketListData binds to "MCAggregateTypeInfo:jkq"
+-- public foreign type MIDIPacketListData binds to "MCAggregateTypeInfo:Jjjhhhhhh" -- Protocol (1=MIDI 1.0),
 -- foreign handler PointerToMIDIPacketList(out rAggregate as MIDIPacketListData, in pPointer as Pointer, in pSize as UIntSize) returns nothing binds to "c:memcpy"
 foreign handler PointerToMIDIPacketList(out rMemChunk as MIDIPacketListData, in pPointer as Pointer, in pSize as UIntSize) returns nothing binds to "c:memcpy"
 
-public variable sMIDIDataBuffer as optional Data
-public handler CoreMIDIReadBuffer (in pMIDIPacketListPtr as Pointer)
-end handler
+public variable sMIDIDataBuffer as optional String
+
 -- foreign handler PointerToMIDIPacket(out rAggregate as MIDIPacket, in pPointer as Pointer, in pSize as UIntSize) returns nothing binds to "c:memcpy"
 -- typedef void (*MIDIReadProc)(const MIDIPacketList *pktlist, void *readProcRefCon, void *srcConnRefCon);
+-- sMIDIClientRef,tDestNameStrRef,sCoreMIDIReadCallbackProcPtr,nothing,sMIDIDestEndpointRef)
+public handler CoreMIDIReadCallbackProc( in pContext as optional ObjcBlockPointer, in pMIDIPacketListPtr as optional any, inout pReadRefCon as optional any, inout pSourceRefCon as optional any)
+      log [pMIDIPacketListPtr,pReadRefCon,pSourceRefCon]
+      -- if pMIDIPacketListPtr is not nothing then
+         --GetPackets(pMIDIPacketListPtr)
+      -- end if
+      -- put StringToNSString("LiveCode") into pParam
+end handler
 -- typedef void (^MIDIReadBlock)(const MIDIPacketList *pktlist, void *srcConnRefCon);
 -- public handler CoreMIDIReadCallbackProcedure( in pContext as optional ObjcBlockPointer, in pMIDIPacketListPtr as MIDIPacketList, in pReadProcRefCont as optional ObjCId, in pSrcConnRefCont as optional ObjCId)
 -- public handler CoreMIDIReadCallbackProcedure( in pContext as optional ObjcBlockPointer, in pMIDIPacketListPtr as MIDIPacketList, in pReadProcRefCont as optional Pointer, in pSrcConnRefCont as optional Pointer)
-public handler CoreMIDIReadCallbackProcedure( in pContext as optional ObjcBlockPointer, in pMIDIPacketListPtr as optional Pointer, in pSourceRefCon as optional Pointer)
-      -- log pMIDIPacketListPtr
-      variable tOSStatus as optional CSInt
-      variable tAbsoluteTime as UInt64
-      variable tTBnumerator as UInt32
-      variable tTBdenominator as UInt32
-      variable tTimebaseInfo as TimeBaseInfo
-      variable tTimeStampStr as String
-      -- variable tTimeStamp as MIDITimeStamp
-      variable tTimeStamp as Real
-
-      variable tMIDIPacket as MIDIPacket
-      variable tMIDIPacketListData as MIDIPacketListData
-      variable tMIDIPacketCount as Number
-      variable tMIDIPacketIterator as Number
-      variable tPacketListArray as Array
-      variable tMIDIPacketListPtr as Pointer
-      variable tObj as ObjCId
-      variable tMIDIPacketList as MIDIPacketList
-      variable tBufferSize as Number
-      variable tMIDIMsgLength as Number
-      variable tMIDIMsg as String
-      variable tMIDIMsgList as List
-      variable tCounter as Integer
-      variable tNum as Number
-      variable tString as String
-      unsafe
-         PointerToMIDIPacketList(tMIDIPacketListData, pMIDIPacketListPtr, 270)
-         put tMIDIPacketListData after sMIDIDataBuffer
-         -- log tMIDIPacketListData
-      end unsafe
+public handler CoreMIDIReadCallbackProcBlock( in pContext as optional ObjcBlockPointer, in pMIDIPacketListPtr as optional Pointer, in pSourceRefCon as optional Pointer)
+      if pMIDIPacketListPtr is not nothing then
+         GetPackets(pMIDIPacketListPtr)
+      end if
 end handler
 
-public handler GetMIDIDataBuffer() returns optional any
+public handler GetPackets(in pMIDIPacketListPtr as Pointer)
+   variable tMIDIPacketListData as MIDIPacketListData
+   variable tMIDIMsg as UInt8
+   variable tNoteNum as UInt8
+   variable tVelocity as UInt8
+
+   unsafe
+      PointerToMIDIPacketList(tMIDIPacketListData, pMIDIPacketListPtr,18)
+      -- PointerToMIDIPacketList(tMIDIPacketListData, pMIDIPacketListPtr, 270)
+   end unsafe
+
+      -- put tMIDIPacketListData after sMIDIDataBuffer
+      -- combine tMIDIPacketListData with "," into tMIDIMsg
+
+      -- log element 1 of tMIDIPacketListData
+      -- log element 2 of tMIDIPacketListData
+      -- log element 3 of tMIDIPacketListData
+      -- log element 4 of tMIDIPacketListData
+      -- log element 5 of tMIDIPacketListData
+      put element 6 of tMIDIPacketListData into tMIDIMsg
+      put element 7 of tMIDIPacketListData into tNoteNum
+      put element 8 of tMIDIPacketListData into tVelocity
+      log [tMIDIMsg,tNoteNum,tVelocity]
+      -- put tMIDIMsg & " " & tNoteNum & " " & tVelocity & "\n" after sMIDIDataBuffer
+end handler
+
+public handler GetMIDIDataBuffer() returns optional String
    -- log sMIDIDataBuffer
    return sMIDIDataBuffer
 end handler
@@ -1407,15 +1414,17 @@ public handler CoreMIDIDestinationCreate(in destinationName as String,in uniqueI
    variable tCFError as optional ObjCId
    variable tPropertyValSInt32 as optional SInt32
 		unsafe
-      if not CreateObjcBlockPointerFromHandler(CoreMIDIReadCallbackProcedure, sCoreMIDIReadCallbackProcPtr) then
+      if not CreateObjcBlockPointerFromHandler(CoreMIDIReadCallbackProcBlock, sCoreMIDIReadCallbackProcPtr) then
+      -- if not CreateObjcBlockPointerFromHandler(CoreMIDIReadCallbackProc, sCoreMIDIReadCallbackProcPtr) then
          put nothing into sCoreMIDIReadCallbackProcPtr
          return "Error Intitializing Read Procedure"
       else
 			put StringToNSString(destinationName) into tDestNameStrRef
          -- OSStatus MIDIDestinationCreateWithBlock(MIDIClientRef client, CFStringRef name, MIDIEndpointRef *outDest, MIDIReadBlock readBlock);
-         put c_MIDIDestinationCreateWithBlock(sMIDIClientRef,tDestNameStrRef,sMIDIDestEndpointRef,sCoreMIDIReadCallbackProcPtr) into tOSStatus
+         -- put c_MIDIDestinationCreateWithBlock(sMIDIClientRef,tDestNameStrRef,sMIDIDestEndpointRef,sCoreMIDIReadCallbackProcPtr) into tOSStatus
          --put c_MIDIDestinationCreate(sMIDIClientRef,pMIDIDestinationNameCFStrRef,pMIDIReadProc,pRefConst,sMIDIDestEndpointRef) into tOSStatus
          -- put c_MIDIDestinationCreate(sMIDIClientRef,tDestNameStrRef,sCoreMIDIReadCallbackProcPtr,tRefConStrRef,sMIDIDestEndpointRef) into tOSStatus
+         put c_MIDIDestinationCreate(sMIDIClientRef,tDestNameStrRef,sCoreMIDIReadCallbackProcPtr,nothing,sMIDIDestEndpointRef) into tOSStatus
          if uniqueIDnum is not nothing then
             put c_MIDIObjectSetIntegerProperty(sMIDIDestEndpointRef,StringToNSString("uniqueID"),uniqueIDnum) into tOSStatus
          end if

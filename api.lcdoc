@@ -1,0 +1,505 @@
+Library: community.coremidi.paulmcclernan
+
+Type: library
+
+Summary: This library contains bindings for macOS & iOS CoreMIDI, useful sending musical performance data to other applications or communicating with external musical devices.
+
+OS: macOS, iOS (untested)
+
+Edition: Community
+
+Description:
+This library is a (currently incomplete) wrapper for Apple's CoreMIDI API.
+
+>*Note:* This library is MIT licensed (permissive).
+> Please share and share a like.
+
+version: 0.6
+
+author: Paul McClernan
+
+
+Name: CoreMIDIController
+
+Type: command
+
+Syntax: CoreMIDIController(<pController>,<pControllerVal><pMIDIChanNum>)
+
+Summary: The send a controller with a single data byte value to on a given channel
+
+Example: CoreMIDIController 7,127,1 -- 7 = Volume Controller, Data Byte 1, channel 1
+
+Parameters: 
+
+pController: The number of the MIDI Controller to set values for
+
+pControllerVal: The value byte one
+
+pMIDIChanNum: MIDI Channel to send the controller value on, 1 to 16
+
+Description: The send a controller with a single data byte value to on a given channel
+
+
+
+
+Name: CoreMIDISendMIDIbytesNow
+
+Type: command
+
+Syntax: CoreMIDISendMIDIbytesNow(<pMIDIMsgData>)
+
+Summary: Sends arbitrary bytes to the MIDI Client.
+
+Example: CoreMIDISendMIDIbytesNow <pMIDIMsgData>
+
+Parameters: 
+
+pMIDIMsgData: arbitrary bytes, does not check for the bytes for validity as MIDI messages
+
+Description:
+Sends arbitrary bytes to the MIDI Client immediately (as fast as possible).
+A MIDI Client must be created first using CoreMIDIClientCreate.
+
+
+
+Name: CoreMIDIPitchbend
+
+Type: command
+
+Syntax: CoreMIDIPitchbend <pPitchBendCoarse>,<pMIDIChannelNum>
+
+Summary: The send pitchbend with coarse range from 0 to 127, 64 is centered (no bend)
+
+Example:
+CoreMIDIPitchbendFine 0,1 -- Pitchbend Maximum Down, channel 1
+CoreMIDIPitchbendFine 127,1 -- Pitchbend Maximum Up, channel 1
+CoreMIDIPitchbendFine 64,1 -- Centered No Bend, channel 1
+
+Parameters: 
+
+pPitchBendCoarse: The number of the pitch bend 'position'
+
+pMIDIChanNum: MIDI Channel to send the bend value on, 1 to 16
+
+Description: The send a controller with a single data byte value to on a given channel
+
+
+
+
+Name: CoreMIDIGetSourceNameAndID
+
+Type: handler
+
+Syntax: CoreMIDIGetSourceNameAndID(<pIndex>)
+
+Summary: Given an index number of a MIDI Source returns Display Name and Unique ID Number.
+
+Example: put CoreMIDIGetSourceNameAndID(1) into line 1 of button "Sources"
+
+Parameters: 
+
+pIndex: Index number of a source currently available to CoreMIDI.
+
+Description: Given an index number of a MIDI Source returns Display Name and Unique ID Number seperated by a comma.
+
+
+
+
+Name: CoreMIDIObjectTypeFromID
+
+Type: handler
+
+Syntax: CoreMIDIObjectTypeFromID(<uniqueIDnum>)
+
+Summary: Given the unique ID number of an object in the current MIDI setup returns the object's type.
+
+Example: CoreMIDIObjectTypeFromID( uniqueIDnum )
+
+Parameters: 
+
+uniqueIDnum: Unique ID number of an object in the current MIDI setup
+
+Description:
+Given the unique ID number of an object in the current MIDI setup returns the object's type.
+(Source, Destination, Extenal Device, etc.)
+
+
+
+Name: CoreMIDINoteOn
+
+Type: command
+
+Syntax: CoreMIDINoteOn <MIDINoteNumber>,pMIDIVelocityNumber,<pMIDIChannelNumber>
+
+Summary: Immediately sends a MIDI Note On message with the given pitch and velocity on the given channel.
+
+Example: CoreMIDINoteOn 60,127,1 -- 60=Middle C, 127=Full velocity, 1=MIDI channel 1
+
+Parameters: 
+
+pMIDINoteNum: The number of the pitch to turn on, 0 to 127, 60 = Middle C
+
+pMIDIVeloNum: The velocity to play the given pitch at, 0 to 127
+
+pMIDIChanNum: The MIDI Channel to play the note on, 1 to 16
+
+Description: Immediately sends a MIDI Note On message with the given pitch and velocity on the given channel.
+
+
+
+
+Name: CoreMIDIStart
+
+Type: command
+
+Syntax: CoreMIDIStart()
+
+Summary: Sends System Realtime Start message
+
+Example: CoreMIDIStart
+
+Description: Sends Start message for receivers such as Drum Machines that respond to System Realtime messages
+
+
+
+
+Name: CoreMIDIGetNumberOfDestinations
+
+Type: handler
+
+Syntax: CoreMIDIGetNumberOfDestinations()
+
+Summary: Returns a count of MIDI Destinations in the MIDI Setup that are currently available.
+
+Example: put CoreMIDIGetNumberOfDestinations() into tDestinationsCount
+
+Description:
+Returns a count of MIDI Destinations in the MIDI Setup that are currently available.
+Destinations in the setup that are powered off or not connected will not be included in the count.
+
+
+
+Name: CoreMIDIAftertouch
+
+Type: command
+
+Syntax: CoreMIDIAftertouch(<pNoteNum>,<pKeyPressure>,<pMIDIChanNum>)
+
+Summary: The send Aftertouch (key pressure) for specified note on the given channel
+
+Example: CoreMIDIAftertouch 60,127,1 -- Middle C=60, 127=Maximum Pressure, channel 1
+
+Parameters: 
+
+pNoteNum: The number of the pitch/key to apply pressure value to
+
+pKeyPressure: The pitch/key pressure value, range 0 to 127
+
+pMIDIChanNum: MIDI Channel to send the value on, 1 to 16
+
+Description: The send Aftertouch (key pressure) for specified note on the given channel. MIDI Controllers can have pressure sensors under each key that can transmit this value for each note.
+
+
+
+
+Name: CoreMIDIProgramChange
+
+Type: command
+
+Syntax: CoreMIDIProgramChange(<pPatch>,<pMIDIChanNum>)
+
+Summary: Sends Program Change message on the given channel
+
+Example: CoreMIDIProgramChange 10,1 -- 10=, channel 1
+
+Parameters: 
+
+pPatch: The patch number to change to, range 1 to 128
+
+pMIDIChanNum: MIDI Channel to send the value on, 1 to 16
+
+Description: Sends Program Change message on the given channel.
+
+
+
+
+Name: CoreMIDISendMIDIbytesInTime
+
+Type: handler
+
+Syntax: CoreMIDISendMIDIbytesInTime(<pTimeOffsetMillisecs>,<pMIDIMsgData>)
+
+Summary: Sends arbitrary bytes to the MIDI Client's Queue in millisecond Offsets from now.
+
+Example:
+CoreMIDISendMIDIbytesInTime(0,pMIDIMsgData) -- sends pMIDIMsgData immediately
+CoreMIDISendMIDIbytesInTime(1000,pMIDIMsgData) -- sends pMIDIMsgData in 1 second
+
+Parameters: 
+
+pTimeOffsetMillisecs: the millesecond offset from now to hold in queue
+
+pMIDIMsgData: arbitrary bytes, does not check for the bytes for validity as MIDI messages
+
+Description:
+Sends arbitrary bytes to the MIDI Client's Queue in millisecond Offsets from now.
+A MIDI Client must be created first using CoreMIDIClientCreate.
+
+
+
+Name: CoreMIDIStop
+
+Type: command
+
+Syntax: CoreMIDIStop()
+
+Summary: Sends System Realtime Stop message
+
+Example: CoreMIDIStop
+
+Description: Sends Stop message for receivers such as Drum Machines that respond to System Realtime messages
+
+
+
+
+Name: CoreMIDISelectSourceByID
+
+Type: handler
+
+Syntax: CoreMIDISelectSourceByID(<uniqueIDnum>)
+
+Summary: Selects the MIDI Source of the corrisponding unique ID as the data output source.
+
+Example:  CoreMIDISelectSourceByID(uniqueIDnum)
+
+Description: Given an index number of a MIDI Source returns Display Name and Unique ID Number seperated by a comma.
+
+
+Parameters:
+:
+
+
+
+
+Name: CoreMIDIGetDestinationInfo
+
+Type: handler
+
+Syntax: CoreMIDIGetDestinationInfo(<pIndex>)
+
+Summary: Given an index number of a MIDI Destination returns Text of it's XML/Plist Data
+
+Example: put CoreMIDIGetDestinationInfo(1) into fld "Destination Plist Info" -- info for the 1st detination found
+
+Parameters: 
+
+pIndex: Index number of a destination in the currently available to CoreMIDI.
+
+Description: Given an index number of a MIDI Destination returns Text of it's XML/Plist Data
+
+
+
+
+Name: CoreMIDINoteOff
+
+Type: command
+
+Syntax: CoreMIDINoteOff <MIDINoteNumber>,<MIDIChannelNumber>
+
+Summary: Immediately sends a MIDI Note Off message with the given pitch and velocity on the given channel.
+
+Example: CoreMIDINoteOff 60,1 -- Turns off Middle C on MIDI channel 1
+
+Parameters: 
+
+pMIDINoteNum: The number of the pitch to turn off, 0 to 127, 60 = Middle C
+
+pMIDIChanNum: The MIDI Channel to send the message to, 0 to 15, 0 = Channel 1
+
+Description: Immediately sends a MIDI Note Off message with the given pitch on the given channel.
+
+
+
+
+Name: CoreMIDIChannelPressure
+
+Type: command
+
+Syntax: CoreMIDIChannelPressure(<pChannelPressure>,<pMIDIChanNum>)
+
+Summary: The send Channel Pressure on the given channel
+
+Example: CoreMIDIChannelPressure 127,1 -- 127=Maximum Pressure, channel 1
+
+Parameters: 
+
+pChannelPressure: The channel pressure value, range 0 to 127
+
+pMIDIChanNum: MIDI Channel to send the value on, 1 to 16
+
+Description: Send Channel Pressure on the given channel. MIDI Controllers can have a single pressure sensor strip for the full range of keys.
+
+
+
+
+Name: CoreMIDIContinue
+
+Type: command
+
+Syntax: CoreMIDIContinue()
+
+Summary: Sends System Realtime Continue message
+
+Example: CoreMIDIContinue
+
+Description: Sends Continue message for receivers such as Drum Machines that respond to System Realtime messages
+
+
+
+
+Name: CoreMIDIGetNumberOfSources
+
+Type: handler
+
+Syntax: CoreMIDIGetNumberOfSources()
+
+Summary: Returns a count of MIDI Sources in the MIDI Setup that are currently available.
+
+Example: put CoreMIDIGetNumberOfSources() into tDestinationsCount
+
+Returns: Count of currently available MIDI Sources
+
+Description:
+Returns a count of MIDI Sources in the MIDI Setup that are currently available.
+Destinations in the setup that are powered off or not connected will not be included in the count.
+
+
+
+Name: CoreMIDIGetDestinationNameAndID
+
+Type: handler
+
+Syntax: CoreMIDIGetDestinationNameAndID(<pIndex>)
+
+Summary: Given an index number of a MIDI Destination returns Display Name and Unique ID Number.
+
+Example: put CoreMIDIGetDestinationNameAndID(1) into line 1 of button "Destinations"
+
+Parameters: 
+
+pIndex: Index number of a destination in the currently available to CoreMIDI.
+
+Description: Given an index number of a MIDI Destination returns Display Name and Unique ID Number seperated by a comma.
+
+
+
+
+Name: CoreMIDIPitchbendFine
+
+Type: command
+
+Syntax: CoreMIDIPitchbendFine <pPitchBendCoarseNFine>,<pMIDIChanNum>
+
+Summary: The send pitchbend with fine range from 0 to 16384, 8192 is centered (no bend)
+
+Example:
+CoreMIDIPitchbendFine 0,1 -- Pitchbend Maximum Down, channel 1
+CoreMIDIPitchbendFine 16384,1 -- Pitchbend Maximum Up, channel 1
+CoreMIDIPitchbendFine 8192,1 -- Centered / No Bend, channel 1
+
+Parameters: pPitchBendCoarseNFine\: The number of the pitch bend 'position'
+
+pMIDIChanNum: MIDI Channel to send the bend value on, 1 to 16
+
+Description: The send pitchbend with fine range from 0 to 16384, 8192 is centered (no bend)
+
+
+
+
+Name: CoreMIDISystemReset
+
+Type: command
+
+Syntax: CoreMIDISystemReset()
+
+Summary: Sends System Realtime Reset message
+
+Example: CoreMIDISystemReset
+
+Description:
+Sends System Reset message for receivers such that respond to such messages.
+
+The receiver should be reset to the following states if available:
+- Omni on, Polyphonic
+- Local control on
+- All notes turned off
+- All controllers returned to their 'normal' settings
+- Any song playing stopped
+- Song Position Pointer = 0
+- Running Status is cleared
+- Reset to power-up conditions
+
+
+
+Name: CoreMIDIGetSourceInfo
+
+Type: handler
+
+Syntax: CoreMIDIGetSourceInfo(<pIndex>)
+
+Summary: Given an index number of a MIDI Source returns Text of it's XML/Plist Data.
+
+Example: put CoreMIDIGetSourceInfo(1) into fld "Source Plist Info" -- info for the 1st detination found
+
+Parameters: 
+
+pIndex: Index number of a source currently available to CoreMIDI.
+
+Description: Given an index number of a MIDI Source returns text of it's XML/Plist Data.
+
+
+
+
+Name: CoreMIDISourceCreate
+
+Type: handler
+
+Syntax: CoreMIDISourceCreate(<sourceName>,<uniqueIDnum>)
+
+Summary: Creates a Virtual MIDI Source with the given name.
+
+Example: CoreMIDISourceCreate("MIDI Output from my LiveCode Stack")
+
+Parameters: 
+
+sourceName: The name to use for the MIDI source
+
+uniqueIDnum:
+A number to use as the unique ID number for your source, if an
+empty value is passed an ID number will be generated by the system.
+
+Description:
+Creates a Virtual MIDI Source with the given name.
+The name will appear as a source of MIDI data in other applications (such as GarageBand or LogicPro)
+
+
+
+Name: CoreMIDIClientCreate
+
+Type: handler
+
+Syntax: CoreMIDIClientCreate(<clientName>)
+
+Summary: Creates a MIDI Client and asigns it a name.
+
+Example: CoreMIDIClientCreate("My LiveCode CoreMIDI Client")
+
+Parameters: 
+
+clientName: The text string to use as the MIDI Client's name
+
+Description: Creates a MIDI Client named with string provided (client name is not generally visible to other applications)
+
+
+
+

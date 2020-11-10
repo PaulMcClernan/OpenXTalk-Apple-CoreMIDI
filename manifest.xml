@@ -1,0 +1,87 @@
+<package version="0.0">
+  <name>community.coremidi.paulmcclernan</name>
+  <title>CoreMIDI library</title>
+  <author>Paul McClernan</author>
+  <version>0.6</version>
+  <license>community</license>
+  <type>library</type>
+  <requires name="com.livecode.objc"/>
+  <requires name="com.livecode.foreign"/>
+  <requires name="com.livecode.engine"/>
+  <requires name="com.livecode.array"/>
+  <requires name="com.livecode.list"/>
+  <requires name="com.livecode.binary"/>
+  <requires name="com.livecode.string"/>
+  <requires name="com.livecode.char"/>
+  <requires name="com.livecode.arithmetic"/>
+  <requires name="com.livecode.logic"/>
+  <requires name="com.livecode.type"/>
+  <requires name="com.livecode.byte"/>
+  <requires name="com.livecode.assert"/>
+  <requires name="com.livecode.mathfoundation"/>
+  <metadata key="svgicon">M541.208,278.627c5.155-6.229,7.713-15.661,5.716-24.663c-7.97,0.751-16.543,7.303-21.699,13.533c-4.019,6.122-7.714,15.661-5.717,24.662C528.724,292.439,537.297,285.888,541.208,278.627z M591.706,363.468c-0.924,2.385-22.17-3.654-24.424-27.565c-1.824-19.356,13.151-31.106,14.29-31.213c-10.397-12.805-25.306-12.548-29.969-13.258c-12.633,0.042-23.267,9.085-28.961,9.622c-5.692,0.537-16.583-5.329-26.831-4.363c-13.663,1.288-24.3,10.331-30.058,22.361c-10.393,22.954-0.053,53.481,13.578,72.396h-42.334c0,0,14.162-11.127,20.231-19.22c-2.022-2.023-4.046-4.046-7.081-7.081c-4.046,4.046-8.092,6.07-11.127,8.093s-11.988,5.855-22.255,5.058s-20.645-9.355-25.289-21.243s-3.978-31.36-3.978-31.36l67.707-0.022c0,0-2.707-22.839-10.116-35.382c-2.572-4.354-16.947-20.4-38.744-19.069c-13.13,0.802-21.95,6.931-27.008,11.988c-5.058,4.046-10.116,11.127-14.162,19.22c-1.2,1.8-10.365,16.995-9.427,44.57c1.083,31.833,26.624,45.459,26.624,45.459h-39.452v-1.012c0-2.023,0-3.035-1.011-4.046c-1.012-1.012-3.035-1.012-7.081-2.023c-4.047,0-6.069-1.011-8.093-1.011c-1.012-1.012-3.035-2.023-4.046-3.035c-4.047-7.081-3.035-64.74-3.035-64.74s0-7.081,3.035-12.139c1.011-3.035,3.034-5.058,5.058-5.058h1.012c1.011,0,3.034,1.012,5.058,3.035c4.046,3.035,7.081,5.058,11.127,5.058c4.047,0,7.081-2.023,9.104-5.058c2.022-4.046,4.046-8.092,4.046-12.139c0-5.058-2.023-9.104-5.058-12.139c-3.035-3.035-7.081-5.058-11.127-5.058c-3.035,0-12.882,6.543-15.174,11.127s-7.081,14.162-7.081,14.162v-30.347h-8.093c-1.012,1.012-2.022,3.035-3.034,5.058c-2.023,4.046-6.07,8.092-11.127,12.139c-5.058,4.046-10.116,6.07-16.185,7.081v5.058c0,2.023,1.011,3.035,3.035,3.035c3.035,1.011,6.069,2.023,8.092,3.035c1.012,1.012,2.023,4.046,2.023,4.046s2.023,70.81,0,73.844c-1.012,2.023-8.093,5.058-12.139,6.07c-2.023,1.011-3.035,1.011-4.046,2.023c0,1.012,0,3.035,0,3.035h-28.324c1.012-1.012,2.023-1.012,3.035-1.012c8.093-6.069,15.173-15.173,20.231-27.312c3.035-8.093,5.058-18.208,5.058-31.359c0-7.081-1.011-14.162-4.046-22.254c-3.035-8.093-6.07-15.174-11.127-21.243c-9.104-12.139-22.254-18.208-39.451-18.208c-8.093,0-14.162,1.011-20.231,3.035c-5.058,2.023-11.127,5.058-16.185,10.116c-4.046,3.035-7.081,7.081-10.116,12.139s-5.058,11.127-7.081,17.197c-2.023,7.081-3.035,13.15-3.035,19.22c0,13.15,2.023,23.266,6.069,32.37s10.116,16.185,19.22,23.266c1.012,1.012,4.046,3.035,4.046,3.035h-52.602l11.127-7.081l7.081-41.474l-12.139,1.012c0,0-15.173,23.266-24.278,30.347c-8.092,7.081-17.196,10.116-25.289,10.116s-15.174-2.023-22.254-7.081c-5.058-3.035-10.116-7.081-13.15-13.15c-21.243-36.417-19.22-104.192,2.023-129.481c9.104-11.127,18.208-18.208,30.347-18.208c10.116,0,19.22,3.035,27.312,9.104c8.092,6.069,24.277,28.324,24.277,28.324h11.127l-9.104-44.509c0,0-16.185-4.046-24.278-5.058c-9.104-1.012-18.208-2.023-28.324-2.023c-24.278,0-44.509,9.104-60.694,28.324S13.15,274.106,13.15,302.43c0,12.139,1.012,23.266,4.046,32.37c3.035,10.116,6.069,18.208,12.139,27.312c5.058,8.093,12.139,15.174,21.243,22.255c4.046,3.035,8.092,5.058,13.15,7.081H5.058v199.28h54.625V438.992h27.312v151.735h54.625V438.992h27.312v151.735h53.613v-180.06c0-5.058-2.023-9.104-5.058-12.139c2.023,0,3.035,0,5.058,0c7.081,0,14.162-2.023,20.231-4.047v196.245h54.625V394.482h21.243v45.521h126.446v103.181H373.27v-75.868h-54.625v124.424h160.84c10.115,0,19.22-8.093,19.22,19.221V411.68c0-0.222-0.024-0.441-0.032-0.663c3.684,2.274,7.56,3.47,11.61,2.63c4.063-0.384,6.949-1.743,9.665-3.309v180.39h54.625V400.033c3.299-3.847,6.128-8.77,8.926-13.965C590.396,373.93,591.706,363.468,591.706,363.468z M394.513,289.279c4.046-6.069,9.104-9.104,14.162-9.104c4.046,0,7.081,1.012,11.127,4.046s6.069,7.081,8.093,12.139c2.022,5.058,3.034,10.116,3.034,16.185c-1.012,0-3.034,0-3.034,0c-1.012,0-3.035,0-5.059,0c-3.034,0-6.069,0-7.08,0h-27.312C387.432,302.43,390.466,294.337,394.513,289.279z M221,385.5c-12,0-25.307-25.195-25.54-51.053s15.464-52.987,28.002-52.217s23.243,30.316,23.361,47.512C247,355.5,233,385.5,221,385.5z</metadata>
+  <handler name="AudioToolboxCreateSequenceFromSMF" parameters="in string" return="optional any"/>
+  <handler name="AudioToolboxSequenceGetInfoDict" parameters="" return="optional any"/>
+  <handler name="AudioToolboxCreateNewSequence" parameters="" return="optional any"/>
+  <handler name="AudioToolboxSequenceGetTrackLength" parameters="" return="number"/>
+  <handler name="AudioToolboxSequenceGetTrackMuteStatus" parameters="" return="boolean"/>
+  <handler name="AudioToolboxSequenceSetTrackMuteStatus" parameters="in boolean" return="any"/>
+  <handler name="AudioToolboxSequenceGetTrackSoloStatus" parameters="" return="boolean"/>
+  <handler name="AudioToolboxSequenceSetTrackSoloStatus" parameters="in boolean" return="any"/>
+  <handler name="AudioToolboxSequenceGetTrackCount" parameters="" return="optional any"/>
+  <handler name="AudioToolboxSequenceSelectedTrackIndex" parameters="" return="optional any"/>
+  <handler name="AudioToolboxMusicSequenceGetIndexTrack" parameters="in UInt32" return="any"/>
+  <handler name="AudioToolboxSequenceNewTrack" parameters="" return="optional any"/>
+  <handler name="AudioToolboxSequenceDisposeTrack" parameters="in UInt32" return="optional any"/>
+  <handler name="AudioToolboxTrackNewMIDINoteEvent" parameters="" return="optional any"/>
+  <handler name="CoreMIDIObjectTypeToString" parameters="in optional number" return="optional string"/>
+  <handler name="CoreMIDISetupChangedCallbackProc" parameters="in optional Pointer,in Pointer" return="any"/>
+  <handler name="CoreMIDIClientCreate" parameters="in string" return="nothing"/>
+  <handler name="CoreMIDISendMIDIbytesNow" parameters="in data" return="nothing"/>
+  <handler name="CoreMIDINoteOn" parameters="in UInt8,in UInt8,in UInt8" return="nothing"/>
+  <handler name="CoreMIDINoteOff" parameters="in UInt8,in UInt8" return="nothing"/>
+  <handler name="CoreMIDIController" parameters="in UInt8,in UInt8,in UInt8" return="nothing"/>
+  <handler name="CoreMIDIPitchbendFine" parameters="in number,in UInt8" return="nothing"/>
+  <handler name="CoreMIDIPitchbend" parameters="in UInt8,in UInt8" return="nothing"/>
+  <handler name="CoreMIDIAftertouch" parameters="in UInt8,in UInt8,in UInt8" return="nothing"/>
+  <handler name="CoreMIDIChannelPressure" parameters="in UInt8,in UInt8" return="nothing"/>
+  <handler name="CoreMIDIProgramChange" parameters="in UInt8,in UInt8" return="nothing"/>
+  <handler name="CoreMIDIStart" parameters="" return="nothing"/>
+  <handler name="CoreMIDIContinue" parameters="" return="nothing"/>
+  <handler name="CoreMIDIStop" parameters="" return="nothing"/>
+  <handler name="CoreMIDISystemReset" parameters="" return="nothing"/>
+  <handler name="CoreMIDISendMIDIbytesInTime" parameters="in optional number,in data" return="nothing"/>
+  <handler name="CoreMIDISourceCreate" parameters="in string,in optional SInt32" return="number"/>
+  <handler name="PostMIDIMsg" parameters="" return="any"/>
+  <handler name="AddToMIDIMsgList" parameters="in list" return="any"/>
+  <handler name="AddToMIDIMsgBufferString" parameters="in number,in number,in number" return="any"/>
+  <handler name="GetMIDIMsgBufferString" parameters="" return="any"/>
+  <handler name="CoreMIDIReadCallbackProc" parameters="in optional Pointer,in optional any,inout optional any,inout optional any" return="any"/>
+  <handler name="CoreMIDIReadCallbackProcBlock" parameters="in optional Pointer,in optional Pointer,in optional Pointer" return="any"/>
+  <handler name="GetPackets" parameters="in Pointer" return="any"/>
+  <handler name="GetMIDIDataBuffer" parameters="" return="optional string"/>
+  <handler name="FlushMIDIDataBuffer" parameters="" return="any"/>
+  <handler name="CoreMIDIDestinationCreate" parameters="in string,in optional SInt32" return="any"/>
+  <handler name="CoreMIDIInputPortCreate" parameters="in string,in optional SInt32" return="number"/>
+  <handler name="CoreMIDIEndPointDispose" parameters="in optional SInt32" return="optional any"/>
+  <handler name="CoreMIDIObjectTypeFromID" parameters="in optional SInt32" return="string"/>
+  <handler name="CoreMIDIGetNumberOfDestinations" parameters="" return="number"/>
+  <handler name="CoreMIDIGetDestinationInfo" parameters="in UInt32" return="data"/>
+  <handler name="CoreMIDIGetDestinationNameAndID" parameters="in UInt32" return="string"/>
+  <handler name="CoreMIDIGetNumberOfSources" parameters="" return="number"/>
+  <handler name="CoreMIDIGetSourceInfo" parameters="in UInt32" return="data"/>
+  <handler name="CoreMIDIGetSourceNameAndID" parameters="in UInt32" return="string"/>
+  <handler name="CoreMIDISelectSourceByID" parameters="in optional SInt32" return="string"/>
+  <handler name="CoreMIDISelectSourceByIndexAlt" parameters="in UInt32" return="string"/>
+  <handler name="CoreMIDISelectSourceByIndex" parameters="in UInt32" return="string"/>
+  <handler name="CoreMIDIGetNumberOfDevices" parameters="" return="number"/>
+  <handler name="CoreMIDIGetDeviceInfo" parameters="in UInt32" return="data"/>
+  <handler name="CoreMIDIGetNumberOfExternalDevices" parameters="" return="number"/>
+  <handler name="CoreMIDIGetExternalDeviceInfo" parameters="in UInt32" return="data"/>
+  <handler name="CoreMIDIDeviceGetNumberOfEntities" parameters="in UInt32" return="number"/>
+  <handler name="CoreMIDIGetDeviceEntityInfo" parameters="in UInt32,in UInt32" return="data"/>
+  <handler name="CoreMIDIRestart" parameters="" return="any"/>
+  <handler name="CoreMIDIFlushOutput" parameters="" return="any"/>
+  <handler name="CoreMIDIInit" parameters="in string" return="data"/>
+  <handler name="CoreMIDIDestroy" parameters="" return="nothing"/>
+</package>
