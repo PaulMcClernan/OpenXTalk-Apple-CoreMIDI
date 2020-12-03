@@ -64,15 +64,17 @@ import module community.coremidi.paulmcclernan
   handler AddToMIDIMsgList(in pMIDIMsgList as List) returns optional any
   handler AddToMIDIMsgBufferString(in pStatusByte as Number, in pDataByteA as Number, in pDataByteB as Number) returns optional any
   handler GetMIDIMsgBufferString() returns any
-  variable sCoreMIDIReadCallbackProcPtr as optional ObjcBlockPointer
+  variable sCoreMIDIReadCallbackProcBlockPtr as optional ObjcBlockPointer
+  variable sCoreMIDIReadCallbackProcPtr as optional Pointer
   foreign type MIDIPacketListData
   variable sMIDIDataBuffer as optional String
-  handler CoreMIDIReadCallbackProc(in pContext as optional ObjcBlockPointer, in pMIDIPacketListPtr as optional any, inout pReadRefCon as optional any, inout pSourceRefCon as optional any) returns optional any
+  handler CoreMIDIReadCallbackProc(in pMIDIPacketListPtr as Pointer, in pReadRefCon as optional Pointer, in pSourceRefCon as optional Pointer) returns nothing
   handler CoreMIDIReadCallbackProcBlock(in pContext as optional ObjcBlockPointer, in pMIDIPacketListPtr as optional Pointer, in pSourceRefCon as optional Pointer) returns optional any
   handler GetPackets(in pMIDIPacketListPtr as Pointer) returns optional any
   handler GetMIDIDataBuffer() returns optional String
   handler FlushMIDIDataBuffer() returns optional any
-  handler CoreMIDIDestinationCreate(in destinationName as String, in uniqueIDnum as optional SInt32) returns any
+  foreign handler type MIDIReadProc(in pMIDIPacketListPtr as Pointer, in pReadRefCon as optional Pointer, in pSourceRefCon as optional Pointer) returns nothing
+  handler CoreMIDIDestinationCreate(in destinationName as String, in uniqueIDnum as optional SInt32) returns optional any
   handler CoreMIDIInputPortCreate(in sourceName as String, in uniqueIDnum as optional SInt32) returns Number
   handler CoreMIDIEndPointDispose(in uniqueIDnum as optional SInt32) returns optional any
   handler CoreMIDIObjectTypeFromID(in uniqueIDnum as optional SInt32) returns String

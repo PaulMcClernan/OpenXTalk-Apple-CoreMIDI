@@ -56,12 +56,12 @@
   <handler name="AddToMIDIMsgList" parameters="in list" return="any"/>
   <handler name="AddToMIDIMsgBufferString" parameters="in number,in number,in number" return="any"/>
   <handler name="GetMIDIMsgBufferString" parameters="" return="any"/>
-  <handler name="CoreMIDIReadCallbackProc" parameters="in optional Pointer,in optional any,inout optional any,inout optional any" return="any"/>
+  <handler name="CoreMIDIReadCallbackProc" parameters="in Pointer,in optional Pointer,in optional Pointer" return="nothing"/>
   <handler name="CoreMIDIReadCallbackProcBlock" parameters="in optional Pointer,in optional Pointer,in optional Pointer" return="any"/>
   <handler name="GetPackets" parameters="in Pointer" return="any"/>
   <handler name="GetMIDIDataBuffer" parameters="" return="optional string"/>
   <handler name="FlushMIDIDataBuffer" parameters="" return="any"/>
-  <handler name="CoreMIDIDestinationCreate" parameters="in string,in optional SInt32" return="any"/>
+  <handler name="CoreMIDIDestinationCreate" parameters="in string,in optional SInt32" return="optional any"/>
   <handler name="CoreMIDIInputPortCreate" parameters="in string,in optional SInt32" return="number"/>
   <handler name="CoreMIDIEndPointDispose" parameters="in optional SInt32" return="optional any"/>
   <handler name="CoreMIDIObjectTypeFromID" parameters="in optional SInt32" return="string"/>
