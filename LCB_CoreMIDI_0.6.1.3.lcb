@@ -1353,6 +1353,9 @@ foreign handler PointerToMIDIPacketList(out rMemChunk as MIDIPacketListData, in 
 
 public variable sMIDIDataBuffer as optional String
 
+
+--public foreign handler type handle_midi_event_func_t( in pOptionalDataPtr as optional Pointer, in mMIDIBufferPtr as Pointer) returns CInt
+public foreign handler type CoreMIDIReadProc(in pMIDIPacketListPtr as optional Pointer, in pReadRefCon as optional Pointer, in pSourceRefCon as optional Pointer) returns nothing
 -- foreign handler PointerToMIDIPacket(out rAggregate as MIDIPacket, in pPointer as Pointer, in pSize as UIntSize) returns nothing binds to "c:memcpy"
 -- typedef void (*MIDIReadProc)(const MIDIPacketList *pktlist, void *readProcRefCon, void *srcConnRefCon);
 -- sMIDIClientRef,tDestNameStrRef,sCoreMIDIReadCallbackProcPtr,nothing,sMIDIDestEndpointRef)
