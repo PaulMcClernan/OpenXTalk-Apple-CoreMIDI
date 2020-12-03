@@ -66,14 +66,16 @@ import module community.coremidi.paulmcclernan
   handler GetMIDIMsgBufferString() returns any
   variable sCoreMIDIReadCallbackProcBlockPtr as optional ObjcBlockPointer
   variable sCoreMIDIReadCallbackProcPtr as optional Pointer
+  foreign handler type MIDIReadProc(in pMIDIPacketListPtr as MIDIPacketPtr, in pReadRefCon as optional Pointer, in pSourceRefCon as optional Pointer) returns nothing
   foreign type MIDIPacketListData
+  foreign type MIDIPacketCnt
+  foreign type MIDIPacketPtr
   variable sMIDIDataBuffer as optional String
-  handler CoreMIDIReadCallbackProc(in pMIDIPacketListPtr as Pointer, in pReadRefCon as optional Pointer, in pSourceRefCon as optional Pointer) returns nothing
+  handler CoreMIDIReadCallbackProc(in pMIDIPacketList as MIDIPacketPtr, in pReadRefCon as optional Pointer, in pSourceRefCon as optional Pointer) returns nothing
   handler CoreMIDIReadCallbackProcBlock(in pContext as optional ObjcBlockPointer, in pMIDIPacketListPtr as optional Pointer, in pSourceRefCon as optional Pointer) returns optional any
   handler GetPackets(in pMIDIPacketListPtr as Pointer) returns optional any
   handler GetMIDIDataBuffer() returns optional String
   handler FlushMIDIDataBuffer() returns optional any
-  foreign handler type MIDIReadProc(in pMIDIPacketListPtr as Pointer, in pReadRefCon as optional Pointer, in pSourceRefCon as optional Pointer) returns nothing
   handler CoreMIDIDestinationCreate(in destinationName as String, in uniqueIDnum as optional SInt32) returns optional any
   handler CoreMIDIInputPortCreate(in sourceName as String, in uniqueIDnum as optional SInt32) returns Number
   handler CoreMIDIEndPointDispose(in uniqueIDnum as optional SInt32) returns optional any

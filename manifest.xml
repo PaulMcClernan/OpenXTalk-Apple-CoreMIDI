@@ -56,7 +56,7 @@
   <handler name="AddToMIDIMsgList" parameters="in list" return="any"/>
   <handler name="AddToMIDIMsgBufferString" parameters="in number,in number,in number" return="any"/>
   <handler name="GetMIDIMsgBufferString" parameters="" return="any"/>
-  <handler name="CoreMIDIReadCallbackProc" parameters="in Pointer,in optional Pointer,in optional Pointer" return="nothing"/>
+  <handler name="CoreMIDIReadCallbackProc" parameters="in MIDIPacketPtr,in optional Pointer,in optional Pointer" return="nothing"/>
   <handler name="CoreMIDIReadCallbackProcBlock" parameters="in optional Pointer,in optional Pointer,in optional Pointer" return="any"/>
   <handler name="GetPackets" parameters="in Pointer" return="any"/>
   <handler name="GetMIDIDataBuffer" parameters="" return="optional string"/>
