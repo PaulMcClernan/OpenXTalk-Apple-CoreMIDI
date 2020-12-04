@@ -1366,11 +1366,9 @@ private foreign handler c_MIDIDestinationCreate(in pMIDIClientRef as MIDIObjRef,
 -- public foreign type MIDIPacketListData binds to "MCAggregateTypeInfo:jhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh" -- Declaration (numPackets: UInt32, *packet(MIDIPacket)) -- j = UInt32
 -- public foreign type MIDIPacketListData binds to "MCAggregateTypeInfo:kihhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh" -- Declaration (numPackets: UInt32, *packet(MIDIPacket)) -- j = UInt32
 public foreign type MIDIPacketListData binds to "MCAggregateTypeInfo:jrkihhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh" -- Declaration (numPackets: UInt32, *packet(MIDIPacket)) -- j = UInt32
-public foreign type MIDIPacketListDataPacket binds to "MCAggregateTypeInfo:jjjihhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh" -- Declaration (numPackets: UInt32, *packet(MIDIPacket)) -- j = UInt32
-
+public foreign type MIDIPacketListDataPacket binds to "MCAggregateTypeInfo:jhhhhhhhhihhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh" -- Declaration (numPackets: UInt32, *packet(MIDIPacket)) -- j = UInt32
 public foreign type MIDIPacketCnt binds to "MCAggregateTypeInfo:i"
 public foreign type MIDIPacketPtr binds to "MCAggregateTypeInfo:r"
-
 -- public foreign type MIDIPacketListData binds to "MCAggregateTypeInfo:jkq"
 -- public foreign type MIDIPacketListData binds to "MCAggregateTypeInfo:Jjjhhhhhh" -- Protocol (1=MIDI 1.0),
 __safe foreign handler PointerToMIDIPacketList(out rAggregate as MIDIPacketListData, in pPointer as Pointer, in pSize as UIntSize) returns nothing binds to "c:memcpy"
@@ -1378,6 +1376,7 @@ __safe foreign handler PointerToMIDIPacketListPacket(out rAggregate as MIDIPacke
 __safe foreign handler PointerToMIDIPacket(out rAggregate as MIDIPacket, in pPointer as Pointer, in pSize as UIntSize) returns nothing binds to "c:memcpy"
 __safe foreign handler PointerToMIDIPacketListSizePktPtr(out rAggregate as MIDIPacketList, in pPointer as Pointer, in pSize as UIntSize) returns nothing binds to "c:memcpy"
 __safe foreign handler PointerToMIDIPacketCnt(out rAggregate as MIDIPacketCnt, in pPointer as Pointer, in pSize as UIntSize) returns nothing binds to "c:memcpy"
+__safe foreign handler PointerByteArrayToTimeStamp(out rAggregate as UInt64, in pPointer as Data, in pSize as UIntSize) returns nothing binds to "c:memcpy"
 
 public variable sMIDIDataBuffer as optional String
 
@@ -1396,31 +1395,45 @@ public handler CoreMIDIReadCallbackProc( in pMIDIPacketListPtr as Pointer, in pR
    variable tNumPackets as optional Uint32
    variable tPacketPtr as optional Pointer
    variable tTimeStamp as optional UInt64
+   variable tTimeStampData as optional Data
+   variable tTimeStampA as optional UInt32
+   variable tTimeStampB as optional UInt32
+
    variable tMsgLength as optional UInt16
    variable tPacketNSMutDataRef as ObjcId
    variable tData1Uint8 as optional UInt8
    variable tData2Uint8 as optional UInt8
    variable tData3Uint8 as optional UInt8
-      --put element 1 of pMIDIPacketListPtr into tNumPackets
-      --put element 2 of pMIDIPacketListPtr into tPacketPtr
-      --log [tNumPackets,tPacketPtr]
-      -- log [pReadRefCon,pSourceRefCon]
-      --if pMIDIPacketListPtr is not nothing then
-         -- GetPackets(pMIDIPacketListPtr)
-         --unsafe
-         -- PointerToMIDIPacketListSizePktPtr(rMIDIPacketList,pMIDIPacketListPtr, 270 )
-         --put element 1 of rMIDIPacketList into tNumPackets
-         --if tNumPackets = 1 then
-              PointerToMIDIPacketListPacket(rMIDIPacketListDataPacket,pMIDIPacketListPtr, 270)
-              -- PointerToMIDIPacketList(rMIDIPacketListData,pMIDIPacketListPtr, 274)
-              put element 2 of rMIDIPacketListDataPacket into tNumPackets
-              put element 3 of rMIDIPacketListDataPacket into tMsgLength
-              put element 4 of rMIDIPacketListDataPacket into tData1Uint8
-              put element 5 of rMIDIPacketListDataPacket into tData2Uint8
-              put element 6 of rMIDIPacketListDataPacket into tData3Uint8
-              log [tNumPackets,tMsgLength,tData1Uint8,tData2Uint8,tData3Uint8]
-              -- PointerToMIDIPacketListPacket(rMIDIPacketListDataPacket,element 2 of rMIDIPacketList, 270 )
-         --end if
+   put the empty data into tTimeStampData
+        PointerToMIDIPacketListPacket(rMIDIPacketListDataPacket,pMIDIPacketListPtr, 1024)
+        -- PointerToMIDIPacketList(rMIDIPacketListData,pMIDIPacketListPtr, 274)
+        put element 1 of rMIDIPacketListDataPacket into tNumPackets
+
+        -- log [element 2 of rMIDIPacketListDataPacket,element 3 of rMIDIPacketListDataPacket, \
+       --  element 4 of rMIDIPacketListDataPacket,element 5 of rMIDIPacketListDataPacket, \
+        -- element 6 of rMIDIPacketListDataPacket,element 7 of rMIDIPacketListDataPacket,\
+        -- element 8 of rMIDIPacketListDataPacket, element 9 of rMIDIPacketListDataPacket] -- after tTimeStampData
+
+        -- put the byte with code (element 2 of rMIDIPacketListDataPacket) -- after tTimeStampData
+        -- put the byte with code (element 3 of rMIDIPacketListDataPacket) -- after tTimeStampData
+        -- put the byte with code (element 4 of rMIDIPacketListDataPacket) -- after tTimeStampData
+        -- put the byte with code (element 5 of rMIDIPacketListDataPacket) -- after tTimeStampData
+        -- put the byte with code (element 6 of rMIDIPacketListDataPacket) -- after tTimeStampData
+        -- put the byte with code (element 7 of rMIDIPacketListDataPacket) -- after tTimeStampData
+        -- put the byte with code (element 8 of rMIDIPacketListDataPacket) -- after tTimeStampData
+        -- put the byte with code (element 9 of rMIDIPacketListDataPacket) -- after tTimeStampData
+        -- put tTimeStampData into tTimeStamp
+       --  PointerToMIDIPacketList(tTimeStamp, tTimeStampData, 8)
+       --  log tTimeStamp
+        put element 10 of rMIDIPacketListDataPacket into tMsgLength
+        put element 11 of rMIDIPacketListDataPacket into tData1Uint8
+        put element 12 of rMIDIPacketListDataPacket into tData2Uint8
+        put element 13 of rMIDIPacketListDataPacket into tData3Uint8
+       --  log [tNumPackets,tTimeStampA,tTimeStampB,tMsgLength,tData1Uint8,tData2Uint8,tData3Uint8]
+       if tMsgLength is 3 then
+          post "MIDIin" to sTarget with [tData1Uint8, tData2Uint8, tData3Uint8]
+        -- PointerToMIDIPacketListPacket(rMIDIPacketListDataPacket,element 2 of rMIDIPacketList, 270 )
+       end if
          --put element 2 of rMIDIPacketList into tPacketPtr
             --log [tNumPackets,tPacketPtr]
             --PointerToMIDIPacketList(rMIDIPacketListData, tPacketPtr, 270)
@@ -1433,7 +1446,7 @@ public handler CoreMIDIReadCallbackProc( in pMIDIPacketListPtr as Pointer, in pR
          -- end unsafe
       --end if
       -- put StringToNSString("LiveCode") into pParam
-      return nothing
+      -- return nothing
 end handler
 -- typedef void (^MIDIReadBlock)(const MIDIPacketList *pktlist, void *srcConnRefCon);
 -- public handler CoreMIDIReadCallbackProcedure( in pContext as optional ObjcBlockPointer, in pMIDIPacketListPtr as MIDIPacketList, in pReadProcRefCont as optional ObjCId, in pSrcConnRefCont as optional ObjCId)
