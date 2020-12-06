@@ -37,6 +37,7 @@
   <handler name="CoreMIDIObjectTypeToString" parameters="in optional number" return="optional string"/>
   <handler name="CoreMIDISetupChangedCallbackProc" parameters="in optional Pointer,in Pointer" return="any"/>
   <handler name="CoreMIDIClientCreate" parameters="in string" return="nothing"/>
+  <handler name="CoreMIDIClientSetScriptObject" parameters="in optional string" return="nothing"/>
   <handler name="CoreMIDISendMIDIbytesNow" parameters="in data" return="nothing"/>
   <handler name="CoreMIDINoteOn" parameters="in UInt8,in UInt8,in UInt8" return="nothing"/>
   <handler name="CoreMIDINoteOff" parameters="in UInt8,in UInt8" return="nothing"/>

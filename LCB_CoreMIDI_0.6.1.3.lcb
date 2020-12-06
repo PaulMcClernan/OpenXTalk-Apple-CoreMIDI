@@ -186,6 +186,14 @@ private foreign handler c_ATCAShowFile(in pMusicObj as Pointer, in pCFFileRef as
 -- private foreign handler c_mach_absolute_time() returns MIDITimeStamp binds to "c:Kernel.framework>mach_absolute_time"
 private foreign handler c_mach_absolute_time() returns UInt64 binds to "c:mach_absolute_time"
 private foreign handler c_mach_timebase_info(inout pTimeBaseInfo as TimeBaseInfo) returns nothing binds to "c:mach_timebase_info"
+
+----------------------------------------------------------------- LiveCode RunLoop Control? ------------------------------------------------------------
+public type MCRunloopActionCallback is Pointer
+public type MCRunloopActionRef is Pointer
+__safe foreign handler MCEngineAddRunloopAction(in pCallback as MCRunloopActionCallback, in pContext as optional Pointer, out rAction as MCRunloopActionRef) returns CBool binds to "<builtin>"
+__safe foreign handler MCEngineRemoveRunloopAction(in pAction as MCRunloopActionRef) returns nothing binds to "<builtin>"
+__safe foreign handler MCEngineRunloopWait() returns CBool binds to "<builtin>"
+__safe foreign handler MCEngineRunloopBreakWait() returns nothing binds to "<builtin>"
 ----------------------------------------------------------------- Constants ------------------------------------------------------------
 ----------------------------------------------------------------- MIDIObjectTypes Constants ------------------------------------------------------------
 constant kMIDIObjectType_ExternalDestination is 0x10 --- 0x10 is just a temporary bitfield place holder
@@ -727,6 +735,18 @@ public handler CoreMIDIClientCreate(in clientName as String) returns nothing
    resolve script object "this stack"
    put the result into sTarget
    log sTarget
+end handler
+
+public handler CoreMIDIClientSetScriptObject(in pNameOfScriptObject as optional String) returns nothing
+   if pNameOfScriptObject is not nothing and pNameOfScriptObject is not the empty string then
+      resolve script object pNameOfScriptObject
+      put the result into sTarget
+      log sTarget
+   else
+      resolve script object "this stack"
+      put the result into sTarget
+      log sTarget
+   end if
 end handler
 
 /**
@@ -1404,7 +1424,9 @@ public handler CoreMIDIReadCallbackProc( in pMIDIPacketListPtr as Pointer, in pR
    variable tData1Uint8 as optional UInt8
    variable tData2Uint8 as optional UInt8
    variable tData3Uint8 as optional UInt8
-   put the empty data into tTimeStampData
+   variable tBool as optional Boolean
+   -- log tBool
+   -- put the empty data into tTimeStampData
         PointerToMIDIPacketListPacket(rMIDIPacketListDataPacket,pMIDIPacketListPtr, 1024)
         -- PointerToMIDIPacketList(rMIDIPacketListData,pMIDIPacketListPtr, 274)
         put element 1 of rMIDIPacketListDataPacket into tNumPackets
@@ -1430,10 +1452,52 @@ public handler CoreMIDIReadCallbackProc( in pMIDIPacketListPtr as Pointer, in pR
         put element 12 of rMIDIPacketListDataPacket into tData2Uint8
         put element 13 of rMIDIPacketListDataPacket into tData3Uint8
        --  log [tNumPackets,tTimeStampA,tTimeStampB,tMsgLength,tData1Uint8,tData2Uint8,tData3Uint8]
-       if tMsgLength is 3 then
-          post "MIDIin" to sTarget with [tData1Uint8, tData2Uint8, tData3Uint8]
-        -- PointerToMIDIPacketListPacket(rMIDIPacketListDataPacket,element 2 of rMIDIPacketList, 270 )
-       end if
+       if tMsgLength > 0 then
+         if tData1Uint8 > 143 and tData1Uint8 < 161 then -- is noteon mesesage
+            subtract 144 from tData1Uint8
+            -- put MCEngineRunloopWait() into tBool
+            if tData3Uint8 is 0 then
+               post "MIDINoteOff" to sTarget with [tData1Uint8, tData2Uint8, tData3Uint8]
+               MCEngineRunloopBreakWait()
+               return
+            else
+               post "MIDINoteOn" to sTarget with [tData1Uint8, tData2Uint8, tData3Uint8]
+               MCEngineRunloopBreakWait()
+               return
+            end if
+         end if
+          if tData1Uint8 > 127 and tData1Uint8 < 144 then -- is noteoff mesesage
+             subtract 128 from tData1Uint8
+             post "MIDINoteOff" to sTarget with [tData1Uint8, tData2Uint8, tData3Uint8]
+             MCEngineRunloopBreakWait()
+             return
+         end if
+         if tData1Uint8 > 175 and tData1Uint8 < 192 then -- is noteon mesesage
+            -- put MCEngineRunloopWait() into tBool
+            subtract 176 from tData1Uint8
+            post "MIDIController" to sTarget with [tData1Uint8, tData2Uint8, tData3Uint8]
+            MCEngineRunloopBreakWait()
+            return
+         end if
+         if tData1Uint8 > 191 and tData1Uint8 < 209 then -- is noteon mesesage
+            -- put MCEngineRunloopWait() into tBool
+            subtract 192 from tData1Uint8
+            post "MIDIProgramChange" to sTarget with [tData1Uint8, tData2Uint8]
+            MCEngineRunloopBreakWait()
+            return
+         end if
+         if tData1Uint8 > 223 and tData1Uint8 < 241 then -- is noteon mesesage
+            -- put MCEngineRunloopWait() into tBool
+            subtract 224 from tData1Uint8
+            post "MIDIPitchBend" to sTarget with [tData1Uint8, tData2Uint8, tData3Uint8]
+            MCEngineRunloopBreakWait()
+            return
+         end if
+         log [tMsgLength]
+         -- log [element 14 of rMIDIPacketListDataPacket]
+         -- log [element 15 of rMIDIPacketListDataPacket]
+         post "MIDIin" to sTarget with [tData1Uint8, tData2Uint8, tData3Uint8]
+      end if
          --put element 2 of rMIDIPacketList into tPacketPtr
             --log [tNumPackets,tPacketPtr]
             --PointerToMIDIPacketList(rMIDIPacketListData, tPacketPtr, 270)

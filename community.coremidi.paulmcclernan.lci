@@ -20,6 +20,8 @@ import module community.coremidi.paulmcclernan
   type MIDITimeStamp is UInt64
   type MIDIObjRef is UInt32
   foreign type FourCharCode
+  type MCRunloopActionCallback is Pointer
+  type MCRunloopActionRef is Pointer
   handler AudioToolboxCreateSequenceFromSMF(in pMIDIfilePath as String) returns optional any
   handler AudioToolboxSequenceGetInfoDict() returns optional any
   handler AudioToolboxCreateNewSequence() returns optional any
@@ -41,6 +43,7 @@ import module community.coremidi.paulmcclernan
   foreign type MIDIObjectPropertyChangeNotification
   handler CoreMIDISetupChangedCallbackProc(in pContext as optional ObjcBlockPointer, in pMIDINotifyStructPtr as Pointer) returns optional any
   handler CoreMIDIClientCreate(in clientName as String) returns nothing
+  handler CoreMIDIClientSetScriptObject(in pNameOfScriptObject as optional String) returns nothing
   handler CoreMIDISendMIDIbytesNow(in pMIDIMsgData as Data) returns nothing
   handler CoreMIDINoteOn(in pMIDINoteNum as UInt8, in pMIDIVeloNum as UInt8, in pMIDIChanNum as UInt8) returns nothing
   handler CoreMIDINoteOff(in pMIDINoteNum as UInt8, in pMIDIChanNum as UInt8) returns nothing
