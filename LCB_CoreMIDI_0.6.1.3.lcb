@@ -1458,45 +1458,46 @@ public handler CoreMIDIReadCallbackProc( in pMIDIPacketListPtr as Pointer, in pR
             -- put MCEngineRunloopWait() into tBool
             if tData3Uint8 is 0 then
                post "MIDINoteOff" to sTarget with [tData1Uint8, tData2Uint8, tData3Uint8]
-               MCEngineRunloopBreakWait()
+               -- MCEngineRunloopBreakWait()
                return
             else
                post "MIDINoteOn" to sTarget with [tData1Uint8, tData2Uint8, tData3Uint8]
-               MCEngineRunloopBreakWait()
+               --MCEngineRunloopBreakWait()
                return
             end if
          end if
           if tData1Uint8 > 127 and tData1Uint8 < 144 then -- is noteoff mesesage
              subtract 128 from tData1Uint8
              post "MIDINoteOff" to sTarget with [tData1Uint8, tData2Uint8, tData3Uint8]
-             MCEngineRunloopBreakWait()
+             --MCEngineRunloopBreakWait()
              return
          end if
          if tData1Uint8 > 175 and tData1Uint8 < 192 then -- is noteon mesesage
             -- put MCEngineRunloopWait() into tBool
             subtract 176 from tData1Uint8
             post "MIDIController" to sTarget with [tData1Uint8, tData2Uint8, tData3Uint8]
-            MCEngineRunloopBreakWait()
+            --MCEngineRunloopBreakWait()
             return
          end if
          if tData1Uint8 > 191 and tData1Uint8 < 209 then -- is noteon mesesage
             -- put MCEngineRunloopWait() into tBool
             subtract 192 from tData1Uint8
             post "MIDIProgramChange" to sTarget with [tData1Uint8, tData2Uint8]
-            MCEngineRunloopBreakWait()
+            --MCEngineRunloopBreakWait()
             return
          end if
          if tData1Uint8 > 223 and tData1Uint8 < 241 then -- is noteon mesesage
             -- put MCEngineRunloopWait() into tBool
             subtract 224 from tData1Uint8
             post "MIDIPitchBend" to sTarget with [tData1Uint8, tData2Uint8, tData3Uint8]
-            MCEngineRunloopBreakWait()
+            --MCEngineRunloopBreakWait()
             return
+         else
+            log [tMsgLength]
+            -- log [element 14 of rMIDIPacketListDataPacket]
+            -- log [element 15 of rMIDIPacketListDataPacket]
+            post "MIDIin" to sTarget with [tData1Uint8, tData2Uint8, tData3Uint8]
          end if
-         log [tMsgLength]
-         -- log [element 14 of rMIDIPacketListDataPacket]
-         -- log [element 15 of rMIDIPacketListDataPacket]
-         post "MIDIin" to sTarget with [tData1Uint8, tData2Uint8, tData3Uint8]
       end if
          --put element 2 of rMIDIPacketList into tPacketPtr
             --log [tNumPackets,tPacketPtr]
