@@ -75,6 +75,7 @@ import module community.coremidi.paulmcclernan
   foreign type MIDIPacketCnt
   foreign type MIDIPacketPtr
   variable sMIDIDataBuffer as optional String
+  handler calculateTime(in pByte1 as Number, in pByte2 as Number, in pByte3 as Number, in pByte4 as Number, in pByte5 as Number, in pByte6 as Number, in pByte7 as Number, in pByte8 as Number) returns optional any
   handler CoreMIDIReadCallbackProc(in pMIDIPacketListPtr as Pointer, in pReadRefCon as optional Pointer, in pSourceRefCon as optional Pointer) returns nothing
   handler CoreMIDIReadCallbackProcBlock(in pContext as optional ObjcBlockPointer, in pMIDIPacketListPtr as optional Pointer, in pSourceRefCon as optional Pointer) returns optional any
   handler GetPackets(in pMIDIPacketListPtr as Pointer) returns optional any

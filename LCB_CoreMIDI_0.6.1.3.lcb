@@ -1400,6 +1400,18 @@ __safe foreign handler PointerByteArrayToTimeStamp(out rAggregate as UInt64, in 
 
 public variable sMIDIDataBuffer as optional String
 
+public handler calculateTime(in pByte1 as Integer,in pByte2 as Integer,in pByte3 as Integer,in pByte4 as Integer,in pByte5 as Integer,in pByte6 as Integer,in pByte7 as Integer,in pByte8 as Integer) returns optional any
+   variable tTotal as UInt64
+   put pByte1 into tTotal
+   put pByte2 * 256 + tTotal into tTotal
+   put pByte3 * (256 * 256) + tTotal into tTotal
+   put pByte2 * (256 * 256 * 256) + tTotal into tTotal
+   put pByte2 * (256 * 256 * 256 * 256) + tTotal into tTotal
+   put pByte2 * (256 * 256 * 256 * 256 * 256) + tTotal into tTotal
+   put pByte2 * (256 * 256 * 256 * 256 * 256 * 256) + tTotal into tTotal
+   put pByte2 * (256 * 256 * 256 * 256 * 256 * 256 * 256) + tTotal into tTotal
+   log tTotal
+end handler
 
 --public foreign handler type handle_midi_event_func_t( in pOptionalDataPtr as optional Pointer, in mMIDIBufferPtr as Pointer) returns CInt
 -- foreign handler PointerToMIDIPacket(out rAggregate as MIDIPacket, in pPointer as Pointer, in pSize as UIntSize) returns nothing binds to "c:memcpy"
@@ -1435,6 +1447,9 @@ public handler CoreMIDIReadCallbackProc( in pMIDIPacketListPtr as Pointer, in pR
        --  element 4 of rMIDIPacketListDataPacket,element 5 of rMIDIPacketListDataPacket, \
         -- element 6 of rMIDIPacketListDataPacket,element 7 of rMIDIPacketListDataPacket,\
         -- element 8 of rMIDIPacketListDataPacket, element 9 of rMIDIPacketListDataPacket] -- after tTimeStampData
+        -- calculateTime((element 2 of rMIDIPacketListDataPacket),(element 3 of rMIDIPacketListDataPacket),\
+       --  (element 4 of rMIDIPacketListDataPacket),(element 5 of rMIDIPacketListDataPacket),(element 6 of rMIDIPacketListDataPacket),\
+       --  (element 7 of rMIDIPacketListDataPacket),(element 8 of rMIDIPacketListDataPacket),(element 9 of rMIDIPacketListDataPacket))
 
         -- put the byte with code (element 2 of rMIDIPacketListDataPacket) -- after tTimeStampData
         -- put the byte with code (element 3 of rMIDIPacketListDataPacket) -- after tTimeStampData
@@ -1458,45 +1473,47 @@ public handler CoreMIDIReadCallbackProc( in pMIDIPacketListPtr as Pointer, in pR
             -- put MCEngineRunloopWait() into tBool
             if tData3Uint8 is 0 then
                post "MIDINoteOff" to sTarget with [tData1Uint8, tData2Uint8, tData3Uint8]
-               -- MCEngineRunloopBreakWait()
-               return
+               MCEngineRunloopBreakWait()
+               -- return
             else
                post "MIDINoteOn" to sTarget with [tData1Uint8, tData2Uint8, tData3Uint8]
-               --MCEngineRunloopBreakWait()
-               return
+               MCEngineRunloopBreakWait()
+               -- return
             end if
          end if
           if tData1Uint8 > 127 and tData1Uint8 < 144 then -- is noteoff mesesage
              subtract 128 from tData1Uint8
              post "MIDINoteOff" to sTarget with [tData1Uint8, tData2Uint8, tData3Uint8]
-             --MCEngineRunloopBreakWait()
-             return
+             MCEngineRunloopBreakWait()
+             -- return
          end if
          if tData1Uint8 > 175 and tData1Uint8 < 192 then -- is noteon mesesage
             -- put MCEngineRunloopWait() into tBool
             subtract 176 from tData1Uint8
             post "MIDIController" to sTarget with [tData1Uint8, tData2Uint8, tData3Uint8]
-            --MCEngineRunloopBreakWait()
-            return
+            MCEngineRunloopBreakWait()
+            -- return
          end if
          if tData1Uint8 > 191 and tData1Uint8 < 209 then -- is noteon mesesage
             -- put MCEngineRunloopWait() into tBool
             subtract 192 from tData1Uint8
             post "MIDIProgramChange" to sTarget with [tData1Uint8, tData2Uint8]
-            --MCEngineRunloopBreakWait()
-            return
+            MCEngineRunloopBreakWait()
+            --return
          end if
          if tData1Uint8 > 223 and tData1Uint8 < 241 then -- is noteon mesesage
             -- put MCEngineRunloopWait() into tBool
             subtract 224 from tData1Uint8
             post "MIDIPitchBend" to sTarget with [tData1Uint8, tData2Uint8, tData3Uint8]
-            --MCEngineRunloopBreakWait()
-            return
+            MCEngineRunloopBreakWait()
+            -- return
          else
             log [tMsgLength]
             -- log [element 14 of rMIDIPacketListDataPacket]
             -- log [element 15 of rMIDIPacketListDataPacket]
             post "MIDIin" to sTarget with [tData1Uint8, tData2Uint8, tData3Uint8]
+            MCEngineRunloopBreakWait()
+            -- return
          end if
       end if
          --put element 2 of rMIDIPacketList into tPacketPtr
@@ -1512,6 +1529,7 @@ public handler CoreMIDIReadCallbackProc( in pMIDIPacketListPtr as Pointer, in pR
       --end if
       -- put StringToNSString("LiveCode") into pParam
       -- return nothing
+      -- return
 end handler
 -- typedef void (^MIDIReadBlock)(const MIDIPacketList *pktlist, void *srcConnRefCon);
 -- public handler CoreMIDIReadCallbackProcedure( in pContext as optional ObjcBlockPointer, in pMIDIPacketListPtr as MIDIPacketList, in pReadProcRefCont as optional ObjCId, in pSrcConnRefCont as optional ObjCId)
