@@ -1405,11 +1405,11 @@ public handler calculateTime(in pByte1 as Integer,in pByte2 as Integer,in pByte3
    put pByte1 into tTotal
    put pByte2 * 256 + tTotal into tTotal
    put pByte3 * (256 * 256) + tTotal into tTotal
-   put pByte2 * (256 * 256 * 256) + tTotal into tTotal
-   put pByte2 * (256 * 256 * 256 * 256) + tTotal into tTotal
-   put pByte2 * (256 * 256 * 256 * 256 * 256) + tTotal into tTotal
-   put pByte2 * (256 * 256 * 256 * 256 * 256 * 256) + tTotal into tTotal
-   put pByte2 * (256 * 256 * 256 * 256 * 256 * 256 * 256) + tTotal into tTotal
+   put pByte4 * (256 * 256 * 256) + tTotal into tTotal
+   put pByte5 * (256 * 256 * 256 * 256) + tTotal into tTotal
+   put pByte6 * (256 * 256 * 256 * 256 * 256) + tTotal into tTotal
+   put pByte7 * (256 * 256 * 256 * 256 * 256 * 256) + tTotal into tTotal
+   put pByte8 * (256 * 256 * 256 * 256 * 256 * 256 * 256) + tTotal into tTotal
    log tTotal
 end handler
 
