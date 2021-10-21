@@ -1,9 +1,9 @@
-# LiveCode Builder CoreMIDI Library
+# OpenXTalk Builder CoreMIDI Library
 
 ## WHAT IT IS:
 
-  This is a LiveCode Builder Library for macOS (possibly iOS too) that builds as a binary module that, when the module is loaded in the LiveCode Engine, adds handlers and utility functions for use in LiveCode Script for interacting with Apple's MIDI/Music Services.
-  It allows your LiveCode scripts to do things like register as a MIDI Client, register as a virtual MIDI Source, send arbitrary bytes as MIDI Data though that LC Virtual Source, and Retreive various infos about the current state of the MIDI setup from the OS. This repo also includes a few demo LiveCode stacks that can be used in conjunction with GarageBand or other external MIDI app to see how it works.
+  This is a Builder Library for macOS (possibly iOS too) that builds as a binary module that, when the module is loaded in the OpenXTalk Engine, adds handlers and utility functions for use in xTalk Scripts for interacting with Apple's MIDI/Music Services.
+  It allows your scripts to do things like register as a MIDI Client, register as a virtual MIDI Source, send arbitrary bytes as MIDI Data though that Virtual Source, and Retreive various infos about the current state of the MIDI setup from the OS. This repo also includes a few demo stacks that can be used in conjunction with GarageBand or other external MIDI app to see how it works.
 
 A short video demonstration (early version) is veiwable here:
 https://www.youtube.com/watch?v=ruauWh3INfw
@@ -13,11 +13,11 @@ https://www.youtube.com/watch?v=s_knX8mJg1c
 
 ### So far this library consists of:
 
-- LiveCode Builder (LCB) Bindings to create a MIDI Client and register as a Virtual MIDI Source from LiveCode Script.
-- Handlers which creates a byte buffer that enables sending binary MIDI data out from LiveCode Script (LCS)
+- Builder (LCB) Bindings to create a MIDI Client and register as a Virtual MIDI Source from Script.
+- Handlers which creates a byte buffer that enables sending binary MIDI data out from Script
 - TimeStamping, it has a seperate 'Send' handler that allows for sending MIDI messages with millisecond offsets from 0 (from when the bytes were passed to it) from LiveCode Script (LCS), obsuring away the conversion to nanosecond time stampings, and retreival (mach_kernel time, used by MIDI Services is a struct that includes division values to use to get most accurate timing on different clock speed processors) from the LCS.
 - In-line Documentation markup describing the handlers of the library module for LiveCode's Dictionary.
-- LiveCode Builder (LCB) Bindings to retreive various infos about the present state of the MIDI Setup on the system, mostly Plist XML right now (WIP).
+- Builder (LCB) Bindings to retreive various infos about the present state of the MIDI Setup on the system, mostly Plist XML right now (WIP).
 - Utility handlers for generating common MIDI messages (no converting to bytes needed) such as Note On/Off, Pitchbend, Controllers, etc.
 - Some more Error Checking and Reporting in the LCB end to return descriptive information about any errors that may occur.
 - MIDI Setup changed notifications to alert LiveCode of changes to the current setup (a MIDI Instrument gets turned off for example)
@@ -39,6 +39,6 @@ https://www.youtube.com/watch?v=s_knX8mJg1c
 
 - maybe merge in my GM MIDI Utils Project (for GM/GS standard Names, Numbers, Controller Names, etc.)
 
-- maybe Port to LCB, or replace with LCB, UDI's Hypercard style 'ABC' Notation compatible opensource LCS Lib called makeSMF. This library was very well written all the way back in the early 2000s (late 1990s?). I've already updated it slightly, mostly to use 'bytes' instead of 'char' keyword (since it was written LiveCode has become fully Unicode ready, so a 'char' could be multi-byte unicode).
+- maybe Port to Builder, or replace with Builder, UDI's Hypercard style 'ABC' Notation compatible opensource Script Lib called makeSMF. This library was very well written all the way back in the early 2000s (late 1990s?). I've already updated it slightly, mostly to use 'bytes' instead of 'char' keyword (since it was written LiveCode has become fully Unicode ready, so a 'char' could be multi-byte unicode).
 
-- maybe port to LCB, or replace with LCB, my LCS scripts for dealing with MIDI's variable length quantities (VLQ), converting back and forth from 7-bits-per-byte (VLQ) to and from standard 8 bit bytes, hex, or decimal numbers. Useful for encoding and decoding TimeStamp numbers in the Standard MIDI file specification.
+- maybe port to Builder, or replace with Builder, my Scripts for dealing with MIDI's variable length quantities (VLQ), converting back and forth from 7-bits-per-byte (VLQ) to and from standard 8 bit bytes, hex, or decimal numbers. Useful for encoding and decoding TimeStamp numbers in the Standard MIDI file specification.
