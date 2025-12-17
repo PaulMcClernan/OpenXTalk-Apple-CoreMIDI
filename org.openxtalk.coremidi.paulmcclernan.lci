@@ -1,0 +1,107 @@
+import module org.openxtalk.coremidi.paulmcclernan
+  use com.livecode.objc
+  use com.livecode.foreign
+  use com.livecode.engine
+  use com.livecode.array
+  use com.livecode.list
+  use com.livecode.binary
+  use com.livecode.string
+  use com.livecode.char
+  use com.livecode.arithmetic
+  use com.livecode.logic
+  use com.livecode.type
+  use com.livecode.byte
+  use com.livecode.assert
+  use com.livecode.mathfoundation
+  foreign type MIDIPacket
+  foreign type MIDIMsg
+  foreign type MIDIPacketList
+  foreign type TimeBaseInfo
+  type MIDITimeStamp is UInt64
+  type MIDIObjRef is UInt32
+  foreign type FourCharCode
+  type MCRunloopActionCallback is Pointer
+  type MCRunloopActionRef is Pointer
+  handler AudioToolboxCreateSequenceFromSMF(in pMIDIfilePath as String) returns optional any
+  handler AudioToolboxSequenceGetInfoDict() returns optional any
+  handler AudioToolboxCreateNewSequence() returns optional any
+  type MusicTimeStamp is Float64
+  handler AudioToolboxSequenceGetTrackLength() returns Number
+  handler AudioToolboxSequenceGetTrackMuteStatus() returns Boolean
+  handler AudioToolboxSequenceSetTrackMuteStatus(in pMutesStatus as Boolean) returns optional any
+  handler AudioToolboxSequenceGetTrackSoloStatus() returns Boolean
+  handler AudioToolboxSequenceSetTrackSoloStatus(in pMutesStatus as Boolean) returns optional any
+  handler AudioToolboxSequenceGetTrackCount() returns optional any
+  handler AudioToolboxSequenceSelectedTrackIndex() returns optional any
+  handler AudioToolboxMusicSequenceGetIndexTrack(in pIndex as UInt32) returns optional any
+  handler AudioToolboxSequenceNewTrack() returns optional any
+  handler AudioToolboxSequenceDisposeTrack(in pIndex as UInt32) returns optional any
+  handler AudioToolboxTrackNewMIDINoteEvent() returns optional any
+  handler CoreMIDIObjectTypeToString(in pMIDIObjTypeEnum as optional Number) returns optional String
+  foreign type MIDINotificationIDnSize
+  foreign type MIDIObjectAddRemoveNotification
+  foreign type MIDIObjectPropertyChangeNotification
+  handler CoreMIDISetupChangedCallbackProc(in pContext as optional ObjcBlockPointer, in pMIDINotifyStructPtr as Pointer) returns optional any
+  handler CoreMIDIClientCreate(in clientName as String) returns nothing
+  handler CoreMIDIClientSetScriptObject(in pNameOfScriptObject as optional String) returns nothing
+  handler CoreMIDISendMIDIbytesNow(in pMIDIMsgData as Data) returns nothing
+  handler CoreMIDINoteOn(in pMIDINoteNum as UInt8, in pMIDIVeloNum as UInt8, in pMIDIChanNum as UInt8) returns nothing
+  handler CoreMIDINoteOff(in pMIDINoteNum as UInt8, in pMIDIChanNum as UInt8) returns nothing
+  handler CoreMIDIController(in pMIDINoteNum as UInt8, in pMIDIVeloNum as UInt8, in pMIDIChanNum as UInt8) returns nothing
+  handler CoreMIDIPitchbendFine(in pPitchBendCoarseNFine as Number, in pMIDIChanNum as UInt8) returns nothing
+  handler CoreMIDIPitchbend(in pMIDINoteNum as UInt8, in pMIDIChanNum as UInt8) returns nothing
+  handler CoreMIDIAftertouch(in pMIDINoteNum as UInt8, in pMIDIVeloNum as UInt8, in pMIDIChanNum as UInt8) returns nothing
+  handler CoreMIDIChannelPressure(in pMIDINoteNum as UInt8, in pMIDIChanNum as UInt8) returns nothing
+  handler CoreMIDIProgramChange(in pMIDINoteNum as UInt8, in pMIDIChanNum as UInt8) returns nothing
+  handler CoreMIDIStart() returns nothing
+  handler CoreMIDIContinue() returns nothing
+  handler CoreMIDIStop() returns nothing
+  handler CoreMIDISystemReset() returns nothing
+  handler CoreMIDISendMIDIbytesInTime(in pTimeOffsetMillisecs as optional Number, in pMIDIMsgData as Data) returns nothing
+  handler CoreMIDISourceCreate(in sourceName as String, in uniqueIDnum as optional SInt32) returns Number
+  variable sMIDIPacketListData as List
+  variable sMIDIPacketListBufferString as String
+  variable sMIDIMsgList as String
+  variable sMIDIinPacketBuffer as Array
+  handler PostMIDIMsg() returns optional any
+  handler AddToMIDIMsgList(in pMIDIMsgList as List) returns optional any
+  handler AddToMIDIMsgBufferString(in pStatusByte as Number, in pDataByteA as Number, in pDataByteB as Number) returns optional any
+  handler GetMIDIMsgBufferString() returns any
+  variable sCoreMIDIReadCallbackProcBlockPtr as optional ObjcBlockPointer
+  variable sCoreMIDIReadCallbackProcPtr as optional Pointer
+  foreign handler type MIDIReadProc(in pMIDIPacketListPtr as Pointer, in pReadRefCon as optional Pointer, in pSourceRefCon as optional Pointer) returns nothing
+  foreign type MIDIPacketListData
+  foreign type MIDIPacketListDataPacket
+  foreign type MIDIPacketCnt
+  foreign type MIDIPacketPtr
+  variable sMIDIDataBuffer as optional String
+  handler calculateTime(in pByte1 as Number, in pByte2 as Number, in pByte3 as Number, in pByte4 as Number, in pByte5 as Number, in pByte6 as Number, in pByte7 as Number, in pByte8 as Number) returns optional any
+  handler CoreMIDIReadCallbackProc(in pMIDIPacketListPtr as Pointer, in pReadRefCon as optional Pointer, in pSourceRefCon as optional Pointer) returns nothing
+  handler CoreMIDIReadCallbackProcBlock(in pContext as optional ObjcBlockPointer, in pMIDIPacketListPtr as optional Pointer, in pSourceRefCon as optional Pointer) returns optional any
+  handler GetPackets(in pMIDIPacketListPtr as Pointer) returns optional any
+  handler GetMIDIDataBuffer() returns optional String
+  handler FlushMIDIDataBuffer() returns optional any
+  handler CoreMIDIDestinationCreate(in destinationName as String, in uniqueIDnum as optional SInt32) returns optional any
+  handler CoreMIDIInputPortCreate(in sourceName as String, in uniqueIDnum as optional SInt32) returns Number
+  handler CoreMIDIEndPointDispose(in uniqueIDnum as optional SInt32) returns optional any
+  handler CoreMIDIObjectTypeFromID(in uniqueIDnum as optional SInt32) returns String
+  handler CoreMIDIGetNumberOfDestinations() returns Number
+  handler CoreMIDIGetDestinationInfo(in pIndex as UInt32) returns Data
+  handler CoreMIDIGetDestinationNameAndID(in pIndex as UInt32) returns String
+  handler CoreMIDIGetNumberOfSources() returns Number
+  handler CoreMIDIGetSourceInfo(in pIndex as UInt32) returns Data
+  handler CoreMIDIGetSourceNameAndID(in pIndex as UInt32) returns String
+  handler CoreMIDISelectSourceByID(in uniqueIDnum as optional SInt32) returns String
+  handler CoreMIDISelectSourceByIndexAlt(in pIndex as UInt32) returns String
+  handler CoreMIDISelectSourceByIndex(in pIndex as UInt32) returns String
+  handler CoreMIDIGetNumberOfDevices() returns Number
+  handler CoreMIDIGetDeviceInfo(in pIndex as UInt32) returns Data
+  handler CoreMIDIGetNumberOfExternalDevices() returns Number
+  handler CoreMIDIGetExternalDeviceInfo(in pIndex as UInt32) returns Data
+  handler CoreMIDIDeviceGetNumberOfEntities(in pDevIndex as UInt32) returns Number
+  handler CoreMIDIGetDeviceEntityInfo(in pDevIndex as UInt32, in pEntityIndex as UInt32) returns Data
+  handler CoreMIDIRestart() returns optional any
+  handler CoreMIDIFlushOutput() returns optional any
+  handler CoreMIDIInit(in pClientName as String) returns Data
+  handler CoreMIDIDestroy() returns nothing
+end module

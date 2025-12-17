@@ -1,5 +1,5 @@
 <package version="0.0">
-  <name>community.coremidi.paulmcclernan</name>
+  <name>org.openxtalk.coremidi.paulmcclernan</name>
   <title>CoreMIDI library</title>
   <author>Paul McClernan</author>
   <version>0.6</version>

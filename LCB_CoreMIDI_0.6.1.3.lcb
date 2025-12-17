@@ -835,7 +835,7 @@ CoreMIDINoteOff 60,1 -- Turns off Middle C on MIDI channel 1
 
 Parameters:
 pMIDINoteNum: The number of the pitch to turn off, 0 to 127, 60 = Middle C
-pMIDIChanNum: The MIDI Channel to send the message to, 0 to 15, 0 = Channel 1
+pMIDIChanNum: The MIDI Channel to send the message to, 1 to 16
 
 Description:
 Immediately sends a MIDI Note Off message with the given pitch on the given channel.
@@ -845,7 +845,7 @@ public handler CoreMIDINoteOff(in pMIDINoteNum as UInt8,in pMIDIChanNum as UInt8
    expect that (pMIDIChanNum >= 1 and pMIDIChanNum <= 16 ) because "MIDI channel values must be in the range of 1 to 16"
    variable tMIDIMsgData as Data
    add 127 to pMIDIChanNum -- 127 instead of 128 for Channel range of 1 to 16 (instead of 0 to 15)
-   put the byte with code pMIDIChanNum into tMIDIMsgData
+   put the byte with code (pMIDIChanNum - 1) into tMIDIMsgData
    put the byte with code pMIDINoteNum after tMIDIMsgData
    put the byte with code 0 after tMIDIMsgData
    CoreMIDISendMIDIbytesNow(tMIDIMsgData)
