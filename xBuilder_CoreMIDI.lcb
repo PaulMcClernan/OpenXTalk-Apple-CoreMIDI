@@ -44,7 +44,7 @@ private foreign handler objC_NSObjectAutoRealease(in pNSObj as ObjcId) returns O
 private foreign handler objC_NSObjectRelease(in pNSObj as ObjcId) returns nothing binds to "objc:NSObject.-release"
 private foreign handler c_CFErrorCopyDescription(in pCFErrorRef as ObjcId) returns ObjcId binds to "c:CFErrorCopyDescription"
 ----------------------------------------------------------------- Data Buffer ------------------------------------------------------------
--- private foreign handler objC_NSMutableDataWithLength(in pDataLength as ObjcId) returns ObjcId binds to "objc:NSMutableData.+dataWithLength:" -- Creates and returns an mutable data object containing a given number of zeroed bytes. Toll free bridges to CFMutableDataRef for Foundation C APIs
+private foreign handler objC_NSMutableDataWithLengthNSNumber(in pDataLength as ObjcId) returns ObjcId binds to "objc:NSMutableData.+dataWithLength:" -- Creates and returns an mutable data object containing a given number of zeroed bytes. Toll free bridges to CFMutableDataRef for Foundation C APIs
 private foreign handler objC_NSMutableDataWithLength(in pDataLength as CUInt) returns ObjcId binds to "objc:NSMutableData.+dataWithLength:" -- Creates and returns an mutable data object containing a given number of zeroed bytes. Toll free bridges to CFMutableDataRef for Foundation C APIs
 private foreign handler objC_NSMutableDataWithCapacity(in pDataLength as CUInt) returns ObjcId binds to "objc:NSMutableData.+dataWithCapacity:"
 private foreign handler objC_NSMutableDataBytesPtr(in pMutableDataRef as ObjcId) returns Pointer binds to "objc:NSMutableData.mutableBytes"
@@ -1146,13 +1146,13 @@ Description:
 Sends arbitrary bytes to the MIDI Client's Queue in millisecond Offsets from now.
 A MIDI Client must be created first using CoreMIDIClientCreate.
 */
-public handler CoreMIDISendMIDIbytesInTime(in pTimeOffsetMillisecs as optional Number, in pMIDIMsgData as Data) returns nothing
+public handler CoreMIDISendMIDIbytesInTime(in pTimeOffsetMillisecs as Number, in pMIDIMsgData as Data) returns nothing
    variable tOSStatus as optional CSInt
    variable tAbsoluteTime as UInt64
    variable tTBnumerator as UInt32
    variable tTBdenominator as UInt32
    variable tTimeStamp as MIDITimeStamp
-   variable tTimeBaseInfoRef as ObjCId
+   -- variable tTimeBaseInfoRef as ObjCId
    variable tTimeBaseInfoPtr as Pointer
    variable tTimebaseInfo as TimeBaseInfo
    variable tMIDIPacket as MIDIPacket
@@ -1162,6 +1162,7 @@ public handler CoreMIDISendMIDIbytesInTime(in pTimeOffsetMillisecs as optional N
    variable tMIDIMsgBytesNSDataRef as ObjCId
    variable tMIDIMsgBytesPtr as Pointer
    put the number of bytes in pMIDIMsgData into tCnt
+   log [tCnt,pMIDIMsgData]
    put 256 into tBufferSize
    put [0,0] into tTimeBaseInfo
    unsafe
@@ -1173,7 +1174,7 @@ public handler CoreMIDISendMIDIbytesInTime(in pTimeOffsetMillisecs as optional N
       put tAbsoluteTime * tTBnumerator / tTBdenominator into tTimeStamp
       -- log tTimeStamp
       put tTimeStamp + (pTimeOffsetMillisecs * 1000000) into tTimeStamp
-      put objC_NSMutableDataWithLength(tBufferSize) into sMIDIPacketByteBufferNSMutableDataRef
+      put objC_NSMutableDataWithLengthNSNumber( NumberToNSNumber(tBufferSize) ) into sMIDIPacketByteBufferNSMutableDataRef
       put objC_NSMutableDataBytesPtr(sMIDIPacketByteBufferNSMutableDataRef) into sMIDIPacketByteBufferPtr
 
       put c_MIDIPacketListInit(sMIDIPacketByteBufferPtr) into sMIDIPacketPtr

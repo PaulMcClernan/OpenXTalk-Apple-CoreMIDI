@@ -1,4 +1,4 @@
-Library: org.openxtalk.coremidi.paulmcclernan
+Library: org.openxtalk.library.coremidi
 
 Type: library
 
@@ -14,7 +14,7 @@ This library is a (currently incomplete) wrapper for Apple's CoreMIDI API.
 >*Note:* This library is MIT licensed (permissive).
 > Please share and share a like.
 
-version: 0.6
+version: 0.6.2
 
 author: Paul McClernan
 
@@ -468,7 +468,7 @@ Syntax: CoreMIDISourceCreate(<sourceName>,<uniqueIDnum>)
 
 Summary: Creates a Virtual MIDI Source with the given name.
 
-Example: CoreMIDISourceCreate("MIDI Output from my LiveCode Stack")
+Example: CoreMIDISourceCreate("My CoreMIDIDestroyMIDI Output")
 
 Parameters: 
 
@@ -492,7 +492,7 @@ Syntax: CoreMIDIClientCreate(<clientName>)
 
 Summary: Creates a MIDI Client and asigns it a name.
 
-Example: CoreMIDIClientCreate("My LiveCode CoreMIDI Client")
+Example: CoreMIDIClientCreate("My CoreMIDI Client")
 
 Parameters: 
 
