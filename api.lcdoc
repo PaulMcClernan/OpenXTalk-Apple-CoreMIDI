@@ -9,7 +9,7 @@ OS: macOS, iOS (untested)
 Edition: Community
 
 Description:
-This library is a (currently incomplete) wrapper for Apple's CoreMIDI API.
+This library is a partial wrapper for Apple's CoreMIDI API.
 
 >*Note:* This library is MIT licensed (permissive).
 > Please share and share a like.
