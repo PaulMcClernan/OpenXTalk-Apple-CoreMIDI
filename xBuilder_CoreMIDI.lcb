@@ -6,7 +6,7 @@ macOS, iOS (untested)
 
 Edition: Community
 Description:
-This library is a (currently incomplete) wrapper for Apple's CoreMIDI API.
+This library is a partial wrapper for Apple's CoreMIDI API.
 
 >*Note:* This library is MIT licensed (permissive).
 > Please share and share a like.
@@ -44,7 +44,6 @@ private foreign handler objC_NSObjectAutoRealease(in pNSObj as ObjcId) returns O
 private foreign handler objC_NSObjectRelease(in pNSObj as ObjcId) returns nothing binds to "objc:NSObject.-release"
 private foreign handler c_CFErrorCopyDescription(in pCFErrorRef as ObjcId) returns ObjcId binds to "c:CFErrorCopyDescription"
 ----------------------------------------------------------------- Data Buffer ------------------------------------------------------------
-private foreign handler objC_NSMutableDataWithLengthNSNumber(in pDataLength as ObjcId) returns ObjcId binds to "objc:NSMutableData.+dataWithLength:" -- Creates and returns an mutable data object containing a given number of zeroed bytes. Toll free bridges to CFMutableDataRef for Foundation C APIs
 private foreign handler objC_NSMutableDataWithLength(in pDataLength as CUInt) returns ObjcId binds to "objc:NSMutableData.+dataWithLength:" -- Creates and returns an mutable data object containing a given number of zeroed bytes. Toll free bridges to CFMutableDataRef for Foundation C APIs
 private foreign handler objC_NSMutableDataWithCapacity(in pDataLength as CUInt) returns ObjcId binds to "objc:NSMutableData.+dataWithCapacity:"
 private foreign handler objC_NSMutableDataBytesPtr(in pMutableDataRef as ObjcId) returns Pointer binds to "objc:NSMutableData.mutableBytes"
@@ -128,11 +127,25 @@ private foreign handler c_MIDIGetDevice(in pSourceIndexNum as optional UInt32) r
 private foreign handler c_MIDIDeviceGetNumberOfEntities(in pMIDIDeviceRef as MIDIObjRef) returns CInt binds to "c:CoreMIDI.framework>MIDIDeviceGetNumberOfEntities"
 private foreign handler c_MIDIDeviceGetEntity(in pDeviceRef as MIDIObjRef, in pSourceIndexNum as UInt32) returns MIDIObjRef binds to "c:CoreMIDI.framework>MIDIDeviceGetEntity"
 ----------------------------------------------------------------- MIDI IO --------------------------------------------------------------------------
+-- enum MIDIProtocolID : SInt32;
+-- kMIDIProtocol_1_0 = 1
+-- kMIDIProtocol_2_0 = 2
+
+-- https://developer.apple.com/documentation/coremidi/midieventlistinit(_:_:)?language=objc
 private foreign handler c_MIDIReceived(in pMIDIEndpointRef as MIDIObjRef, in pMIDIPacketListPtr as Pointer) returns CSInt binds to "c:CoreMIDI.framework>MIDIReceived" -- OSStatus MIDIReceived(MIDIEndpointRef src, const MIDIPacketList *pktlist);ai -- Use for SENDING Notes To Virstual Source (not MIDISend)
 private foreign handler c_MIDISend(in pMIDIPortRef as MIDIObjRef, in pMIDIEndpointRef as ObjCId, in pMIDIPacketList as Pointer) returns CSInt binds to "c:CoreMIDI.framework>MIDISend"
-private foreign handler c_MIDIPacketListInit(in pMIDIPacketListByteBuffer as Pointer) returns Pointer binds to "c:CoreMIDI.framework>MIDIPacketListInit"
+
+private foreign handler c_MIDIMIDIEventListInit( in pMIDIPacketListByteBuffer as Pointer, in pMIDIProtocol as CInt ) returns Pointer binds to "c:CoreMIDI.framework>MIDIMIDIEventListInit"
+private foreign handler c_MIDIEventListAdd(in pMIDIPacketListByteBuffer as Pointer, in pByteCnt as UInt32, in pMIDIEventPacket as Pointer, in pMIDITimeStamp as UInt64, pPcktByteCnt as UInt16, in pPacket as Pointer) returns Pointer binds to "c:CoreMIDI.framework>MIDIPacketListAdd"
+-- extern MIDIEventPacket * MIDIEventListAdd( MIDIEventList * evtlist, ByteCount listSize, MIDIEventPacket * curPacket, MIDITimeStamp time, ByteCount wordCount, const UInt32 * words);
+
 private foreign handler c_MIDIPacketNext(in pMIDIPacketListByteBuffer as Pointer) returns Pointer binds to "c:CoreMIDI.framework>MIDIPacketNext"
+
+-- MIDIPacketListInit is deprecated as of macOS 11 BigSur -- Use c_MIDIMIDIEventListInit instead
+private foreign handler c_MIDIPacketListInit(in pMIDIPacketListByteBuffer as Pointer) returns Pointer binds to "c:CoreMIDI.framework>MIDIPacketListInit"
+--- MIDIPacketListAdd is deprecated as of macOS 11 BigSur -- Use MIDIEventListAdd instead
 private foreign handler c_MIDIPacketListAdd(in pMIDIPacketListByteBuffer as Pointer, in pPacketsCnt as UInt32, in pMIDIPacket as Pointer, in pMIDITimeStamp as UInt64, pPcktByteCnt as UInt16, in pPacket as Pointer) returns Pointer binds to "c:CoreMIDI.framework>MIDIPacketListAdd"
+
 private foreign handler c_MIDIRestart() returns CSInt binds to  "c:CoreMIDI.framework>MIDIRestart" -- OSStatus MIDIRestart(void); This is useful for forcing CoreMIDI to ask its drivers to rescan for hardware.
 private foreign handler c_MIDIFlushOutput(in MIDIEndpointRef as optional MIDIObjRef) returns CSInt binds to  "c:CoreMIDI.framework>MIDIFlushOutput" -- OSStatus MIDIFlushOutput(MIDIEndpointRef dest); -- Parameters dest, All pending events scheduled to be sent to this destination are unscheduled. If NULL, the operation applies to all destinations.
 ----------------------------------------------------------------- MIDI Object Properties ------------------------------------------------------------
@@ -750,6 +763,21 @@ public handler CoreMIDIClientSetScriptObject(in pNameOfScriptObject as optional 
    end if
 end handler
 
+public handler systemVersionArray() returns optional any
+   variable tString as String
+   variable tVersion as List
+   variable tMajor as Integer
+   variable tMinor as Integer
+   -- execute script "set the itemDel to numToChar(46) ; return item 1 of systemVersion()"
+   --  execute script "get systemVersion(); split it by numToChar(46); return it"
+   execute script "return systemVersion()"
+   put the result into tString
+   split tString by "." into tVersion
+   put (element 1 of tVersion) parsed as number into tMajor
+   put (element 2 of tVersion) parsed as number into tMinor
+   return [tMajor,tMinor]
+end handler
+
 /**
 Sends arbitrary bytes to the MIDI Client.
 
@@ -766,6 +794,7 @@ Sends arbitrary bytes to the MIDI Client immediately (as fast as possible).
 A MIDI Client must be created first using CoreMIDIClientCreate.
 */
 public handler CoreMIDISendMIDIbytesNow(in pMIDIMsgData as Data) returns nothing
+   -- log element 1 of systemVersionArray()
    variable tOSStatus as optional CSInt
    variable tTimeStamp as MIDITimeStamp
    variable tMIDIPacket as MIDIPacket
@@ -781,6 +810,7 @@ public handler CoreMIDISendMIDIbytesNow(in pMIDIMsgData as Data) returns nothing
       put objC_NSMutableDataWithLength(tBufferSize) into sMIDIPacketByteBufferNSMutableDataRef
       put objC_NSMutableDataBytesPtr(sMIDIPacketByteBufferNSMutableDataRef) into sMIDIPacketByteBufferPtr
 
+      -- MIDIPacketListInit & MIDIPacketListAdd are deprecated as of macOS 11+
       put c_MIDIPacketListInit(sMIDIPacketByteBufferPtr) into sMIDIPacketPtr
 
       put objC_NSMutableDataWithLength(tCnt) into tMIDIMsgBytesNSDataRef
@@ -1146,24 +1176,28 @@ Description:
 Sends arbitrary bytes to the MIDI Client's Queue in millisecond Offsets from now.
 A MIDI Client must be created first using CoreMIDIClientCreate.
 */
-public handler CoreMIDISendMIDIbytesInTime(in pTimeOffsetMillisecs as Number, in pMIDIMsgData as Data) returns nothing
+public handler CoreMIDISendMIDIbytesInTime(in pTimeOffsetMillisecs as optional Number, in pMIDIMsgData as Data) returns nothing
+   if element 1 of systemVersionArray() > 11 then
+      throw " This method for scheduling MIDI messages is deprecated as of macOS 11 (BigSur) "
+   end if
+   variable tMIDIPacket as MIDIPacket
+   variable tMIDIPacketList as MIDIPacketList
+
    variable tOSStatus as optional CSInt
    variable tAbsoluteTime as UInt64
    variable tTBnumerator as UInt32
    variable tTBdenominator as UInt32
    variable tTimeStamp as MIDITimeStamp
-   -- variable tTimeBaseInfoRef as ObjCId
+   variable tTimeBaseInfoRef as ObjCId
    variable tTimeBaseInfoPtr as Pointer
    variable tTimebaseInfo as TimeBaseInfo
-   variable tMIDIPacket as MIDIPacket
-   variable tMIDIPacketList as MIDIPacketList
+
    variable tBufferSize  as Number
    variable tCnt as Number
    variable tMIDIMsgBytesNSDataRef as ObjCId
    variable tMIDIMsgBytesPtr as Pointer
    put the number of bytes in pMIDIMsgData into tCnt
-   log [tCnt,pMIDIMsgData]
-   put 256 into tBufferSize
+   put 255 into tBufferSize
    put [0,0] into tTimeBaseInfo
    unsafe
       -- put objC_NSMutableDataBytesPtr(tTimeBaseInfoRef) into tTimeBaseInfoPtr
@@ -1174,12 +1208,12 @@ public handler CoreMIDISendMIDIbytesInTime(in pTimeOffsetMillisecs as Number, in
       put tAbsoluteTime * tTBnumerator / tTBdenominator into tTimeStamp
       -- log tTimeStamp
       put tTimeStamp + (pTimeOffsetMillisecs * 1000000) into tTimeStamp
-      put objC_NSMutableDataWithLengthNSNumber( NumberToNSNumber(tBufferSize) ) into sMIDIPacketByteBufferNSMutableDataRef
-      put objC_NSMutableDataBytesPtr(sMIDIPacketByteBufferNSMutableDataRef) into sMIDIPacketByteBufferPtr
+      put objC_NSMutableDataWithLength( tBufferSize ) into sMIDIPacketByteBufferNSMutableDataRef
+      put objC_NSMutableDataBytesPtr( sMIDIPacketByteBufferNSMutableDataRef ) into sMIDIPacketByteBufferPtr
 
-      put c_MIDIPacketListInit(sMIDIPacketByteBufferPtr) into sMIDIPacketPtr
+      put c_MIDIPacketListInit( sMIDIPacketByteBufferPtr ) into sMIDIPacketPtr
 
-      put objC_NSMutableDataWithLength(tCnt) into tMIDIMsgBytesNSDataRef
+      put objC_NSMutableDataWithLength( tCnt ) into tMIDIMsgBytesNSDataRef
       objC_NSMutableDataSetData(tMIDIMsgBytesNSDataRef, DataToNSData(pMIDIMsgData))
       put objC_NSMutableDataBytesPtr(tMIDIMsgBytesNSDataRef) into tMIDIMsgBytesPtr
 
