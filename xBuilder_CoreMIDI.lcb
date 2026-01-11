@@ -975,7 +975,7 @@ pMIDIChanNum: MIDI Channel to send the bend value on, 1 to 16
 Description:
 The send a controller with a single data byte value to on a given channel
 */
-public handler CoreMIDIPitchbend(in pPitchBendCoarse as UInt8,in pMIDIChanNum as UInt8) returns nothing
+public handler CoreMIDIPitchbend(in pPitchBendCoarse as CUInt,in pMIDIChanNum as CUInt) returns nothing
    expect that (pPitchBendCoarse >= 0 and pPitchBendCoarse <= 127 ) because "MIDI controller selection must be in the range of 0 to 127"
    expect that (pMIDIChanNum >= 1 and pMIDIChanNum <= 16 ) because "MIDI channel values must be in the range of 1 to 16"
 
